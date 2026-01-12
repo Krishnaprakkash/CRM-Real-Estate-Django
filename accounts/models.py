@@ -7,6 +7,7 @@ class User(AbstractUser):
         CEO = "CEO", "CEO",
         MANAGER = "Manager", "Manager",
         SALESMAN = "Salesman", "Salesman"
+        
     role = models.CharField(
         max_length=20,
         choices=Role.choices,

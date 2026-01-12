@@ -1,0 +1,8 @@
+{% extends 'dashboards/base_dashboard.html' %}  
+
+{% block title %}Salesman Dashboard{% endblock %}
+
+{% block content %}
+    <p class="text-muted">Welcome {{ user.get_full_name|default:user.username }}</p>
+{{ block.super }}  
+{% endblock %}

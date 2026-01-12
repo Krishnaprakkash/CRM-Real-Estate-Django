@@ -1,0 +1,9 @@
+{% extends 'dashboards/base_dashboard.html' %}
+
+{% block title %}Manager Dashboard{% endblock %}
+
+{% block content %}
+{{ block.super }}
+    <p>Welcome {{ user.get_full_name|default:user.username }}</p>
+    <strong>Branch: </strong> {{ user.branch.name }}  ({{ user.branch.get_region_display}})
+{% endblock %}
