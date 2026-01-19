@@ -1,0 +1,15 @@
+<form method="post">
+    {% csrf_token %}
+    {{ form.title.label_tag }} {{ form.title }}
+    {{ form.type.label_tag }} {{ form.type }}
+    {{ form.address.label_tag }} {{ form.address }}
+    {{ form.city.label_tag }} {{ form.city }}
+    {{ form.proposed_price.label_tag }} {{ form.proposed_price }}
+    
+    {# Only shows for Manager #}
+    {% if form.assigned_salesman %}
+        {{ form.assigned_salesman.label_tag }} {{ form.assigned_salesman }}
+    {% endif %}
+    
+    <button type="submit">Create</button>
+</form>

@@ -1,6 +1,9 @@
+from urllib import request
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
+from inventory.views import listings_visible_to
+
 
 # Create your views here.
 def is_salesman(user):
@@ -15,17 +18,20 @@ def is_ceo(user):
 @login_required
 @user_passes_test(is_salesman)
 def salesman_dashboard(request):
-    return render(request, 'dashboards/salesman_dashboard.html')
+    listings = listings_visible_to(request.user)
+    return render(request, 'dashboards/salesman_dashboard.html', {'listings': listings})
 
 @login_required
 @user_passes_test(is_manager)
 def manager_dashboard(request):
-    return render(request, 'dashboards/manager_dashboard.html')
+    listings = listings_visible_to(request.user)
+    return render(request, 'dashboards/manager_dashboard.html', {'listings': listings})
 
 @login_required
 @user_passes_test(is_ceo)
 def ceo_dashboard(request):
-    return render(request, 'dashboards/ceo_dashboard.html')
+    listings = listings_visible_to(request.user)
+    return render(request, 'dashboards/ceo_dashboard.html', {'listings': listings})
 
 @login_required
 def dashboard_view(request):

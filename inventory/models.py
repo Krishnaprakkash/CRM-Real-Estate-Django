@@ -50,6 +50,14 @@ class Listing(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+    assigned_salesman = models.ForeignKey(
+        'accounts.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_salesmen',
+        limit_choices_to={'role': 'Salesman'},
+    )
 
 
     def __str__(self):
