@@ -1,54 +1,75 @@
-{% extends 'dashboards/base_dashboard.html' %}  
+{% extends 'dashboards/base_dashboard.html' %}
 
 {% block title %}Manager Dashboard{% endblock %}
 
 {% block content %}
-
 {{ block.super }}
-    <!-- Listings Table -->
+
+<!-- COMPLETE BATCH FORM - WRAPS EVERYTHING -->
+<form method="post" id="batch-form">
+    {% csrf_token %}
+    
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Listings</h5>
+            <h5>Listings ({{ listings|length }})</h5>
             {% if perms.inventory.add_listing %}
-                <div class="mb-3">
-                    {% if user.role == 'Salesman' %}
-                        <a href="{% url 'inventory:listing_create_salesman' %}" class="btn btn-success">
-                            Create New Listing
-                        </a>
-                    {% elif user.role == 'Manager' %}
-                        <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success">
-                            Create New Listing (Assign Salesman)
-                        </a>
-                    {% endif %}
-                </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success btn-sm">
+                    Create New Listing
+                </a>
+            </div>
             {% endif %}
         </div>
+        
         <div class="card-body">
+            <!-- BATCH ACTION BUTTONS -->
+            <div class="d-flex gap-2 mb-3 p-2 bg-light rounded">
+                <button type="button" class="btn btn-success btn-sm" onclick="setAction('approve')">
+                    Approve Selected
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="setAction('reject')">
+                    Reject Selected
+                </button>
+                <button type="button" class="btn btn-warning btn-sm" onclick="setAction('pending')">
+                    Mark Pending
+                </button>
+                <span class="ms-auto text-muted">{{ listings|length }} total</span>
+            </div>
+            
+            <!-- HIDDEN FIELDS - MUST BE HERE -->
+            <input type="hidden" name="action" id="batch-action" value="">
+            <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
+            
+            <!-- CHECKBOX TABLE -->
             {% if listings %}
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="select_all" onchange="toggleSelectAll(this)"> </th>
                         <th>ID</th>
                         <th>Title</th>
                         <th>Type</th>
                         <th>Price</th>
                         <th>Status</th>
-                        <th>Assigned Salesman</th>
+                        <th>Salesman</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for listing in listings %}
                     <tr>
+                        <td>
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                        </td>
                         <td>{{ listing.id }}</td>
                         <td>{{ listing.title }}</td>
                         <td>{{ listing.get_type_display }}</td>
                         <td>${{ listing.proposed_price|floatformat:0 }}</td>
                         <td>
-                            <span class="badge bg-{% if listing.status == 'Approved' %}success{% elif listing.status == 'Pending GM Approval' %}warning{% else %}danger{% endif %}">
+                            <span class="badge bg-{% if listing.status == 'Approved' %}success{% elif listing.status == 'Pending GM Approval' %}warning{% elif listing.status == 'REJECTED' %}danger{% else %}secondary{% endif %}">
                                 {{ listing.get_status_display }}
                             </span>
                         </td>
-                        <td>{{ listing.assigned_salesman.get_full_name }}</td>
+                        <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username|default:"—" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -58,5 +79,6 @@
             {% endif %}
         </div>
     </div>
-</div>
+</form>
 {% endblock %}
+

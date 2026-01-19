@@ -58,6 +58,7 @@ class Listing(models.Model):
         related_name='assigned_salesmen',
         limit_choices_to={'role': 'Salesman'},
     )
+    comments = models.TextField(null=True, max_length=100, blank=True)
 
 
     def __str__(self):
