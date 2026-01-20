@@ -3,18 +3,13 @@
 {% block title %}{{ dashboard_title }}{% endblock %}
 
 {% block content %}
-<div class="dashboard">
-    <h1> Welcome {{ user.get_full_name }}</h1>
-    
-    <!-- KPI Cards (placeholders) -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5>Total Listings</h5>
-                    <h3>{{ listings|length }}</h3>
-                </div>
-            </div>
+<div class="d-flex align-items-center gap-4 mb-4">
+    <h1 class="flex-grow-1 mb-0 ms-2">Welcome {{ user.get_full_name }}</h1>
+    <div class="card flex-shrink-1 mt-2 me-2">
+        <div class="card-body py-3 px-4">
+            <h3 class="card-title mb-1">Total Listings</h3>
+            <h4 class="mb-1">{{ listings|length }}</h4>
         </div>
     </div>
+</div>
 {% endblock %}
