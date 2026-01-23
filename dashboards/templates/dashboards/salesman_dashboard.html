@@ -1,38 +1,73 @@
-{% extends 'dashboards/base_dashboard.html' %}  
+{% extends 'dashboards/base_dashboard.html' %}
 
 {% block title %}Salesman Dashboard{% endblock %}
 
 {% block content %}
-
 {{ block.super }}
-    <!-- Listings Table -->
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5>Listings</h5>
-            {% if perms.inventory.add_listing %}
-                <div class="mb-3">
-                    {% if user.role == 'Salesman' %}
-                        <a href="{% url 'inventory:listing_create_salesman' %}" class="btn btn-success">
-                            Create New Listing
-                        </a>
-                    {% elif user.role == 'Manager' %}
-                        <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success">
-                            Create New Listing (Assign Salesman)
-                        </a>
-                    {% endif %}
-                </div>
-            {% endif %}
+
+<!-- COMPLETE BATCH FORM - WRAPS EVERYTHING -->
+<form method="post" id="batch-form">
+    {% csrf_token %}
+    
+    <div class="card">      
+        <div class="container-fluid mt-4">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Property Type:</label>
+                <select id="typeFilter" class="form-select">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Status:</label>
+                <select id="statusFilter" class="form-select">
+                    <option value="">All Status</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Salesman:</label>
+                <select id="salesmanFilter" class="form-select">
+                    <option value="">All Salesmen</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button id="clearFilters" class="btn btn-outline-secondary">Clear Filters</button>
+            </div>
         </div>
-        <div class="card-body">
+        <div class="container-fluid">
+            <div class="d-flex gap-2 mb-3 p-2 bg-light rounded">
+                <button type="button" class="btn btn-success btn-sm" onclick="setAction('approve')">
+                    Approve Selected
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="setAction('reject')">
+                    Reject Selected
+                </button>
+                <button type="button" class="btn btn-warning btn-sm" onclick="setAction('pending')">
+                    Mark Pending
+                </button>
+                {% if perms.inventory.add_listing %}
+                <div class="ms-auto">
+                    <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-primary btn-sm">
+                        Create New Listing
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <input type="hidden" name="action" id="batch-action" value="">
+        <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
+        <div class="container-fluid">
             {% if listings %}
-            <table class="table table-striped">
+            <table id="manager-listings-table" class="table table-striped">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Title</th>
                         <th>Type</th>
                         <th>Price</th>
+                        <th>Salesman</th>
                         <th>Status</th>
+                        <th><input type="checkbox" id="select_all" onchange="toggleSelectAll(this)"> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,10 +77,14 @@
                         <td>{{ listing.title }}</td>
                         <td>{{ listing.get_type_display }}</td>
                         <td>${{ listing.proposed_price|floatformat:0 }}</td>
+                        <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username|default:"—" }}</td>
                         <td>
-                            <span class="badge bg-{% if listing.status == 'Approved' %}success{% elif listing.status == 'Pending GM Approval' %}warning{% else %}danger{% endif %}">
+                            <span class="badge bg-{% if listing.status == 'Approved' %}success{% elif listing.status == 'Pending GM Approval' %}warning{% elif listing.status == 'REJECTED' %}danger{% else %}secondary{% endif %}">
                                 {{ listing.get_status_display }}
                             </span>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
                     </tr>
                     {% endfor %}
@@ -54,7 +93,8 @@
             {% else %}
             <p class="text-muted">No listings found.</p>
             {% endif %}
-        </div>
+        </div> 
     </div>
-</div>
+</form>
 {% endblock %}
+
