@@ -14,10 +14,13 @@ class Listing(models.Model):
 
     class statusChoices(models.TextChoices):
         DRAFT = "Draft", "Draft"
-        PENDING_GM_APPROVAL = "Pending GM Approval", "Pending GM Approval"
-        APPROVED = "Approved", "Approved"
+        PENDING_INITIAL_APPROVAL = "Pending Initial Approval", "Pending Initial Approval"
         REJECTED = "Rejected", "Rejected"
-        ARCHIVED = "Archived", "Archived"
+        PROSPECTING = "Prospecting", "Prospecting"
+        NEGOTIATING = "Negotiating", "Negotiating"
+        PENDING_FINAL_APPROVAL = "Pending Final Approval", "Pending Final Approval"
+        CLOSED = "Closed", "Closed"
+
 
     id = models.CharField(max_length=10, primary_key=True)
     branch  = models.ForeignKey(

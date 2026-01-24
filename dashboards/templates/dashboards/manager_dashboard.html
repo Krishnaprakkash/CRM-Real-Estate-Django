@@ -55,7 +55,7 @@
         <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
         <div>
             {% if listings %}
-            <table id="manager-listings-table">
+            <table id="manager-leads-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -69,6 +69,7 @@
                 </thead>
                 <tbody>
                     {% for listing in listings %}
+                    {% if listing.status == "Pending Initial Approval" or listing.status == "Rejected" %}
                     <tr>
                         <td>{{ listing.id }}</td>
                         <td>{{ listing.title }}</td>
@@ -84,6 +85,7 @@
                             <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
                     </tr>
+                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -95,6 +97,88 @@
 </div>
 
 <div id="opportunities" class="tabcontent" style="display: none;">
-    <h1>Opportunities table</h1>
+    <form method="post" id="batch-form">
+        {% csrf_token %}
+        <div>
+            <div>
+                <label>Property Type:</label>
+                <select id="typeFilter">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div>
+                <label>Salesman:</label>
+                <select id="salesmanFilter">
+                    <option value="">All Salesmen</option>
+                </select>
+            </div>
+            <div>
+                <button id="clearFilters">Clear Filters</button>
+            </div>
+        </div>
+        <div>
+            <div>
+                <button type="button" onclick="setAction('reject')">
+                    Reject Selected
+                </button>
+                <button type="button" onclick="setAction('pending')">
+                    Mark Pending
+                </button>
+                {% if perms.inventory.add_listing %}
+                <div>
+                    <a href="{% url 'inventory:listing_create_manager' %}">
+                        Create New Listing
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <input type="hidden" name="action" id="batch-action" value="">
+        <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
+        <div>
+            {% if listings %}
+            <table id="manager-opps-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Salesman</th>
+                        <th>Status</th>
+                        <th><input type="checkbox" id="select_all" onchange="toggleSelectAll(this)"> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for listing in listings %}
+                    {% if listing.status == "Approved" %}
+                    <tr>
+                        <td>{{ listing.id }}</td>
+                        <td>{{ listing.title }}</td>
+                        <td>{{ listing.get_type_display }}</td>
+                        <td>${{ listing.proposed_price|floatformat:0 }}</td>
+                        <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username|default:"—" }}</td>
+                        <td>
+                            <span>
+                                {{ listing.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No listings found.</p>
+            {% endif %}
+        </div> 
+    </form>
+</div>
+
+<div id="sales" class="tabcontent" style="display: none">
+    <h1>Sales table</h1>
 </div>
 {% endblock %}

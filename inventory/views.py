@@ -23,7 +23,7 @@ def listing_create_salesman(request):
             listing = form.save(commit=False)
             listing.id = f"LIST{Listing.objects.count() + 1:04d}"
             listing.branch = request.user.branch
-            listing.status = Listing.statusChoices.PENDING_GM_APPROVAL
+            listing.status = Listing.statusChoices.PENDING_INITIAL_APPROVAL
             listing.assigned_salesman = request.user  # Auto-assign self
             listing.save()
             return redirect('dashboards:salesman_dashboard')
@@ -40,7 +40,7 @@ def listing_create_manager(request):
             listing = form.save(commit=False)
             listing.id = f"LIST{Listing.objects.count() + 1:04d}"
             listing.branch = request.user.branch
-            listing.status = Listing.statusChoices.APPROVED
+            listing.status = Listing.statusChoices.PROSPECTING
             listing.gm_approved_by = request.user
             listing.gm_approved_at = timezone.now()
             listing.save()

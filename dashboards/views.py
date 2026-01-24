@@ -34,7 +34,7 @@ def manager_dashboard(request):
             action = request.POST.get('action')
             if action == 'approve':
                 listings_to_update.update(
-                    status=Listing.statusChoices.APPROVED,
+                    status=Listing.statusChoices.PROSPECTING,
                     gm_approved_by=request.user,
                     gm_approved_at=timezone.now(),
                     comments=''
@@ -42,7 +42,7 @@ def manager_dashboard(request):
                 messages.success(request, f"Approved {len(selected_ids)} listings.")
             elif action == 'pending':
                 listings_to_update.update(
-                    status=Listing.statusChoices.PENDING_GM_APPROVAL,
+                    status=Listing.statusChoices.PENDING_INITIAL_APPROVAL,
                     gm_approved_by=None,
                     gm_approved_at=None,
                     comments=''
