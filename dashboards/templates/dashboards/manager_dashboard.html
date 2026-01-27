@@ -8,6 +8,9 @@
 <div id="leads" class="tabcontent" style="display: block;">
     <form method="post" id="batch-form">
         {% csrf_token %}
+        <input type="hidden" name="action" id="batch-action" value="">
+        <input type="hidden" name="rejection-reason" id="rejection-reason" value="">
+        <input type="hidden" name="stage" id="stage" value="opportunity">
         <div>
             <div>
                 <label>Property Type:</label>
@@ -51,8 +54,6 @@
                 {% endif %}
             </div>
         </div>
-        <input type="hidden" name="action" id="batch-action" value="">
-        <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
         <div>
             {% if listings %}
             <table id="manager-leads-table">
@@ -69,7 +70,6 @@
                 </thead>
                 <tbody>
                     {% for listing in listings %}
-                    {% if listing.status == "Pending Initial Approval" or listing.status == "Rejected" %}
                     <tr>
                         <td>{{ listing.id }}</td>
                         <td>{{ listing.title }}</td>
@@ -78,14 +78,13 @@
                         <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username|default:"—" }}</td>
                         <td>
                             <span>
-                                {{ listing.get_status_display }}
+                                {{ listing.get_lead_status_display }}
                             </span>
                         </td>
                         <td>
                             <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
                     </tr>
-                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -99,11 +98,20 @@
 <div id="opportunities" class="tabcontent" style="display: none;">
     <form method="post" id="batch-form">
         {% csrf_token %}
+        <input type="hidden" name="action" id="batch-action" value="">
+        <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
+        <input type="hidden" name="stage" id="stage" value="opportunity">
         <div>
             <div>
                 <label>Property Type:</label>
                 <select id="typeFilter">
                     <option value="">All Types</option>
+                </select>
+            </div>
+            <div>
+                <label>Status:</label>
+                <select id="statusFilter">
+                    <option value="">All Status</option>
                 </select>
             </div>
             <div>
@@ -133,8 +141,6 @@
                 {% endif %}
             </div>
         </div>
-        <input type="hidden" name="action" id="batch-action" value="">
-        <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
         <div>
             {% if listings %}
             <table id="manager-opps-table">
@@ -151,7 +157,7 @@
                 </thead>
                 <tbody>
                     {% for listing in listings %}
-                    {% if listing.status == "Approved" %}
+                    {% if listing.lead_status == "Approved" %}
                     <tr>
                         <td>{{ listing.id }}</td>
                         <td>{{ listing.title }}</td>
@@ -160,7 +166,7 @@
                         <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username|default:"—" }}</td>
                         <td>
                             <span>
-                                {{ listing.get_status_display }}
+                                {{ listing.get_opp_status_display }}
                             </span>
                         </td>
                         <td>

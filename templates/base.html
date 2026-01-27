@@ -56,7 +56,7 @@
         console.log(`Toggled ${checkboxes.length} checkboxes`);
     }
     
-    function setAction(action) {
+    function setAction(action, stage = 'lead') {
         console.log('Action clicked:', action);
         
         const selected = document.querySelectorAll('input.listing-checkbox:checked');
@@ -73,8 +73,15 @@
             }
             document.getElementById('rejection-reason').value = reason;
         }
+
+        if (action == 'approve') {
+            if (!confirm(`Are you sure you want to approve the selected listings?`)) {
+                return;
+            }
+        }
         
         document.getElementById('batch-action').value = action;
+        document.getElementById('stage').value = stage;
         console.log(`Submitting ${selected.length} listings for ${action}`);
         document.getElementById('batch-form').submit();
     }

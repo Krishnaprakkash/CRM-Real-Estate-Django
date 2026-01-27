@@ -12,14 +12,22 @@ class Listing(models.Model):
         RETAIL_STORE = "Retail Store", "Retail Store"
         OFFICE_SPACE = "Office Space", "Office Space"
 
-    class statusChoices(models.TextChoices):
-        DRAFT = "Draft", "Draft"
-        PENDING_INITIAL_APPROVAL = "Pending Initial Approval", "Pending Initial Approval"
+    class leadStatusChoices(models.TextChoices):
+        PENDING = "Approval Pending", "Approval Pending"
         REJECTED = "Rejected", "Rejected"
-        PROSPECTING = "Prospecting", "Prospecting"
+        APPROVED = "Approved", "Approved"
+
+    class oppStatusChoices(models.TextChoices):
+        PROSPECTING = "Proespecting", "Prospecting"
         NEGOTIATING = "Negotiating", "Negotiating"
-        PENDING_FINAL_APPROVAL = "Pending Final Approval", "Pending Final Approval"
-        CLOSED = "Closed", "Closed"
+        PENDING = "Pending Approval", "Pending Approval"
+        REJECTED = "Rejected", "Rejected"
+        APPROVED = "Approved", "Approved"
+
+    class saleStatusChoices(models.TextChoices):
+        PROCESSING = "Processing", "Processing"
+        CLOSED_WON = "Closed Won", "Closed Won"
+        CLOSED_LOST = "Closed Lost", "Closed List"
 
 
     id = models.CharField(max_length=10, primary_key=True)
@@ -36,20 +44,47 @@ class Listing(models.Model):
     title = models.CharField(max_length=200)
     address = models.TextField()  
     city = models.CharField(max_length=100)
-    status = models.TextField(
+
+    # Lead status fields
+    lead_status = models.TextField(
         max_length=30,
-        choices=statusChoices.choices,
-        default=statusChoices.DRAFT
+        choices=leadStatusChoices.choices,
+        default=leadStatusChoices.PENDING
     )
-    gm_approved_by = models.ForeignKey(
+    lead_approved_by = models.ForeignKey(
         'accounts.User',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='approved_listings'
+        related_name='approved_leads'
     )
-    gm_approved_at = models.DateTimeField(null=True, blank=True)
-    gm_rejection_rsn = models.TextField(null=True, blank=True)
+    lead_approved_at = models.DateTimeField(null=True, blank=True)
+
+    # Opportunity status fields
+    opp_status = models.TextField(
+        max_length=30,
+        choices=oppStatusChoices.choices,
+        default=oppStatusChoices.PENDING
+    )
+    opp_approved_by = models.ForeignKey(
+        'accounts.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_opportunities'
+    )
+    opp_approved_at = models.DateTimeField(null=True, blank=True)
+
+    # Sale status fields
+    sale_status = models.TextField(
+        max_length=30,
+        choices=saleStatusChoices.choices,
+        default=saleStatusChoices.PROCESSING
+    )
+    sale_closed_at = models.DateTimeField(null=True, blank=True)
+    sale_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)

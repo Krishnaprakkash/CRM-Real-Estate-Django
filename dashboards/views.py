@@ -30,31 +30,54 @@ def manager_dashboard(request):
         selected_ids = request.POST.getlist('listing_ids')
         if selected_ids:
             listings_to_update = Listing.objects.filter(id__in=selected_ids)
-
             action = request.POST.get('action')
-            if action == 'approve':
-                listings_to_update.update(
-                    status=Listing.statusChoices.PROSPECTING,
-                    gm_approved_by=request.user,
-                    gm_approved_at=timezone.now(),
-                    comments=''
-                )
-                messages.success(request, f"Approved {len(selected_ids)} listings.")
-            elif action == 'pending':
-                listings_to_update.update(
-                    status=Listing.statusChoices.PENDING_INITIAL_APPROVAL,
-                    gm_approved_by=None,
-                    gm_approved_at=None,
-                    comments=''
-                )
-                messages.success(request, f"Marked {len(selected_ids)} as pending.")
-            elif action == 'reject':
-                listings_to_update.update(
-                    status=Listing.statusChoices.REJECTED,
-                    gm_approved_by=request.user,
-                    gm_approved_at=timezone.now(),
-                )
-                messages.success(request, f"Rejected {len(selected_ids)} listings.")
+            stage = request.POST.get('stage', 'lead')  
+            rejection_reason = request.POST.get('rejection-reason', '')
+
+            for listing in listings_to_update:
+                if stage == 'lead':
+                    if action == 'approve':
+                        listing.lead_status = Listing.leadStatusChoices.APPROVED
+                        listing.comments = 'No further changes. Proceed as Opportunity.'
+                        listing.lead_approved_by = request.user
+                        listing.lead_approved_at = timezone.now()
+                        listing.opp_status = Listing.oppStatusChoices.PROSPECTING
+                    elif action == 'reject':
+                        listing.lead_status = Listing.leadStatusChoices.REJECTED
+                        listing.comments = rejection_reason
+                        listing.lead_approved_by = request.user
+                        listing.lead_approved_at = timezone.now()
+                        listing.opp_status = None
+                    elif action == 'pending':
+                        listing.lead_status = Listing.leadStatusChoices.PENDING
+                        listing.comments = ''
+                        listing.lead_approved_by = None
+                        listing.lead_approved_at = None
+                        listing.opp_status = None
+                
+                elif stage == 'opportunity':
+                    if action == 'approve':
+                        listing.opp_status = Listing.oppStatusChoices.APPROVED
+                        listing.comments = 'No further changes. Proceed to sale. '
+                        listing.opp_approved_by = request.user
+                        listing.opp_approved_at = timezone.now()
+                        listing.sale_status = Listing.saleStatusChoices.PROCESSING
+                    elif action == 'reject':
+                        listing.opp_status = Listing.oppStatusChoices.REJECTED
+                        listing.comments = rejection_reason
+                        listing.opp_approved_by = request.user
+                        listing.opp_approved_at = timezone.now()
+                        listing.sale_status = None
+                    elif action == 'pending':
+                        listing.opp_status = Listing.oppStatusChoices.PENDING
+                        listing.comments = ''
+                        listing.opp_approved_by = None
+                        listing.opp_approved_at = None
+                        listing.sale_status = None
+                
+                listing.save()
+
+            messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
 
     listings = listings_visible_to(request.user)
     return render(request, 'dashboards/manager_dashboard.html', {'listings': listings})
