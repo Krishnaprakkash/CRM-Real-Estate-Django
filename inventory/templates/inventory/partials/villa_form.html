@@ -1,0 +1,193 @@
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.bhk_config.id_for_label }}" class="form-label">
+            {{ form.bhk_config.label }}
+        </label>
+        {{ form.bhk_config }}
+        {% if form.bhk_config.errors %}
+            <div class="text-danger small">{{ form.bhk_config.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.bedrooms.id_for_label }}" class="form-label">
+            {{ form.bedrooms.label }}
+        </label>
+        {{ form.bedrooms }}
+        {% if form.bedrooms.errors %}
+            <div class="text-danger small">{{ form.bedrooms.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.bathrooms.id_for_label }}" class="form-label">
+            {{ form.bathrooms.label }}
+        </label>
+        {{ form.bathrooms }}
+        {% if form.bathrooms.errors %}
+            <div class="text-danger small">{{ form.bathrooms.errors.0 }}</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.plot_area_sqft.id_for_label }}" class="form-label">
+            {{ form.plot_area_sqft.label }}
+        </label>
+        {{ form.plot_area_sqft }}
+        {% if form.plot_area_sqft.errors %}
+            <div class="text-danger small">{{ form.plot_area_sqft.errors.0 }}</div>
+        {% endif %}
+        <small class="form-text text-muted">Square feet</small>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.built_up_area_sqft.id_for_label }}" class="form-label">
+            {{ form.built_up_area_sqft.label }}
+        </label>
+        {{ form.built_up_area_sqft }}
+        {% if form.built_up_area_sqft.errors %}
+            <div class="text-danger small">{{ form.built_up_area_sqft.errors.0 }}</div>
+        {% endif %}
+        <small class="form-text text-muted">Square feet</small>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.carpet_area_sqft.id_for_label }}" class="form-label">
+            {{ form.carpet_area_sqft.label }}
+        </label>
+        {{ form.carpet_area_sqft }}
+        {% if form.carpet_area_sqft.errors %}
+            <div class="text-danger small">{{ form.carpet_area_sqft.errors.0 }}</div>
+        {% endif %}
+        <small class="form-text text-muted">Square feet</small>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.number_of_floors.id_for_label }}" class="form-label">
+            {{ form.number_of_floors.label }}
+        </label>
+        {{ form.number_of_floors }}
+        {% if form.number_of_floors.errors %}
+            <div class="text-danger small">{{ form.number_of_floors.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.furnishing_status.id_for_label }}" class="form-label">
+            {{ form.furnishing_status.label }}
+        </label>
+        {{ form.furnishing_status }}
+        {% if form.furnishing_status.errors %}
+            <div class="text-danger small">{{ form.furnishing_status.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.facing.id_for_label }}" class="form-label">
+            {{ form.facing.label }}
+        </label>
+        {{ form.facing }}
+        {% if form.facing.errors %}
+            <div class="text-danger small">{{ form.facing.errors.0 }}</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.covered_parking_spaces.id_for_label }}" class="form-label">
+            {{ form.covered_parking_spaces.label }}
+        </label>
+        {{ form.covered_parking_spaces }}
+        {% if form.covered_parking_spaces.errors %}
+            <div class="text-danger small">{{ form.covered_parking_spaces.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <label for="{{ form.open_parking_spaces.id_for_label }}" class="form-label">
+            {{ form.open_parking_spaces.label }}
+        </label>
+        {{ form.open_parking_spaces }}
+        {% if form.open_parking_spaces.errors %}
+            <div class="text-danger small">{{ form.open_parking_spaces.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="form-check mt-4">
+            {{ form.parking_available }}
+            <label class="form-check-label" for="{{ form.parking_available.id_for_label }}">
+                {{ form.parking_available.label }}
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <h5 class="border-bottom pb-2">Amenities</h5>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <div class="form-check">
+            {{ form.swimming_pool }}
+            <label class="form-check-label" for="{{ form.swimming_pool.id_for_label }}">
+                {{ form.swimming_pool.label }}
+            </label>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="form-check">
+            {{ form.private_garden }}
+            <label class="form-check-label" for="{{ form.private_garden.id_for_label }}">
+                {{ form.private_garden.label }}
+            </label>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="form-check">
+            {{ form.servant_quarters }}
+            <label class="form-check-label" for="{{ form.servant_quarters.id_for_label }}">
+                {{ form.servant_quarters.label }}
+            </label>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="form-check">
+            {{ form.power_backup }}
+            <label class="form-check-label" for="{{ form.power_backup.id_for_label }}">
+                {{ form.power_backup.label }}
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <div class="form-check">
+            {{ form.security_24x7 }}
+            <label class="form-check-label" for="{{ form.security_24x7.id_for_label }}">
+                {{ form.security_24x7.label }}
+            </label>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="form-check">
+            {{ form.gated_community }}
+            <label class="form-check-label" for="{{ form.gated_community.id_for_label }}">
+                {{ form.gated_community.label }}
+            </label>
+        </div>
+    </div>
+</div>

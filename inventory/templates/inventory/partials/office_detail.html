@@ -1,0 +1,261 @@
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h4><i class="bi bi-briefcase"></i> Office Space Details</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Office Configuration</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Office Type:</th>
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ property_details.get_office_type_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Furnishing Status:</th>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ property_details.get_furnishing_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Workstation Capacity:</th>
+                            <td>{{ property_details.workstation_capacity }} seats</td>
+                        </tr>
+                        <tr>
+                            <th>Building Grade:</th>
+                            <td>
+                                <span class="badge bg-success">
+                                    {{ property_details.get_building_grade_display }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Area Details</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Carpet Area:</th>
+                            <td>{{ property_details.carpet_area_sqft }} sq ft</td>
+                        </tr>
+                        <tr>
+                            <th>Built-up Area:</th>
+                            <td>
+                                {% if property_details.built_up_area_sqft %}
+                                    {{ property_details.built_up_area_sqft }} sq ft
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Maintenance:</th>
+                            <td>
+                                {% if property_details.maintenance_per_sqft %}
+                                    ₹{{ property_details.maintenance_per_sqft }}/sq ft
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Room Configuration</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Cabins:</th>
+                            <td>{{ property_details.number_of_cabins }}</td>
+                        </tr>
+                        <tr>
+                            <th>Conference Rooms:</th>
+                            <td>{{ property_details.conference_rooms }}</td>
+                        </tr>
+                        <tr>
+                            <th>Meeting Rooms:</th>
+                            <td>{{ property_details.meeting_rooms }}</td>
+                        </tr>
+                        <tr>
+                            <th>Reception Area:</th>
+                            <td>
+                                {% if property_details.reception_area %}
+                                    <span class="badge bg-success">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Building Information</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Building Name:</th>
+                            <td>
+                                {% if property_details.building_name %}
+                                    {{ property_details.building_name }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Floor Number:</th>
+                            <td>{{ property_details.floor_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Floors:</th>
+                            <td>{{ property_details.total_floors }}</td>
+                        </tr>
+                        <tr>
+                            <th>Number of Lifts:</th>
+                            <td>{{ property_details.lifts }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Parking</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Parking Type:</th>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ property_details.get_parking_type_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Car Parking Spaces:</th>
+                            <td>{{ property_details.car_parking_spaces }} spaces</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Power & Infrastructure</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Power Load:</th>
+                            <td>
+                                {% if property_details.power_load_kva %}
+                                    {{ property_details.power_load_kva }} KVA
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Power Backup:</th>
+                            <td>
+                                {% if property_details.power_backup %}
+                                    <span class="badge bg-success">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Fiber Optic:</th>
+                            <td>
+                                {% if property_details.fiber_optic %}
+                                    <span class="badge bg-success">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <h5 class="border-bottom pb-2 mb-3">Facilities & Amenities</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.pantry %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Pantry
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Pantry
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.cafeteria %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Cafeteria
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Cafeteria
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.server_room %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Server Room
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Server Room
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.central_ac %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Central AC
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Central AC
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.access_24x7 %}
+                            <i class="bi bi-check-circle-fill text-success"></i> 24x7 Access
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> 24x7 Access
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.security_24x7 %}
+                            <i class="bi bi-check-circle-fill text-success"></i> 24x7 Security
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> 24x7 Security
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.fire_safety_system %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Fire Safety System
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Fire Safety System
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

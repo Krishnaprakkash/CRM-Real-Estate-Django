@@ -1,0 +1,239 @@
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h4><i class="bi bi-shop"></i> Retail Store Details</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Shop Specifications</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Carpet Area:</th>
+                            <td>{{ property_details.carpet_area_sqft }} sq ft</td>
+                        </tr>
+                        <tr>
+                            <th>Frontage:</th>
+                            <td>
+                                {% if property_details.frontage_ft %}
+                                    {{ property_details.frontage_ft }} ft
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Ceiling Height:</th>
+                            <td>
+                                {% if property_details.ceiling_height_ft %}
+                                    {{ property_details.ceiling_height_ft }} ft
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Mezzanine Available:</th>
+                            <td>
+                                {% if property_details.mezzanine_available %}
+                                    <span class="badge bg-success">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Location Details</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Location Type:</th>
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ property_details.get_location_type_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Floor Location:</th>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ property_details.get_floor_location_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Mall Name:</th>
+                            <td>
+                                {% if property_details.mall_name %}
+                                    {{ property_details.mall_name }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Estimated Footfall:</th>
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    {{ property_details.get_estimated_footfall_display }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Shop Features</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        {% if property_details.display_window %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Display Window
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Display Window
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        {% if property_details.corner_shop %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Corner Shop
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Corner Shop
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        {% if property_details.main_road_facing %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Main Road Facing
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Main Road Facing
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        {% if property_details.storage_room %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Storage Room
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Storage Room
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        {% if property_details.attached_restroom %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Attached Restroom
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Attached Restroom
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Utilities & Infrastructure</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Power Load:</th>
+                            <td>
+                                {% if property_details.power_load_kw %}
+                                    {{ property_details.power_load_kw }} KW
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Air Conditioning:</th>
+                            <td>
+                                {% if property_details.air_conditioning %}
+                                    <span class="badge bg-success">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Power Backup:</th>
+                            <td>
+                                {% if property_details.power_backup %}
+                                    <span class="badge bg-success">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Parking</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Dedicated Parking:</th>
+                            <td>{{ property_details.dedicated_parking }} spaces</td>
+                        </tr>
+                        <tr>
+                            <th>Common Parking:</th>
+                            <td>
+                                {% if property_details.common_parking_available %}
+                                    <span class="badge bg-success">Available</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Not Available</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Business Permissions</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">External Signage:</th>
+                            <td>
+                                {% if property_details.external_signage_allowed %}
+                                    <span class="badge bg-success">Allowed</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Not Allowed</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Food License:</th>
+                            <td>
+                                {% if property_details.food_license_possible %}
+                                    <span class="badge bg-success">Possible</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Not Possible</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Monthly Maintenance:</th>
+                            <td>
+                                {% if property_details.maintenance_monthly %}
+                                    ₹{{ property_details.maintenance_monthly }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

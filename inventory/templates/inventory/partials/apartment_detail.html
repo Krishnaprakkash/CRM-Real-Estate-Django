@@ -1,0 +1,188 @@
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h4><i class="bi bi-building"></i> Apartment Details</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Unit Configuration</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">BHK Configuration:</th>
+                            <td>{{ property_details.get_bhk_config_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Bedrooms:</th>
+                            <td>{{ property_details.bedrooms }}</td>
+                        </tr>
+                        <tr>
+                            <th>Bathrooms:</th>
+                            <td>{{ property_details.bathrooms }}</td>
+                        </tr>
+                        <tr>
+                            <th>Balconies:</th>
+                            <td>{{ property_details.balconies }}</td>
+                        </tr>
+                        <tr>
+                            <th>Furnishing Status:</th>
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ property_details.get_furnishing_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Area Details</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Carpet Area:</th>
+                            <td>{{ property_details.carpet_area_sqft }} sq ft</td>
+                        </tr>
+                        <tr>
+                            <th>Built-up Area:</th>
+                            <td>{{ property_details.built_up_area_sqft }} sq ft</td>
+                        </tr>
+                        <tr>
+                            <th>Super Built-up Area:</th>
+                            <td>
+                                {% if property_details.super_built_up_area_sqft %}
+                                    {{ property_details.super_built_up_area_sqft }} sq ft
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Location in Building</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Floor Number:</th>
+                            <td>{{ property_details.floor_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Floors:</th>
+                            <td>{{ property_details.total_floors }}</td>
+                        </tr>
+                        <tr>
+                            <th>Tower:</th>
+                            <td>
+                                {% if property_details.tower %}
+                                    {{ property_details.tower }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Unit Number:</th>
+                            <td>
+                                {% if property_details.unit_number %}
+                                    {{ property_details.unit_number }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="border-bottom pb-2 mb-3">Parking & Maintenance</h5>
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <th width="50%">Parking Type:</th>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ property_details.get_parking_type_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Parking Spaces:</th>
+                            <td>{{ property_details.parking_spaces }}</td>
+                        </tr>
+                        <tr>
+                            <th>Monthly Maintenance:</th>
+                            <td>
+                                {% if property_details.maintenance_monthly %}
+                                    ₹{{ property_details.maintenance_monthly }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <h5 class="border-bottom pb-2 mb-3">Amenities & Features</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.lift_available %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Lift Available
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Lift Available
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.power_backup %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Power Backup
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Power Backup
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.swimming_pool %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Swimming Pool
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Swimming Pool
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.gym %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Gym
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Gym
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.clubhouse %}
+                            <i class="bi bi-check-circle-fill text-success"></i> Clubhouse
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> Clubhouse
+                        {% endif %}
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        {% if property_details.security_24x7 %}
+                            <i class="bi bi-check-circle-fill text-success"></i> 24x7 Security
+                        {% else %}
+                            <i class="bi bi-x-circle text-muted"></i> 24x7 Security
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

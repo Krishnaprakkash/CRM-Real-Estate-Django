@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Listing{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h4>Confirm Delete</h4>
+        </div>
+        <div class="card-body">
+            <p>Are you sure you want to delete the listing:</p>
+            <h5>"{{ listing.title }}"</h5>
+            <p class="text-muted">
+                {{ listing.get_type_display }} in {{ listing.city }}<br>
+                ID: {{ listing.id }}
+            </p>
+            
+            <div class="alert alert-warning">
+                <strong>Warning:</strong> This action cannot be undone. 
+                All property details associated with this listing will also be deleted.
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                <a href="{% url 'inventory:listing_detail' listing.pk %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

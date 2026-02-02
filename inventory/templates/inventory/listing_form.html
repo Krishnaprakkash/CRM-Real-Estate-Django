@@ -1,15 +1,198 @@
-<form method="post">
-    {% csrf_token %}
-    {{ form.title.label_tag }} {{ form.title }}
-    {{ form.type.label_tag }} {{ form.type }}
-    {{ form.address.label_tag }} {{ form.address }}
-    {{ form.city.label_tag }} {{ form.city }}
-    {{ form.proposed_price.label_tag }} {{ form.proposed_price }}
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ title }}</h1>
+    <hr>
     
-    {# Only shows for Manager #}
-    {% if form.assigned_salesman %}
-        {{ form.assigned_salesman.label_tag }} {{ form.assigned_salesman }}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
     {% endif %}
     
-    <button type="submit">Create</button>
-</form>
+    <form method="post" id="listing-form">
+        {% csrf_token %}
+        
+        <!-- Base Listing Fields -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Basic Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <div class="text-danger">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        {{ form.type.label_tag }}
+                        {{ form.type }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        {{ form.address.label_tag }}
+                        {{ form.address }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        {{ form.city.label_tag }}
+                        {{ form.city }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        {{ form.proposed_price.label_tag }}
+                        {{ form.proposed_price }}
+                    </div>
+                    
+                    {% if form.assigned_salesman %}
+                    <div class="col-md-4 mb-3">
+                        {{ form.assigned_salesman.label_tag }}
+                        {{ form.assigned_salesman }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-md-4 mb-3">
+                        {{ form.comments.label_tag }}
+                        {{ form.comments }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Property-Specific Fields -->
+        <div id="property-details-container">
+            
+            <!-- Villa -->
+            <div id="villa-fields" class="property-fields" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h4>Villa Details</h4>
+                    </div>
+                    <div class="card-body">
+                        {% include 'inventory/partials/villa_form.html' with form=villa_form %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Apartment -->
+            <div id="apartment-fields" class="property-fields" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h4>Apartment Details</h4>
+                    </div>
+                    <div class="card-body">
+                        {% include 'inventory/partials/apartment_form.html' with form=apartment_form %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Warehouse -->
+            <div id="warehouse-fields" class="property-fields" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h4>Warehouse Details</h4>
+                    </div>
+                    <div class="card-body">
+                        {% include 'inventory/partials/warehouse_form.html' with form=warehouse_form %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Retail -->
+            <div id="retail-fields" class="property-fields" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h4>Retail Store Details</h4>
+                    </div>
+                    <div class="card-body">
+                        {% include 'inventory/partials/retail_form.html' with form=retail_form %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Office -->
+            <div id="office-fields" class="property-fields" style="display: none;">
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h4>Office Space Details</h4>
+                    </div>
+                    <div class="card-body">
+                        {% include 'inventory/partials/office_form.html' with form=office_form %}
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Buttons -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+                {{ submit_text|default:"Save" }}
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Cancel</a>
+            
+            {% if is_edit and is_manager %}
+            <a href="{% url 'inventory:listing_delete' listing.pk %}" 
+               class="btn btn-danger btn-lg float-end"
+               onclick="return confirm('Are you sure you want to delete this listing?')">
+                Delete
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('id_type');
+    const propertyFields = document.querySelectorAll('.property-fields');
+    
+    const typeToFieldsMap = {
+        'Villa': 'villa-fields',
+        'Apartment': 'apartment-fields',
+        'Warehouse': 'warehouse-fields',
+        'Retail': 'retail-fields',
+        'Office': 'office-fields',
+    };
+    
+    function showPropertyFields() {
+        const selectedType = typeSelect.value;
+        
+        // Hide all and disable inputs
+        propertyFields.forEach(container => {
+            container.style.display = 'none';
+            container.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = true;
+            });
+        });
+        
+        // Show selected and enable inputs
+        const fieldsId = typeToFieldsMap[selectedType];
+        if (fieldsId) {
+            const container = document.getElementById(fieldsId);
+            if (container) {
+                container.style.display = 'block';
+                container.querySelectorAll('input, select, textarea').forEach(input => {
+                    input.disabled = false;
+                });
+            }
+        }
+    }
+    
+    // **FIXED: Add event listener to trigger the function**
+    typeSelect.addEventListener('change', showPropertyFields);
+    
+    // **FIXED: Call on page load to show correct fields if form has errors or is being edited**
+    showPropertyFields();
+});
+</script>
+{% endblock %}
