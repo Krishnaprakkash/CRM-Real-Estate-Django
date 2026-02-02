@@ -36,13 +36,13 @@
         </div>
         <div>
             <div>
-                <button type="button" onclick="setAction('approve')">
+                <button type="button" onclick="setAction('approve','leads')">
                     Approve Selected
                 </button>
-                <button type="button" onclick="setAction('reject')">
+                <button type="button" onclick="setAction('reject','leads')">
                     Reject Selected
                 </button>
-                <button type="button" onclick="setAction('pending')">
+                <button type="button" onclick="setAction('pending','leads')">
                     Mark Pending
                 </button>
                 {% if perms.inventory.add_listing %}
@@ -126,13 +126,13 @@
         </div>
         <div>
             <div>
-                <button type="button" onclick="setAction('approve')">
+                <button type="button" onclick="setAction('approve','opps')">
                     Approve Selected
                 </button>
-                <button type="button" onclick="setAction('reject')">
+                <button type="button" onclick="setAction('reject','opps')">
                     Reject Selected
                 </button>
-                <button type="button" onclick="setAction('pending')">
+                <button type="button" onclick="setAction('pending','opps')">
                     Mark Pending
                 </button>
                 {% if perms.inventory.add_listing %}

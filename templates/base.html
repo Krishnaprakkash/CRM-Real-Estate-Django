@@ -51,27 +51,31 @@
     <script>
     function toggleSelectAll(source) {
         const table = source.closest('table');
-        const checkboxes = document.querySelectorAll('input.listing-checkbox');
+        if (!table) return;
+        const checkboxes = table.querySelectorAll('input.listing-checkbox');
         checkboxes.forEach(cb => cb.checked = source.checked);
         console.log(`Toggled ${checkboxes.length} checkboxes`);
     }
-    
-    function setAction(action, stage = 'lead') {
-        console.log('Action clicked:', action);
-        
-        const selected = document.querySelectorAll('input.listing-checkbox:checked');
+
+    // `suffix` corresponds to the form/table suffix used in templates: 'leads' or 'opps'
+    function setAction(action, suffix = 'leads') {
+        console.log('Action clicked:', action, 'for', suffix);
+
+        const formSelector = `#batch-form-${suffix}`;
+        const selected = document.querySelectorAll(`${formSelector} input.listing-checkbox:checked`);
         if (selected.length === 0) {
             alert(`Please select at least one listing first!`);
             return;
         }
-        
+
         if (action === 'reject') {
             const reason = prompt('Enter rejection reason (required):');
             if (!reason || !reason.trim()) {
                 alert('Rejection reason is required!');
                 return;
             }
-            document.getElementById('rejection-reason').value = reason;
+            const rr = document.getElementById(`rejection-reason-${suffix}`);
+            if (rr) rr.value = reason;
         }
 
         if (action == 'approve') {
@@ -79,11 +83,14 @@
                 return;
             }
         }
-        
-        document.getElementById('batch-action').value = action;
-        document.getElementById('stage').value = stage;
-        console.log(`Submitting ${selected.length} listings for ${action}`);
-        document.getElementById('batch-form').submit();
+
+        const ba = document.getElementById(`batch-action-${suffix}`);
+        const st = document.getElementById(`stage-${suffix}`);
+        const bf = document.getElementById(`batch-form-${suffix}`);
+        if (ba) ba.value = action;
+        if (st) st.value = (st.value || '');
+        console.log(`Submitting ${selected.length} listings for ${action} (form ${formSelector})`);
+        if (bf) bf.submit();
     }
     </script>
 
