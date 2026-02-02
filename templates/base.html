@@ -104,13 +104,13 @@
 
             setTimeout(() => populateFilters(table), 100);
 
-            $('#typeFilter, #statusFilter, #salesmanFilter').on('change', filterTable);
-            $('#clearFilters').click(clearFilters);
+            $('#typeFilterLeads, #statusFilterLeads, #salesmanFilterLeads').on('change', filterTable);
+            $('#clearFiltersLeads').click(clearFilters);
 
             function populateFilters(table) {
-                populateFilter('#typeFilter', table, typeCol);
-                populateFilter('#statusFilter', table, statusCol);
-                populateFilter('#salesmanFilter', table, salesmanCol);
+                populateFilter('#typeFilterLeads', table, typeCol);
+                populateFilter('#statusFilterLeads', table, statusCol);
+                populateFilter('#salesmanFilterLeads', table, salesmanCol);
             }
 
             function populateFilter(selector, table, colIndex) {
@@ -138,80 +138,84 @@
                     const statusCell = $(row).find('td:nth-child(6)').text().trim();
                     const salesmanCell = $(row).find('td:nth-child(5)').text().trim();
 
-                    return (!$("#typeFilter").val() || typeCell === $("#typeFilter").val()) &&
-                           (!$("#statusFilter").val() || statusCell === $("#statusFilter").val()) &&
-                           (!$("#salesmanFilter").val() || salesmanCell === $("#salesmanFilter").val());
+                          return (!$("#typeFilterLeads").val() || typeCell === $("#typeFilterLeads").val()) &&
+                              (!$("#statusFilterLeads").val() || statusCell === $("#statusFilterLeads").val()) &&
+                              (!$("#salesmanFilterLeads").val() || salesmanCell === $("#salesmanFilterLeads").val());
                 });
                 
                 table.draw();
             }
 
             function clearFilters() {
-                $('#typeFilter, #statusFilter, #salesmanFilter').val('').trigger('change');
+                $('#typeFilterLeads, #statusFilterLeads, #salesmanFilterLeads').val('').trigger('change');
             }
         }
     });
     </script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (document.getElementById('manager-opps-table')) {
-            const table = $('#manager-opps-table').DataTable({
-                order: [[0, 'desc']],
-                pageLength: 10,
-                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-                columnDefs: [{ orderable: false, targets: 6 }] 
-            });
-
-            const typeCol = 2;     
-            const salesmanCol = 4; 
-
-            setTimeout(() => populateFilters(table), 100);
-
-            $('#typeFilter, #salesmanFilter').on('change', filterTable);
-            $('#clearFilters').click(clearFilters);
-
-            function populateFilters(table) {
-                populateFilter('#typeFilter', table, typeCol);
-                populateFilter('#salesmanFilter', table, salesmanCol);
-            }
-
-            function populateFilter(selector, table, colIndex) {
-                const select = $(selector);
-                const values = [];
-                
-                table.column(colIndex).nodes().to$().each(function() {
-                    const cleanText = $(this).text().trim(); 
-                    if (cleanText && !values.includes(cleanText)) {
-                        values.push(cleanText);
-                    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('manager-opps-table')) {
+                const table = $('#manager-opps-table').DataTable({
+                    order: [[0, 'desc']],
+                    pageLength: 10,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    columnDefs: [{ orderable: false, targets: 6 }] 
                 });
-                
-                values.sort().forEach(val => {
-                    select.append(`<option value="${val}">${val}</option>`);
-                });
-            }
 
-            function filterTable() {
-                $.fn.dataTable.ext.search.pop();
-                
-                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-                    const row = table.row(dataIndex).node();
-                    const typeCell = $(row).find('td:nth-child(3)').text().trim();
-                    const salesmanCell = $(row).find('td:nth-child(5)').text().trim();
+                const typeCol = 2;   
+                const statusCol = 5;  
+                const salesmanCol = 4; 
 
-                    return (!$("#typeFilter").val() || typeCell === $("#typeFilter").val()) &&
-                           (!$("#salesmanFilter").val() || salesmanCell === $("#salesmanFilter").val());
-                });
-                
-                table.draw();
-            }
+                setTimeout(() => populateFilters(table), 100);
 
-            function clearFilters() {
-                $('#typeFilter, #salesmanFilter').val('').trigger('change');
+                $('#typeFilterOpps, #salesmanFilterOpps').on('change', filterTable);
+                $('#clearFiltersOpps').click(clearFilters);
+
+                function populateFilters(table) {
+                    populateFilter('#typeFilterOpps', table, typeCol);
+                    populateFilter('#statusFilterOpps', table, statusCol);
+                    populateFilter('#salesmanFilterOpps', table, salesmanCol);
+                }
+
+                function populateFilter(selector, table, colIndex) {
+                    const select = $(selector);
+                    const values = [];
+                    
+                    table.column(colIndex).nodes().to$().each(function() {
+                        const cleanText = $(this).text().trim(); 
+                        if (cleanText && !values.includes(cleanText)) {
+                            values.push(cleanText);
+                        }
+                    });
+                    
+                    values.sort().forEach(val => {
+                        select.append(`<option value="${val}">${val}</option>`);
+                    });
+                }
+
+                function filterTable() {
+                    $.fn.dataTable.ext.search.pop();
+                    
+                    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                        const row = table.row(dataIndex).node();
+                        const typeCell = $(row).find('td:nth-child(3)').text().trim();
+                        const statusCell = $(row).find('td:nth-child(6)').text().trim();
+                        const salesmanCell = $(row).find('td:nth-child(5)').text().trim();
+
+                        return (!$("#typeFilterOpps").val() || typeCell === $("#typeFilterOpps").val()) &&
+                            (!$("#statusFilterOpps").val() || statusCell === $("#statusFilterOpps").val()) &&   
+                            (!$("#salesmanFilterOpps").val() || salesmanCell === $("#salesmanFilterOpps").val());
+                    });
+                    
+                    table.draw();
+                }
+
+                function clearFilters() {
+                    $('#typeFilterOpps, #salesmanFilterOpps, #statusFilterOpps').val('').trigger('change');
+                }
             }
-        }
-    });
+        });
     </script>
 
 

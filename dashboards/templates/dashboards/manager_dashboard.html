@@ -6,32 +6,32 @@
 
 {{ block.super }}
 <div id="leads" class="tabcontent" style="display: block;">
-    <form method="post" id="batch-form">
+    <form method="post" id="batch-form-leads">
         {% csrf_token %}
-        <input type="hidden" name="action" id="batch-action" value="">
-        <input type="hidden" name="rejection-reason" id="rejection-reason" value="">
-        <input type="hidden" name="stage" id="stage" value="opportunity">
+        <input type="hidden" name="action" id="batch-action-leads" value="">
+        <input type="hidden" name="rejection-reason" id="rejection-reason-leads" value="">
+        <input type="hidden" name="stage" id="stage-leads" value="lead">
         <div>
             <div>
                 <label>Property Type:</label>
-                <select id="typeFilter">
+                <select id="typeFilterLeads">
                     <option value="">All Types</option>
                 </select>
             </div>
             <div>
                 <label>Status:</label>
-                <select id="statusFilter">
+                <select id="statusFilterLeads">
                     <option value="">All Status</option>
                 </select>
             </div>
             <div>
                 <label>Salesman:</label>
-                <select id="salesmanFilter">
+                <select id="salesmanFilterLeads">
                     <option value="">All Salesmen</option>
                 </select>
             </div>
             <div>
-                <button id="clearFilters">Clear Filters</button>
+                <button id="clearFiltersLeads">Clear Filters</button>
             </div>
         </div>
         <div>
@@ -96,36 +96,39 @@
 </div>
 
 <div id="opportunities" class="tabcontent" style="display: none;">
-    <form method="post" id="batch-form">
+    <form method="post" id="batch-form-opps">
         {% csrf_token %}
-        <input type="hidden" name="action" id="batch-action" value="">
-        <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
-        <input type="hidden" name="stage" id="stage" value="opportunity">
+        <input type="hidden" name="action" id="batch-action-opps" value="">
+        <input type="hidden" name="rejection-reason" id="rejection-reason-opps" value="">
+        <input type="hidden" name="stage" id="stage-opps" value="opportunity">
         <div>
             <div>
                 <label>Property Type:</label>
-                <select id="typeFilter">
+                <select id="typeFilterOpps">
                     <option value="">All Types</option>
                 </select>
             </div>
             <div>
                 <label>Status:</label>
-                <select id="statusFilter">
+                <select id="statusFilterOpps">
                     <option value="">All Status</option>
                 </select>
             </div>
             <div>
                 <label>Salesman:</label>
-                <select id="salesmanFilter">
+                <select id="salesmanFilterOpps">
                     <option value="">All Salesmen</option>
                 </select>
             </div>
             <div>
-                <button id="clearFilters">Clear Filters</button>
+                <button id="clearFiltersOpps">Clear Filters</button>
             </div>
         </div>
         <div>
             <div>
+                <button type="button" onclick="setAction('approve')">
+                    Approve Selected
+                </button>
                 <button type="button" onclick="setAction('reject')">
                     Reject Selected
                 </button>
