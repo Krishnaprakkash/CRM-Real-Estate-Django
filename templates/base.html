@@ -63,9 +63,28 @@
 
         const formSelector = `#batch-form-${suffix}`;
         const selected = document.querySelectorAll(`${formSelector} input.listing-checkbox:checked`);
+
         if (selected.length === 0) {
             alert(`Please select at least one listing first!`);
             return;
+        }
+
+        if (suffix === 'opps') {
+            const invalidItems = [];
+            selected.forEach((checkbox) => {
+                const row = checkbox.closest('tr');
+                if (row) {
+                    const columnValue = row.cells[5]?.textContent?.trim();
+                    if (columnValue !== 'Pending Approval') {
+                        const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
+                        invalidItems.push({ id: itemId, value: columnValue });
+                    }
+                } 
+            });
+            if (invalidItems.length > 0) {
+                alert(`Cannot perform batch action. ${invalidItems.length} selected item(s) have not been submitted for approval.`);
+                return;
+            }       
         }
 
         if (action === 'reject') {

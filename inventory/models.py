@@ -64,7 +64,8 @@ class Listing(models.Model):
     opp_status = models.TextField(
         max_length=30,
         choices=oppStatusChoices.choices,
-        default=oppStatusChoices.PENDING
+        default=oppStatusChoices.PENDING,
+        null=True, blank=True
     )
     opp_approved_by = models.ForeignKey(
         'accounts.User',
@@ -79,7 +80,8 @@ class Listing(models.Model):
     sale_status = models.TextField(
         max_length=30,
         choices=saleStatusChoices.choices,
-        default=saleStatusChoices.PROCESSING
+        default=saleStatusChoices.PROCESSING,
+        null=True, blank=True
     )
     sale_closed_at = models.DateTimeField(null=True, blank=True)
     sale_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
