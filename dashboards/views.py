@@ -6,6 +6,7 @@ from inventory.views import listings_visible_to
 from inventory.models import Listing
 from django.utils import timezone
 from django.contrib import messages
+from django.db.models import Q
 
 # Create your views here.
 def is_salesman(user):
@@ -42,18 +43,21 @@ def manager_dashboard(request):
                         listing.lead_approved_by = request.user
                         listing.lead_approved_at = timezone.now()
                         listing.opp_status = Listing.oppStatusChoices.PROSPECTING
+                        listing.sale_status = None
                     elif action == 'reject':
                         listing.lead_status = Listing.leadStatusChoices.REJECTED
                         listing.comments = rejection_reason
                         listing.lead_approved_by = request.user
                         listing.lead_approved_at = timezone.now()
                         listing.opp_status = None
+                        listing.sale_status = None
                     elif action == 'pending':
                         listing.lead_status = Listing.leadStatusChoices.PENDING
                         listing.comments = ''
                         listing.lead_approved_by = None
                         listing.lead_approved_at = None
                         listing.opp_status = None
+                        listing.sale_status = None
                 
                 elif stage == 'opportunity':
                     if action == 'approve':
@@ -78,9 +82,53 @@ def manager_dashboard(request):
                 listing.save()
 
             messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
-
+            
     listings = listings_visible_to(request.user)
-    return render(request, 'dashboards/manager_dashboard.html', {'listings': listings})
+    lead_count = listings.filter(
+        Q(lead_status=Listing.leadStatusChoices.PENDING) |
+        Q(lead_status=Listing.leadStatusChoices.APPROVED) |
+        Q(lead_status=Listing.leadStatusChoices.REJECTED)).count()
+    lead_active_count = listings.filter(lead_status=Listing.leadStatusChoices.PENDING).count()
+    lead_approved_count = listings.filter(lead_status=Listing.leadStatusChoices.APPROVED).count()
+    lead_rejected_count = listings.filter(lead_status=Listing.leadStatusChoices.REJECTED).count()
+    opp_count = listings.filter(
+        Q(opp_status=Listing.oppStatusChoices.PENDING) |
+        Q(opp_status=Listing.oppStatusChoices.PROSPECTING) |
+        Q(opp_status=Listing.oppStatusChoices.NEGOTIATING) |
+        Q(opp_status=Listing.oppStatusChoices.APPROVED) |
+        Q(opp_status=Listing.oppStatusChoices.REJECTED)).count()
+    opp_active_count = listings.filter(
+        Q(opp_status=Listing.oppStatusChoices.PENDING) |
+        Q(opp_status=Listing.oppStatusChoices.PROSPECTING) |
+        Q(opp_status=Listing.oppStatusChoices.NEGOTIATING)).count()
+    opp_approved_count = listings.filter(opp_status=Listing.oppStatusChoices.APPROVED).count()
+    opp_rejected_count = listings.filter(opp_status=Listing.oppStatusChoices.REJECTED).count()
+    sale_count = listings.filter(
+        Q(sale_status=Listing.saleStatusChoices.PROCESSING) |
+        Q(sale_status=Listing.saleStatusChoices.CLOSED_WON) |
+        Q(sale_status=Listing.saleStatusChoices.CLOSED_LOST)).count()
+    sale_active_count = listings.filter(sale_status=Listing.saleStatusChoices.PROCESSING).count()
+    sale_won_count = listings.filter(sale_status=Listing.saleStatusChoices.CLOSED_WON).count()
+    sale_lost_count = listings.filter(sale_status=Listing.saleStatusChoices.CLOSED_LOST).count()
+    stage = request.POST.get('stage', 'lead') 
+            
+    context = {
+        'listings': listings,
+        'lead_count': lead_count,
+        'lead_active_count': lead_active_count,
+        'lead_approved_count': lead_approved_count,
+        'lead_rejected_count': lead_rejected_count,
+        'opp_count': opp_count,
+        'opp_active_count': opp_active_count,
+        'opp_approved_count': opp_approved_count,
+        'opp_rejected_count': opp_rejected_count,
+        'sale_count': sale_count,
+        'sale_active_count': sale_active_count,
+        'sale_won_count': sale_won_count,
+        'sale_lost_count': sale_lost_count,
+        'stage': stage
+    }
+    return render(request, 'dashboards/manager_dashboard.html', context)
 
 @login_required
 @user_passes_test(is_ceo)

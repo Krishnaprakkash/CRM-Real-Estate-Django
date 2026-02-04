@@ -7,22 +7,63 @@
     <h1 class="flex-grow-1 mb-0 ms-2">Welcome {{ user.get_full_name }}</h1>
     <div class="card flex-shrink-1 mt-2 me-2">
         <div class="card-body py-3 px-4">
-            <h3 class="card-title mb-1">Total Listings</h3>
+            <h3 class="card-title mb-1">Listings</h3>
             <h4 class="mb-1">{{ listings|length }}</h4>
         </div>
     </div>
-    <div class="card flex-shrink-1 mt-2 me-2">
-        <div class="card-body py-3 px-4">
-            <h3 class="card-title mb-1">Total Leads</h3>
-            <h4 class="mb-1">{{ listings|length }}</h4>
+
+    <div class="stats-group" id="stats-lead">
+        <div class="card flex-shrink-1 mt-2 me-2">
+            <div class="card-body py-3 px-4">
+                <h3 class="card-title mb-1">Total: {{ lead_count }}</h3>
+                <h3 class="card-title mb-1">Active: {{ lead_active_count }}</h3>
+                <h3 class="card-title mb-1">Approved: {{ lead_approved_count }}</h3>
+                <h3 class="card-title mb-1">Rejected: {{ lead_rejected_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-group" id="stats-opportunity" style="display: none;">
+        <div class="card flex-shrink-1 mt-2 me-2">
+            <div class="card-body py-3 px-4">
+                <h3 class="card-title mb-1">Total: {{ opp_count }}</h3>
+                <h3 class="card-title mb-1">Active: {{ opp_active_count }}</h3>
+                <h3 class="card-title mb-1">Approved: {{ opp_approved_count }}</h3>
+                <h3 class="card-title mb-1">Rejected: {{ opp_rejected_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-group" id="stats-sale" style="display: none;">
+        <div class="card flex-shrink-1 mt-2 me-2">
+            <div class="card-body py-3 px-4">
+                <h3 class="card-title mb-1">Total: {{ sale_count }}</h3>
+                <h3 class="card-title mb-1">Active: {{ sale_active_count }}</h3>
+                <h3 class="card-title mb-1">Won: {{ sale_won_count }}</h3>
+                <h3 class="card-title mb-1">Lost: {{ sale_lost_count }}</h3>
+                
+            </div>
         </div>
     </div>
 </div>
 
 <div class="menu">
-    <button class="tablinks" onClick="switchTab(event, 'leads')">Leads</button>
-    <button class="tablinks" onClick="switchTab(event, 'opportunities')">Opportunities</button>
-    <button class="tablinks" onClick="switchTab(event, 'sales')">Sales</button>
+    <button class="tablinks" onclick="switchTab(event, 'lead')">Leads</button>
+    <button class="tablinks" onclick="switchTab(event, 'opportunity')">Opportunities</button>
+    <button class="tablinks" onclick="switchTab(event, 'sale')">Sales</button>
 </div>
 
+{% endblock %}
+
+{% block styles %}
+<style>
+.stats-group {
+    display: flex;
+    gap: 0.5rem;
+}
+.tablinks.active {
+    background-color: #007bff;
+    color: white;
+}
+</style>
 {% endblock %}

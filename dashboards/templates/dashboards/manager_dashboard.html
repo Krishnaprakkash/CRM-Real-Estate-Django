@@ -5,7 +5,8 @@
 {% block content %}
 
 {{ block.super }}
-<div id="leads" class="tabcontent" style="display: block;">
+
+<div id="lead" class="tabcontent" style="display: block;">
     <form method="post" id="batch-form-leads">
         {% csrf_token %}
         <input type="hidden" name="action" id="batch-action-leads" value="">
@@ -31,7 +32,7 @@
                 </select>
             </div>
             <div>
-                <button id="clearFiltersLeads">Clear Filters</button>
+                <button type="button" id="clearFiltersLeads">Clear Filters</button>
             </div>
         </div>
         <div>
@@ -95,7 +96,7 @@
     </form>
 </div>
 
-<div id="opportunities" class="tabcontent" style="display: none;">
+<div id="opportunity" class="tabcontent" style="display: none;">
     <form method="post" id="batch-form-opps">
         {% csrf_token %}
         <input type="hidden" name="action" id="batch-action-opps" value="">
@@ -121,7 +122,7 @@
                 </select>
             </div>
             <div>
-                <button id="clearFiltersOpps">Clear Filters</button>
+                <button type="button" id="clearFiltersOpps">Clear Filters</button>
             </div>
         </div>
         <div>
@@ -155,7 +156,7 @@
                         <th>Price</th>
                         <th>Salesman</th>
                         <th>Status</th>
-                        <th><input type="checkbox" id="select_all" onchange="toggleSelectAll(this)"> </th>
+                        <th><input type="checkbox" id="select_all_opps" onchange="toggleSelectAll(this)"> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -187,7 +188,8 @@
     </form>
 </div>
 
-<div id="sales" class="tabcontent" style="display: none">
+<div id="sale" class="tabcontent" style="display: none">
     <h1>Sales table</h1>
 </div>
+
 {% endblock %}
