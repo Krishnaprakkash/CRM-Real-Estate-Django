@@ -1,46 +1,46 @@
 {% extends 'dashboards/base_dashboard.html' %}
 
-{% block title %}Manager Dashboard{% endblock %}
+{% block title %}Salesman Dashboard{% endblock %}
 
 {% block content %}
 
 {{ block.super }}
-<div id="leads" class="tabcontent" style="display: block;">
-    <form method="post" id="batch-form">
+
+<div id="lead" class="tabcontent" style="display: block;">
+    <form method="post" id="batch-form-leads">
         {% csrf_token %}
+        <input type="hidden" name="action" id="batch-action-leads" value="">
+        <input type="hidden" name="rejection-reason" id="rejection-reason-leads" value="">
+        <input type="hidden" name="stage" id="stage-leads" value="lead">
         <div>
             <div>
                 <label>Property Type:</label>
-                <select id="typeFilter">
+                <select id="typeFilterLeads">
                     <option value="">All Types</option>
                 </select>
             </div>
             <div>
                 <label>Status:</label>
-                <select id="statusFilter">
+                <select id="statusFilterLeads">
                     <option value="">All Status</option>
                 </select>
             </div>
             <div>
-                <button id="clearFilters">Clear Filters</button>
+                <button type="button" id="clearFiltersLeads">Clear Filters</button>
             </div>
         </div>
         <div>
+            {% if perms.inventory.add_listing %}
             <div>
-                {% if perms.inventory.add_listing %}
-                <div>
-                    <a href="{% url 'inventory:listing_create_salesman' %}">
-                        Create New Listing
-                    </a>
-                </div>
-                {% endif %}
+                <a href="{% url 'inventory:listing_create_salesman' %}">
+                    Create New Listing
+                </a>
             </div>
+            {% endif %}
         </div>
-        <input type="hidden" name="action" id="batch-action" value="">
-        <input type="hidden" name="rejection_reason" id="rejection-reason" value="">
         <div>
             {% if listings %}
-            <table id="salesman-listings-table">
+            <table id="salesman-leads-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -48,7 +48,6 @@
                         <th>Type</th>
                         <th>Price</th>
                         <th>Status</th>
-                        <th><input type="checkbox" id="select_all" onchange="toggleSelectAll(this)"> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,11 +59,8 @@
                         <td>${{ listing.proposed_price|floatformat:0 }}</td>
                         <td>
                             <span>
-                                {{ listing.get_status_display }}
+                                {{ listing.get_lead_status_display }}
                             </span>
-                        </td>
-                        <td>
-                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
                     </tr>
                     {% endfor %}
@@ -73,15 +69,176 @@
             {% else %}
             <p>No listings found.</p>
             {% endif %}
-        </div> 
+        </div>
     </form>
 </div>
 
-<div id="opportunities" class="tabcontent" style="display: none;">
-    <h1>Opportunities table</h1>
+<div id="opportunity" class="tabcontent" style="display: none;">
+    <form method="post" id="batch-form-opps">
+        {% csrf_token %}
+        <input type="hidden" name="action" id="batch-action-opps" value="">
+        <input type="hidden" name="rejection-reason" id="rejection-reason-opps" value="">
+        <input type="hidden" name="stage" id="stage-opps" value="opportunity">
+        <div>
+            <div>
+                <label>Property Type:</label>
+                <select id="typeFilterOpps">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div>
+                <label>Status:</label>
+                <select id="statusFilterOpps">
+                    <option value="">All Status</option>
+                </select>
+            </div>
+            <div>
+                <button type="button" id="clearFiltersOpps">Clear Filters</button>
+            </div>
+        </div>
+        <div>
+            <div>
+                <button type="button" onclick="setAction('approve','opps')">
+                    Approve Selected
+                </button>
+                <button type="button" onclick="setAction('reject','opps')">
+                    Reject Selected
+                </button>
+                <button type="button" onclick="setAction('pending','opps')">
+                    Mark Pending
+                </button>
+                {% if perms.inventory.add_listing %}
+                <div>
+                    <a href="{% url 'inventory:listing_create_manager' %}">
+                        Create New Listing
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            {% if listings %}
+            <table id="salesman-opps-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th><input type="checkbox" id="select_all_opps" onchange="toggleSelectAll(this)"> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for listing in listings %}
+                    {% if listing.lead_status == "Approved" %}
+                    <tr>
+                        <td>{{ listing.id }}</td>
+                        <td>{{ listing.title }}</td>
+                        <td>{{ listing.get_type_display }}</td>
+                        <td>${{ listing.proposed_price|floatformat:0 }}</td>
+                        <td>
+                            <span>
+                                {{ listing.get_opp_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No listings found.</p>
+            {% endif %}
+        </div>
+    </form>
 </div>
 
-<div id="sales" class="tabcontent" style="display: none">
-    <h1>Sales table</h1>
+<div id="sale" class="tabcontent" style="display: none">
+    <form method="post" id="batch-form-sale">
+        {% csrf_token %}
+        <input type="hidden" name="action" id="batch-action-sale" value="">
+        <input type="hidden" name="rejection-reason" id="rejection-reason-sale" value="">
+        <input type="hidden" name="stage" id="stage-sale" value="sale">
+        <div>
+            <div>
+                <label>Property Type:</label>
+                <select id="typeFilterSale">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div>
+                <label>Status:</label>
+                <select id="statusFilterSale">
+                    <option value="">All Status</option>
+                </select>
+            </div>
+            <div>
+                <button type="button" id="clearFiltersSale">Clear Filters</button>
+            </div>
+        </div>
+        <div>
+            <div>
+                <button type="button" onclick="setAction('approve','sale')">
+                    Approve Selected
+                </button>
+                <button type="button" onclick="setAction('reject','sale')">
+                    Reject Selected
+                </button>
+                <button type="button" onclick="setAction('pending','sale')">
+                    Mark Pending
+                </button>
+                {% if perms.inventory.add_listing %}
+                <div>
+                    <a href="{% url 'inventory:listing_create_manager' %}">
+                        Create New Listing
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            {% if listings %}
+            <table id="salesman-sales-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th><input type="checkbox" id="select_all_sales" onchange="toggleSelectAll(this)"> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for listing in listings %}
+                    {% if listing.opp_status == "Approved" %}
+                    <tr>
+                        <td>{{ listing.id }}</td>
+                        <td>{{ listing.title }}</td>
+                        <td>{{ listing.get_type_display }}</td>
+                        <td>${{ listing.proposed_price|floatformat:0 }}</td>
+                        <td>
+                            <span>
+                                {{ listing.get_sale_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No listings found.</p>
+            {% endif %}
+        </div>
+    </form>
 </div>
+
 {% endblock %}

@@ -21,8 +21,88 @@ def is_ceo(user):
 @login_required
 @user_passes_test(is_salesman)
 def salesman_dashboard(request):
+    if request.method == 'POST' and request.POST.get('action'):
+        selected_ids = request.POST.getlist('listing_ids')
+        if selected_ids:
+            listings_to_update = Listing.objects.filter(id__in=selected_ids)
+            action = request.POST.get('action')
+            stage = request.POST.get('stage', 'lead')  
+            rejection_reason = request.POST.get('rejection-reason', '')
+
+            for listing in listings_to_update:       
+                if stage == 'opportunity':
+                    if action == 'approve':
+                        listing.opp_status = Listing.oppStatusChoices.APPROVED
+                        listing.comments = 'No further changes. Proceed to sale. '
+                        listing.opp_approved_by = request.user
+                        listing.opp_approved_at = timezone.now()
+                        listing.sale_status = Listing.saleStatusChoices.PROCESSING
+                        listing.sale_price = listing.opp_price
+                    elif action == 'reject':
+                        listing.opp_status = Listing.oppStatusChoices.REJECTED
+                        listing.comments = rejection_reason
+                        listing.opp_approved_by = request.user
+                        listing.opp_approved_at = timezone.now()
+                        listing.sale_status = None
+                        listing.sale_price = None
+                    elif action == 'pending':
+                        listing.opp_status = Listing.oppStatusChoices.PENDING
+                        listing.comments = ''
+                        listing.opp_approved_by = None
+                        listing.opp_approved_at = None
+                        listing.sale_status = None
+                        listing.sale_price = None
+                
+                listing.save()
+
+            messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
+            
     listings = listings_visible_to(request.user)
-    return render(request, 'dashboards/salesman_dashboard.html', {'listings': listings})
+    lead_count = listings.filter(
+        Q(lead_status=Listing.leadStatusChoices.PENDING) |
+        Q(lead_status=Listing.leadStatusChoices.APPROVED) |
+        Q(lead_status=Listing.leadStatusChoices.REJECTED)).count()
+    lead_active_count = listings.filter(lead_status=Listing.leadStatusChoices.PENDING).count()
+    lead_approved_count = listings.filter(lead_status=Listing.leadStatusChoices.APPROVED).count()
+    lead_rejected_count = listings.filter(lead_status=Listing.leadStatusChoices.REJECTED).count()
+    opp_count = listings.filter(
+        Q(opp_status=Listing.oppStatusChoices.PENDING) |
+        Q(opp_status=Listing.oppStatusChoices.PROSPECTING) |
+        Q(opp_status=Listing.oppStatusChoices.NEGOTIATING) |
+        Q(opp_status=Listing.oppStatusChoices.APPROVED) |
+        Q(opp_status=Listing.oppStatusChoices.REJECTED)).count()
+    opp_active_count = listings.filter(
+        Q(opp_status=Listing.oppStatusChoices.PENDING) |
+        Q(opp_status=Listing.oppStatusChoices.PROSPECTING) |
+        Q(opp_status=Listing.oppStatusChoices.NEGOTIATING)).count()
+    opp_approved_count = listings.filter(opp_status=Listing.oppStatusChoices.APPROVED).count()
+    opp_rejected_count = listings.filter(opp_status=Listing.oppStatusChoices.REJECTED).count()
+    sale_count = listings.filter(
+        Q(sale_status=Listing.saleStatusChoices.PROCESSING) |
+        Q(sale_status=Listing.saleStatusChoices.CLOSED_WON) |
+        Q(sale_status=Listing.saleStatusChoices.CLOSED_LOST)).count()
+    sale_active_count = listings.filter(sale_status=Listing.saleStatusChoices.PROCESSING).count()
+    sale_won_count = listings.filter(sale_status=Listing.saleStatusChoices.CLOSED_WON).count()
+    sale_lost_count = listings.filter(sale_status=Listing.saleStatusChoices.CLOSED_LOST).count()
+    stage = request.POST.get('stage', 'lead') 
+            
+    context = {
+        'listings': listings,
+        'lead_count': lead_count,
+        'lead_active_count': lead_active_count,
+        'lead_approved_count': lead_approved_count,
+        'lead_rejected_count': lead_rejected_count,
+        'opp_count': opp_count,
+        'opp_active_count': opp_active_count,
+        'opp_approved_count': opp_approved_count,
+        'opp_rejected_count': opp_rejected_count,
+        'sale_count': sale_count,
+        'sale_active_count': sale_active_count,
+        'sale_won_count': sale_won_count,
+        'sale_lost_count': sale_lost_count,
+        'stage': stage
+    }
+    return render(request, 'dashboards/salesman_dashboard.html', context)
 
 @login_required
 @user_passes_test(is_manager)
@@ -43,6 +123,7 @@ def manager_dashboard(request):
                         listing.lead_approved_by = request.user
                         listing.lead_approved_at = timezone.now()
                         listing.opp_status = Listing.oppStatusChoices.PROSPECTING
+                        listing.opp_price = listing.proposed_price
                         listing.sale_status = None
                     elif action == 'reject':
                         listing.lead_status = Listing.leadStatusChoices.REJECTED
@@ -50,6 +131,7 @@ def manager_dashboard(request):
                         listing.lead_approved_by = request.user
                         listing.lead_approved_at = timezone.now()
                         listing.opp_status = None
+                        listing.opp_price = None
                         listing.sale_status = None
                     elif action == 'pending':
                         listing.lead_status = Listing.leadStatusChoices.PENDING
@@ -57,6 +139,7 @@ def manager_dashboard(request):
                         listing.lead_approved_by = None
                         listing.lead_approved_at = None
                         listing.opp_status = None
+                        listing.opp_price = None
                         listing.sale_status = None
                 
                 elif stage == 'opportunity':
@@ -66,18 +149,21 @@ def manager_dashboard(request):
                         listing.opp_approved_by = request.user
                         listing.opp_approved_at = timezone.now()
                         listing.sale_status = Listing.saleStatusChoices.PROCESSING
+                        listing.sale_price = listing.opp_price
                     elif action == 'reject':
                         listing.opp_status = Listing.oppStatusChoices.REJECTED
                         listing.comments = rejection_reason
                         listing.opp_approved_by = request.user
                         listing.opp_approved_at = timezone.now()
                         listing.sale_status = None
+                        listing.sale_price = None
                     elif action == 'pending':
                         listing.opp_status = Listing.oppStatusChoices.PENDING
                         listing.comments = ''
                         listing.opp_approved_by = None
                         listing.opp_approved_at = None
                         listing.sale_status = None
+                        listing.sale_price = None
                 
                 listing.save()
 

@@ -262,7 +262,7 @@
         });
     </script>
 
-        <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             if (document.getElementById('manager-sales-table')) {
                 const table = $('#manager-sales-table').DataTable({
@@ -322,6 +322,190 @@
 
                 function clearFilters() {
                     $('#typeFilterSale, #salesmanFilterSale, #statusFilterSale').val('').trigger('change');
+                }
+            }
+        });
+    </script>
+
+    <!-- Salesman DataTable Filter-->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('salesman-leads-table')) {
+                const table = $('#salesman-leads-table').DataTable({
+                    order: [[0, 'desc']],
+                    pageLength: 10,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    columnDefs: [{ orderable: false, targets: 4 }]
+                });
+
+                const typeCol = 2;
+                const statusCol = 4;
+
+                setTimeout(() => populateFilters(table), 100);
+
+                $('#typeFilterLeads, #statusFilterLeads').on('change', filterTable);
+                $('#clearFiltersLeads').click(clearFilters);
+
+                function populateFilters(table) {
+                    populateFilter('#typeFilterLeads', table, typeCol);
+                    populateFilter('#statusFilterLeads', table, statusCol);
+                }
+
+                function populateFilter(selector, table, colIndex) {
+                    const select = $(selector);
+                    const values = [];
+
+                    table.column(colIndex).nodes().to$().each(function () {
+                        const cleanText = $(this).text().trim();
+                        if (cleanText && !values.includes(cleanText)) {
+                            values.push(cleanText);
+                        }
+                    });
+
+                    values.sort().forEach(val => {
+                        select.append(`<option value="${val}">${val}</option>`);
+                    });
+                }
+
+                function filterTable() {
+                    $.fn.dataTable.ext.search.pop();
+
+                    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                        const row = table.row(dataIndex).node();
+                        const typeCell = $(row).find('td:nth-child(3)').text().trim();
+                        const statusCell = $(row).find('td:nth-child(5)').text().trim();
+
+                        return (!$("#typeFilterLeads").val() || typeCell === $("#typeFilterLeads").val()) &&
+                            (!$("#statusFilterLeads").val() || statusCell === $("#statusFilterLeads").val())
+                    });
+
+                    table.draw();
+                }
+
+                function clearFilters() {
+                    $('#typeFilterLeads, #statusFilterLeads, #salesmanFilterLeads').val('').trigger('change');
+                }
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('salesman-opps-table')) {
+                const table = $('#salesman-opps-table').DataTable({
+                    order: [[0, 'desc']],
+                    pageLength: 10,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    columnDefs: [{ orderable: false, targets: 4 }]
+                });
+
+                const typeCol = 2;
+                const statusCol = 4;
+
+                setTimeout(() => populateFilters(table), 100);
+
+                $('#typeFilterOpps, #statusFilterOpps').on('change', filterTable);
+                $('#clearFiltersOpps').click(clearFilters);
+
+                function populateFilters(table) {
+                    populateFilter('#typeFilterOpps', table, typeCol);
+                    populateFilter('#statusFilterOpps', table, statusCol);
+                }
+
+                function populateFilter(selector, table, colIndex) {
+                    const select = $(selector);
+                    const values = [];
+
+                    table.column(colIndex).nodes().to$().each(function () {
+                        const cleanText = $(this).text().trim();
+                        if (cleanText && !values.includes(cleanText)) {
+                            values.push(cleanText);
+                        }
+                    });
+
+                    values.sort().forEach(val => {
+                        select.append(`<option value="${val}">${val}</option>`);
+                    });
+                }
+
+                function filterTable() {
+                    $.fn.dataTable.ext.search.pop();
+
+                    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                        const row = table.row(dataIndex).node();
+                        const typeCell = $(row).find('td:nth-child(3)').text().trim();
+                        const statusCell = $(row).find('td:nth-child(5)').text().trim();
+
+                        return (!$("#typeFilterOpps").val() || typeCell === $("#typeFilterOpps").val()) &&
+                            (!$("#statusFilterOpps").val() || statusCell === $("#statusFilterOpps").val())
+                    });
+
+                    table.draw();
+                }
+
+                function clearFilters() {
+                    $('#typeFilterOpps, #statusFilterOpps, #salesmanFilterOpps').val('').trigger('change');
+                }
+            }
+        });
+    </script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('salesman-sales-table')) {
+                const table = $('#salesman-sales-table').DataTable({
+                    order: [[0, 'desc']],
+                    pageLength: 10,
+                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                    columnDefs: [{ orderable: false, targets: 4 }]
+                });
+
+                const typeCol = 2;
+                const statusCol = 4;
+
+                setTimeout(() => populateFilters(table), 100);
+
+                $('#typeFilterSales, #statusFilterSales').on('change', filterTable);
+                $('#clearFiltersSales').click(clearFilters);
+
+                function populateFilters(table) {
+                    populateFilter('#typeFilterSales', table, typeCol);
+                    populateFilter('#statusFilterSales', table, statusCol);
+                }
+
+                function populateFilter(selector, table, colIndex) {
+                    const select = $(selector);
+                    const values = [];
+
+                    table.column(colIndex).nodes().to$().each(function () {
+                        const cleanText = $(this).text().trim();
+                        if (cleanText && !values.includes(cleanText)) {
+                            values.push(cleanText);
+                        }
+                    });
+
+                    values.sort().forEach(val => {
+                        select.append(`<option value="${val}">${val}</option>`);
+                    });
+                }
+
+                function filterTable() {
+                    $.fn.dataTable.ext.search.pop();
+
+                    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                        const row = table.row(dataIndex).node();
+                        const typeCell = $(row).find('td:nth-child(3)').text().trim();
+                        const statusCell = $(row).find('td:nth-child(5)').text().trim();
+
+                        return (!$("#typeFilterSales").val() || typeCell === $("#typeFilterSales").val()) &&
+                            (!$("#statusFilterSales").val() || statusCell === $("#statusFilterSales").val())
+                    });
+
+                    table.draw();
+                }
+
+                function clearFilters() {
+                    $('#typeFilterSales, #statusFilterSales, #salesmanFilterSales').val('').trigger('change');
                 }
             }
         });
