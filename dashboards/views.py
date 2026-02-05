@@ -31,28 +31,33 @@ def salesman_dashboard(request):
 
             for listing in listings_to_update:       
                 if stage == 'opportunity':
-                    if action == 'approve':
-                        listing.opp_status = Listing.oppStatusChoices.APPROVED
-                        listing.comments = 'No further changes. Proceed to sale. '
-                        listing.opp_approved_by = request.user
-                        listing.opp_approved_at = timezone.now()
-                        listing.sale_status = Listing.saleStatusChoices.PROCESSING
-                        listing.sale_price = listing.opp_price
-                    elif action == 'reject':
-                        listing.opp_status = Listing.oppStatusChoices.REJECTED
-                        listing.comments = rejection_reason
-                        listing.opp_approved_by = request.user
-                        listing.opp_approved_at = timezone.now()
+                    if action == 'prospect':
+                        listing.opp_status = Listing.oppStatusChoices.PROSPECTING
+                        listing.comments = 'Prospecting potential buyers for Listing.'
                         listing.sale_status = None
                         listing.sale_price = None
-                    elif action == 'pending':
+                    elif action == 'negotiate':
+                        listing.opp_status = Listing.oppStatusChoices.NEGOTIATING
+                        listing.comments = 'Negotiating sale with potential buyer.'
+                        listing.sale_status = None
+                        listing.sale_price = None
+                    elif action == 'submit':
                         listing.opp_status = Listing.oppStatusChoices.PENDING
-                        listing.comments = ''
-                        listing.opp_approved_by = None
-                        listing.opp_approved_at = None
+                        listing.comments = 'Negotiated with buyer. Raising for Approval.'
                         listing.sale_status = None
                         listing.sale_price = None
-                
+                        
+                elif stage == 'sale':
+                    if action == 'process':
+                        listing.sale_status = Listing.saleStatusChoices.PROCESSING
+                        listing.comments = 'Processing paperwork for handover.'
+                    elif action == 'won':
+                        listing.sale_status = Listing.saleStatusChoices.CLOSED_WON
+                        listing.comments = 'Sale Closed and Won.'
+                    elif action == 'lost':
+                        listing.sale_status = Listing.saleStatusChoices.CLOSED_LOST
+                        listing.comments = 'Sale Closed but Lost.'
+                    
                 listing.save()
 
             messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
@@ -151,7 +156,7 @@ def manager_dashboard(request):
                         listing.sale_status = Listing.saleStatusChoices.PROCESSING
                         listing.sale_price = listing.opp_price
                     elif action == 'reject':
-                        listing.opp_status = Listing.oppStatusChoices.REJECTED
+                        listing.opp_status = Listing.oppStatusChoices.NEGOTIATING
                         listing.comments = rejection_reason
                         listing.opp_approved_by = request.user
                         listing.opp_approved_at = timezone.now()

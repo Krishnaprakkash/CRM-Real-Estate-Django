@@ -98,14 +98,14 @@
         </div>
         <div>
             <div>
-                <button type="button" onclick="setAction('approve','opps')">
-                    Approve Selected
+                <button type="button" onclick="setSalesmanAction('prospect','opps')">
+                    Prospecting
                 </button>
-                <button type="button" onclick="setAction('reject','opps')">
-                    Reject Selected
+                <button type="button" onclick="setSalesmanAction('negotiate','opps')">
+                    Negotiating
                 </button>
-                <button type="button" onclick="setAction('pending','opps')">
-                    Mark Pending
+                <button type="button" onclick="setSalesmanAction('submit','opps')">
+                    Submit for Approval
                 </button>
                 {% if perms.inventory.add_listing %}
                 <div>
@@ -182,14 +182,14 @@
         </div>
         <div>
             <div>
-                <button type="button" onclick="setAction('approve','sale')">
-                    Approve Selected
+                <button type="button" onclick="setSalesmanAction('process','sale')">
+                    Processing
                 </button>
-                <button type="button" onclick="setAction('reject','sale')">
-                    Reject Selected
+                <button type="button" onclick="setSalesmanAction('won','sale')">
+                    Closed Won
                 </button>
-                <button type="button" onclick="setAction('pending','sale')">
-                    Mark Pending
+                <button type="button" onclick="setSalesmanAction('lost','sale')">
+                    Closed Lost
                 </button>
                 {% if perms.inventory.add_listing %}
                 <div>

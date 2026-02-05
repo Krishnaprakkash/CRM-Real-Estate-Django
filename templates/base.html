@@ -89,6 +89,7 @@
 
             if (suffix === 'opps') {
                 const invalidItems = [];
+                const invalidItems1 = [];
                 selected.forEach((checkbox) => {
                     const row = checkbox.closest('tr');
                     if (row) {
@@ -117,6 +118,114 @@
 
             if (action == 'approve') {
                 if (!confirm(`Are you sure you want to approve the selected listings?`)) {
+                    return;
+                }
+            }
+
+            const ba = document.getElementById(`batch-action-${suffix}`);
+            const st = document.getElementById(`stage-${suffix}`);
+            const bf = document.getElementById(`batch-form-${suffix}`);
+            if (ba) ba.value = action;
+            if (st) st.value = (st.value || '');
+            console.log(`Submitting ${selected.length} listings for ${action} (form ${formSelector})`);
+            if (bf) bf.submit();
+        }
+
+        function setSalesmanAction(action, suffix) {
+            console.log('Salesman action clicked:', action, 'for', suffix);
+
+            const formSelector = `#batch-form-${suffix}`;
+            const selected = document.querySelectorAll(`${formSelector} input.listing-checkbox:checked`);
+
+            if (selected.length === 0) {
+                alert(`Please select at least one listing first!`);
+                return;
+            }
+
+            // Validation for submitting opportunities
+            if (suffix === 'opps' && action === 'negotiating') {
+                const invalidItems = [];
+                selected.forEach((checkbox) => {
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        const statusCell = row.cells[4]?.textContent?.trim();
+                        if (statusCell !== 'Prospecting') {
+                            const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
+                            invalidItems.push({ id: itemId, status: statusCell });
+                        }
+                    }
+                });
+                if (invalidItems.length > 0) {
+                    alert(`Cannot submit for approval. ${invalidItems.length} selected item(s) are not in Prospecting status.`);
+                    return;
+                }
+            }
+            if (suffix === 'opps' && action === 'submit') {
+                const invalidItems = [];
+                selected.forEach((checkbox) => {
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        const statusCell = row.cells[4]?.textContent?.trim();
+                        if (statusCell !== 'Negotiating') {
+                            const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
+                            invalidItems.push({ id: itemId, status: statusCell });
+                        }
+                    }
+                });
+                if (invalidItems.length > 0) {
+                    alert(`Cannot submit for approval. ${invalidItems.length} selected item(s) are not in Negotiating status.`);
+                    return;
+                }
+            }
+            if (suffix === 'opps' && action === 'submit') {
+                const invalidItems = [];
+                selected.forEach((checkbox) => {
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        const statusCell = row.cells[4]?.textContent?.trim();
+                        if (statusCell === 'Pending Approval' || statusCell === 'Approved') {
+                            const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
+                            invalidItems.push({ id: itemId, status: statusCell });
+                        }
+                    }
+                });
+                if (invalidItems.length > 0) {
+                    alert(`Cannot submit for approval. ${invalidItems.length} selected item(s) are already submitted for approval. `);
+                    return;
+                }
+            }
+
+            // Validation for processing sales
+            if (suffix === 'sale' && (action === 'process' || action === 'won' || action === 'lost')) {
+                const invalidItems = [];
+                selected.forEach((checkbox) => {
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        const statusCell = row.cells[4]?.textContent?.trim();
+                        // Different validations based on action
+                        if (action === 'process' && statusCell !== 'Processing') {
+                            // Allow any status to move to Processing
+                        } else if ((action === 'won' || action === 'lost') && statusCell !== 'Processing') {
+                            const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
+                            invalidItems.push({ id: itemId, status: statusCell });
+                        }
+                    }
+                });
+                if (invalidItems.length > 0 && (action === 'won' || action === 'lost')) {
+                    alert(`Cannot mark as ${action}. ${invalidItems.length} selected item(s) are are already closed.`);
+                    return;
+                }
+            }
+
+            // Confirmations for critical actions
+            const confirmations = {
+                'submit': `Are you sure you want to submit ${selected.length} listing(s) for approval?`,
+                'won': `Are you sure you want to mark ${selected.length} listing(s) as Closed Won?`,
+                'lost': `Are you sure you want to mark ${selected.length} listing(s) as Closed Lost?`
+            };
+
+            if (confirmations[action]) {
+                if (!confirm(confirmations[action])) {
                     return;
                 }
             }
@@ -450,7 +559,7 @@
         });
     </script>
 
-        <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             if (document.getElementById('salesman-sales-table')) {
                 const table = $('#salesman-sales-table').DataTable({
@@ -465,12 +574,12 @@
 
                 setTimeout(() => populateFilters(table), 100);
 
-                $('#typeFilterSales, #statusFilterSales').on('change', filterTable);
-                $('#clearFiltersSales').click(clearFilters);
+                $('#typeFilterSale, #statusFilterSale').on('change', filterTable);
+                $('#clearFiltersSale').click(clearFilters);
 
                 function populateFilters(table) {
-                    populateFilter('#typeFilterSales', table, typeCol);
-                    populateFilter('#statusFilterSales', table, statusCol);
+                    populateFilter('#typeFilterSale', table, typeCol);
+                    populateFilter('#statusFilterSale', table, statusCol);
                 }
 
                 function populateFilter(selector, table, colIndex) {
@@ -497,8 +606,8 @@
                         const typeCell = $(row).find('td:nth-child(3)').text().trim();
                         const statusCell = $(row).find('td:nth-child(5)').text().trim();
 
-                        return (!$("#typeFilterSales").val() || typeCell === $("#typeFilterSales").val()) &&
-                            (!$("#statusFilterSales").val() || statusCell === $("#statusFilterSales").val())
+                        return (!$("#typeFilterSale").val() || typeCell === $("#typeFilterSale").val()) &&
+                            (!$("#statusFilterSale").val() || statusCell === $("#statusFilterSale").val())
                     });
 
                     table.draw();
