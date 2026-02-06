@@ -35,8 +35,11 @@ def get_details_form(property_type, data=None, instance=None):
 
 def get_existing_details(listing):
     try:
-        return listing.get_property_details()
-    except:
+        details = listing.get_property_details()
+        print(f"Details for {listing.id}: {details}")  # Debug
+        return details
+    except Exception as e:
+        print(f"Error getting details for {listing.id}: {e}")  # Debug
         return None
 
 def generate_listing_id():
@@ -115,7 +118,7 @@ def listing_create_manager(request):
             listing.id = generate_listing_id()
             listing.branch = request.user.branch
             listing.lead_status = Listing.leadStatusChoices.APPROVED
-            listing.opportunity_status = Listing.oppStatusChoices.PROSPECTING
+            listing.opp_status = Listing.oppStatusChoices.PROSPECTING
             listing.lead_approved_by = request.user
             listing.lead_approved_at = timezone.now()
             listing.created_at = timezone.now()
@@ -171,6 +174,7 @@ def listing_detail(request, pk):
     listing = get_object_or_404(listings, pk=pk)
 
     property_details = get_existing_details(listing)
+    stage = listing.current_stage
 
     detail_template_map = {
         'Villa': 'inventory/partials/villa_detail.html',
@@ -179,16 +183,19 @@ def listing_detail(request, pk):
         'Office': 'inventory/partials/office_detail.html',
         'Retail': 'inventory/partials/retail_detail.html',
     }
-
-    return render(request, 'inventory/listing_detail.html', {
+    
+    context = {
         'listing': listing,
         'property_details': property_details,
-        'detail_template': detail_template_map.get(listing.type),  # Fixed: was missing comma
+        'stage': stage,
+        'stage_display': listing.stage_display,
+        'detail_template': detail_template_map.get(listing.type),
         'can_edit': (
             request.user.role == 'Manager' or
             listing.assigned_salesman == request.user
-        )
-    })
+    )}
+
+    return render(request, 'inventory/listing_detail.html', context)
 
 @login_required  # Fixed: indentation was wrong
 def get_property_form_ajax(request):

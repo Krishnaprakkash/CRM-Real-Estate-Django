@@ -54,9 +54,11 @@ def salesman_dashboard(request):
                     elif action == 'won':
                         listing.sale_status = Listing.saleStatusChoices.CLOSED_WON
                         listing.comments = 'Sale Closed and Won.'
+                        listing.sale_closed_at = timezone.now()
                     elif action == 'lost':
                         listing.sale_status = Listing.saleStatusChoices.CLOSED_LOST
                         listing.comments = 'Sale Closed but Lost.'
+                        listing.sale_closed_at = timezone.now()
                     
                 listing.save()
 

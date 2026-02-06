@@ -113,6 +113,45 @@ class Listing(models.Model):
             except AttributeError:
                 return None
         return None
+    
+    @property
+    def current_stage(self):
+        if self.sale_status:
+            if self.sale_status == Listing.saleStatusChoices.CLOSED_WON:
+                return 'closed_won'
+            elif self.sale_status == Listing.saleStatusChoices.CLOSED_LOST:
+                return 'closed_lost'
+            else:
+                return 'processing'
+            
+        elif self.opp_status:
+            if self.opp_status == self.oppStatusChoices.PROSPECTING:
+                return 'prospecting'
+            elif self.opp_status == self.oppStatusChoices.NEGOTIATING:
+                return 'negotiating'
+            else:
+                return 'final_approval'
+            
+        elif self.lead_status:
+            if self.lead_status == Listing.leadStatusChoices.PENDING:
+                return 'created'
+            else:
+                return 'first_approval'
+        return 'created'
+    
+    @property
+    def stage_display(self):
+        stage_names = {
+            'closed_won': 'Closed Won',
+            'closed_lost': 'Closed Lost',
+            'processing': 'Processing',
+            'prospecting': 'Prospecting',
+            'negotiating': 'Negotiating',
+            'final_approval': 'Final Approval',
+            'created': 'Created',
+            'first_approval': 'First Approval'
+        }
+        return stage_names.get(self.current_stage, 'Unknown')
 
 
 # ============================================

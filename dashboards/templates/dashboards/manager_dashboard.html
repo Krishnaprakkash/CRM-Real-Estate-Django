@@ -72,7 +72,11 @@
                 <tbody>
                     {% for listing in listings %}
                     <tr>
-                        <td>{{ listing.id }}</td>
+                        <td>
+                            <a href="{% url 'inventory:listing_detail' listing.pk %}">
+                                {{ listing.id }}
+                            </a>
+                        </td>
                         <td>{{ listing.title }}</td>
                         <td>{{ listing.get_type_display }}</td>
                         <td>${{ listing.proposed_price|floatformat:0 }}</td>
@@ -163,7 +167,11 @@
                     {% for listing in listings %}
                     {% if listing.lead_status == "Approved" %}
                     <tr>
-                        <td>{{ listing.id }}</td>
+                        <td>
+                            <a href="{% url 'inventory:listing_detail' listing.pk %}">
+                                {{ listing.id }}
+                            </a>
+                        </td>
                         <td>{{ listing.title }}</td>
                         <td>{{ listing.get_type_display }}</td>
                         <td>${{ listing.proposed_price|floatformat:0 }}</td>
@@ -244,7 +252,11 @@
                     {% for listing in listings %}
                     {% if listing.opp_status == "Approved" %}
                     <tr>
-                        <td>{{ listing.id }}</td>
+                        <td>
+                            <a href="{% url 'inventory:listing_detail' listing.pk %}">
+                                {{ listing.id }}
+                            </a>
+                        </td>
                         <td>{{ listing.title }}</td>
                         <td>{{ listing.get_type_display }}</td>
                         <td>${{ listing.proposed_price|floatformat:0 }}</td>
