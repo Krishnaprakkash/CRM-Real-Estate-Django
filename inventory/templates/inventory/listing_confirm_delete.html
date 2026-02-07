@@ -4,27 +4,52 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="card">
+    <div class="card border-danger">
         <div class="card-header bg-danger text-white">
-            <h4>Confirm Delete</h4>
+            <h3 class="mb-0">Confirm Deletion</h3>
         </div>
         <div class="card-body">
-            <p>Are you sure you want to delete the listing:</p>
-            <h5>"{{ listing.title }}"</h5>
-            <p class="text-muted">
-                {{ listing.get_type_display }} in {{ listing.city }}<br>
-                ID: {{ listing.id }}
-            </p>
+            <h4>Are you sure you want to delete this listing?</h4>
             
-            <div class="alert alert-warning">
-                <strong>Warning:</strong> This action cannot be undone. 
-                All property details associated with this listing will also be deleted.
+            <div class="alert alert-warning mt-3">
+                <strong>Warning:</strong> This action cannot be undone. All associated data will be permanently deleted.
             </div>
             
-            <form method="post">
+            <table class="table table-bordered mt-3">
+                <tr>
+                    <th width="30%">Listing ID:</th>
+                    <td>{{ listing.id }}</td>
+                </tr>
+                <tr>
+                    <th>Title:</th>
+                    <td>{{ listing.title }}</td>
+                </tr>
+                <tr>
+                    <th>Property Type:</th>
+                    <td>{{ listing.get_type_display }}</td>
+                </tr>
+                <tr>
+                    <th>City:</th>
+                    <td>{{ listing.city }}</td>
+                </tr>
+                <tr>
+                    <th>Price:</th>
+                    <td>${{ listing.proposed_price }}</td>
+                </tr>
+                <tr>
+                    <th>Status:</th>
+                    <td>{{ listing.stage_display }}</td>
+                </tr>
+            </table>
+            
+            <form method="post" class="mt-4">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Yes, Delete</button>
-                <a href="{% url 'inventory:listing_detail' listing.pk %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-danger btn-lg">
+                    <i class="bi bi-trash"></i> Yes, Delete This Listing
+                </button>
+                <a href="{% url 'inventory:listing_detail' listing.pk %}" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
             </form>
         </div>
     </div>

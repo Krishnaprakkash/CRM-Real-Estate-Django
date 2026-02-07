@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ title }}</h1>
+        <a href="{% url 'inventory:listing_detail' listing.pk %}" class="btn btn-secondary">
+            Cancel
+        </a>
+    </div>
+    
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    <form method="post" id="listing-edit-form">
+        {% csrf_token %}
+        
+        <!-- Basic Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Basic Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                        <div class="text-danger">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.type.id_for_label }}" class="form-label">{{ form.type.label }}</label>
+                        {{ form.type }}
+                        {% if form.type.errors %}
+                        <div class="text-danger">{{ form.type.errors.0 }}</div>
+                        {% endif %}
+                        <small class="text-muted">Cannot change property type after creation</small>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                        <div class="text-danger">{{ form.address.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.city.id_for_label }}" class="form-label">{{ form.city.label }}</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                        <div class="text-danger">{{ form.city.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.proposed_price.id_for_label }}" class="form-label">{{ form.proposed_price.label }}</label>
+                        {{ form.proposed_price }}
+                        {% if form.proposed_price.errors %}
+                        <div class="text-danger">{{ form.proposed_price.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if form.assigned_salesman %}
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.assigned_salesman.id_for_label }}" class="form-label">{{ form.assigned_salesman.label }}</label>
+                        {{ form.assigned_salesman }}
+                        {% if form.assigned_salesman.errors %}
+                        <div class="text-danger">{{ form.assigned_salesman.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.comments.id_for_label }}" class="form-label">{{ form.comments.label }}</label>
+                        {{ form.comments }}
+                        {% if form.comments.errors %}
+                        <div class="text-danger">{{ form.comments.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Property Details -->
+        <div id="property-details-container">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">{{ property_type }} Details</h4>
+                </div>
+                <div class="card-body">
+                    {% if property_type == 'Villa' %}
+                        {% include 'inventory/partials/villa_form.html' with form=details_form %}
+                    {% elif property_type == 'Apartment' %}
+                        {% include 'inventory/partials/apartment_form.html' with form=details_form %}
+                    {% elif property_type == 'Warehouse' %}
+                        {% include 'inventory/partials/warehouse_form.html' with form=details_form %}
+                    {% elif property_type == 'Retail' %}
+                        {% include 'inventory/partials/retail_form.html' with form=details_form %}
+                    {% elif property_type == 'Office' %}
+                        {% include 'inventory/partials/office_form.html' with form=details_form %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between mb-4">
+            <div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-save"></i> {{ submit_text }}
+                </button>
+                <a href="{% url 'inventory:listing_detail' listing.pk %}" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </div>
+            
+            {% if request.user.role == 'Manager' %}
+            <a href="{% url 'inventory:listing_delete' listing.pk %}" 
+               class="btn btn-danger btn-lg"
+               onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.')">
+                <i class="bi bi-trash"></i> Delete Listing
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<script>
+// Disable type field since it can't be changed after creation
+document.getElementById('{{ form.type.id_for_label }}').disabled = true;
+</script>
+{% endblock %}

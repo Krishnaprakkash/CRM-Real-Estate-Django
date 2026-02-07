@@ -197,7 +197,84 @@ def listing_detail(request, pk):
 
     return render(request, 'inventory/listing_detail.html', context)
 
-@login_required  # Fixed: indentation was wrong
+@login_required
+@user_passes_test(is_manager_or_salesman)
+def listing_edit(request, pk):
+    listings = listings_visible_to(request.user)
+    listing = get_object_or_404(listings, pk=pk)
+    
+    can_edit = (
+        request.user.role =='Manager' or
+        listing.assigned_salesman == request.user
+    )
+    
+    if not can_edit:
+        messages.error(request, "You are not allowed to edit this Listing.")
+        return redirect('inventory:listing_detail', pk=pk)
+    
+    property_details = get_existing_details(listing)
+    
+    if request.method == 'POST':
+        if request.user.role == 'Manager':
+            form = ManagerListingForm(request, instance=listing, manager=request.user)
+        else:
+            form = SalesmanListingForm(request, instance=listing)
+        
+        details_form = get_details_form(listing.type, request.POST, instance=property_details)
+        
+        form_valid = form.is_valid()
+        details_valid = details_from.is_valid() if details_from else True
+        
+        if form_valid and details_valid:
+            listing = form.save(commit=False)
+            listing.updated_at = timezone.now()
+            listing.save()
+            
+            if details_form:
+                details = details_from.save(commit=False)
+                details.listing = listing
+                details.save()
+            
+            messages.success(request, 'Listing Updated Successfully.')
+            return redirect('inventory:listing_detail', pk=pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        if request.user.role == 'Manager':
+            form = ManagerListingForm(instance=listing, manager=request.user)
+        else:
+            form = SalesmanListingForm(instance=listing)
+        
+        details_form = get_details_form(listing.type, instance=property_details)
+        
+    context = {
+        'form': form,
+        'details_form': details_form,
+        'listing': listing,
+        'title': f'Edit Listing {listing.title}',
+        'submit_text': 'Update Listing',
+        'is_edit': True,
+        'property_type': listing.type,
+        **get_all_details_forms()
+    }
+    
+    return render(request, 'inventory/listing_edit.html', context)
+
+@login_required
+@user_passes_test(is_manager)
+def listing_delete(request, pk):
+    listings = listings_visible_to(request.user)
+    listing = get_object_or_404(listings, pk=pk)
+    
+    if request.method == 'POST':
+        listing_title = listing.title
+        listing.delete()
+        messages.success(request, f'Listing {listing_title} successfully deleted.')
+        return redirect('dashboards:manager_dashboard')
+    
+    return render(request, 'inventory/listing_confirm_delete.html', {'listing': listing})
+
+@login_required 
 def get_property_form_ajax(request):
     property_type = request.GET.get('property_type')
     listing_id = request.GET.get('listing_id')

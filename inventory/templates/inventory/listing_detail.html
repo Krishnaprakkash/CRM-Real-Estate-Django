@@ -9,259 +9,399 @@
         <div>
             <span class="badge bg-primary fs-5">{{ stage_display }}</span>
         </div>
+        <div>
+            {% if can_edit %}
+            <a href="{% url 'inventory:listing_edit' listing.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Edit Listing
+            </a>
+            {% endif %}
+        </div>
     </div>
 
-    <!-- Stage Progress Bar -->
+    <!-- Stage Progress Bar / Tabs -->
     <div class="mb-4">
-        <ul class="nav nav-pills nav-fill">
-            <li class="nav-item">
-                <span class="nav-link {% if stage == 'created' %}active{% elif stage != 'created' %}bg-success text-white{% endif %}">
+        <ul class="nav nav-pills nav-fill" id="stageTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link {% if stage == 'created' %}active{% else %}bg-success text-white{% endif %}"
+                    id="created-tab" data-bs-toggle="pill" data-bs-target="#created" type="button" role="tab">
                     Created
-                </span>
+                </button>
             </li>
-            <li class="nav-item">
-                <span class="nav-link {% if stage == 'first_approval' %}active{% elif stage in 'prospecting negotiating final_approval processing closed_won closed_lost' %}bg-success text-white{% endif %}">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link {% if stage == 'first_approval' %}active{% elif stage in 'prospecting,negotiating,final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="first-approval-tab" data-bs-toggle="pill" data-bs-target="#first-approval" type="button"
+                    role="tab" {% if stage == 'created' %}disabled{% endif %}>
                     First Approval
-                </span>
+                </button>
             </li>
-            <li class="nav-item">
-                <span class="nav-link {% if stage == 'prospecting' %}active{% elif stage in 'negotiating final_approval processing closed_won closed_lost' %}bg-success text-white{% endif %}">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link {% if stage == 'prospecting' %}active{% elif stage in 'negotiating,final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="prospecting-tab" data-bs-toggle="pill" data-bs-target="#prospecting" type="button" role="tab" {% if stage not in 'prospecting,negotiating,final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
                     Prospecting
-                </span>
+                </button>
             </li>
-            <li class="nav-item">
-                <span class="nav-link {% if stage == 'negotiating' %}active{% elif stage in 'final_approval processing closed_won closed_lost' %}bg-success text-white{% endif %}">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link {% if stage == 'negotiating' %}active{% elif stage in 'final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="negotiating-tab" data-bs-toggle="pill" data-bs-target="#negotiating" type="button" role="tab" {% if stage not in 'negotiating,final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
                     Negotiating
-                </span>
+                </button>
             </li>
-            <li class="nav-item">
-                <span class="nav-link {% if stage == 'final_approval' %}active{% elif stage in 'processing closed_won closed_lost' %}bg-success text-white{% endif %}">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link {% if stage == 'final_approval' %}active{% elif stage in 'processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="final-approval-tab" data-bs-toggle="pill" data-bs-target="#final-approval" type="button"
+                    role="tab" {% if stage not in 'final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
                     Final Approval
-                </span>
+                </button>
             </li>
-            <li class="nav-item">
-                <span class="nav-link {% if stage == 'processing' %}active{% elif stage in 'closed_won closed_lost' %}bg-success text-white{% endif %}">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link {% if stage == 'processing' %}active{% elif stage in 'closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="processing-tab" data-bs-toggle="pill" data-bs-target="#processing" type="button" role="tab" {% if stage not in 'processing,closed_won,closed_lost' %}disabled{% endif %}>
                     Processing
-                </span>
+                </button>
             </li>
-            <li class="nav-item">
-                <span class="nav-link {% if stage == 'closed_won' %}bg-success text-white active{% elif stage == 'closed_lost' %}bg-danger text-white active{% endif %}">
+            <li class="nav-item" role="presentation">
+                <button
+                    class="nav-link {% if stage == 'closed_won' %}active bg-success text-white{% elif stage == 'closed_lost' %}active bg-danger text-white{% endif %}"
+                    id="closed-tab" data-bs-toggle="pill" data-bs-target="#closed" type="button" role="tab" {% if stage not in 'closed_won,closed_lost' %}disabled{% endif %}>
                     Closed
-                </span>
+                </button>
             </li>
         </ul>
     </div>
 
-    <!-- Tabs for different information sections -->
-    <ul class="nav nav-tabs" id="detailTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#basic-info">
-                Basic Info
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#property-details">
-                Property Details
-            </button>
-        </li>
-        {% if stage != 'created' %}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lead-info">
-                Lead Information
-            </button>
-        </li>
-        {% endif %}
-        {% if stage in 'prospecting negotiating final_approval processing closed_won closed_lost' %}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#opportunity-info">
-                Opportunity Information
-            </button>
-        </li>
-        {% endif %}
-        {% if stage in 'processing closed_won closed_lost' %}
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#sale-info">
-                Sale Information
-            </button>
-        </li>
-        {% endif %}
-    </ul>
+    <!-- Tab Content -->
+    <div class="tab-content" id="stageTabsContent">
 
-    <div class="tab-content mt-3" id="detailTabsContent">
-        <!-- Basic Information Tab -->
-        <div class="tab-pane fade show active" id="basic-info">
-            <div class="card">
+        <!-- Created Tab: Basic Info + Property Details -->
+        <div class="tab-pane fade {% if stage == 'created' %}show active{% endif %}" id="created" role="tabpanel">
+            <!-- Basic Information -->
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Basic Information</h5>
+                </div>
                 <div class="card-body">
-                    <form>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Listing ID</label>
-                                <input type="text" class="form-control" value="{{ listing.id }}" disabled>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Title</label>
-                                <input type="text" class="form-control" value="{{ listing.title }}" disabled>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Listing ID</label>
+                            <input type="text" class="form-control" value="{{ listing.id }}" disabled>
                         </div>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Property Type</label>
-                                <input type="text" class="form-control" value="{{ listing.get_type_display }}" disabled>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">City</label>
-                                <input type="text" class="form-control" value="{{ listing.city }}" disabled>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Proposed Price</label>
-                                <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" value="{{ listing.title }}" disabled>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Address</label>
-                                <textarea class="form-control" rows="2" disabled>{{ listing.address }}</textarea>
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Property Type</label>
+                            <input type="text" class="form-control" value="{{ listing.get_type_display }}" disabled>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Branch</label>
-                                <input type="text" class="form-control" value="{{ listing.branch.name }}" disabled>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Assigned Salesman</label>
-                                <input type="text" class="form-control" value="{{ listing.assigned_salesman.get_full_name }}" disabled>
-                            </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" value="{{ listing.city }}" disabled>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Comments</label>
-                                <textarea class="form-control" rows="3" disabled>{{ listing.comments|default:"No comments" }}</textarea>
-                            </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Proposed Price</label>
+                            <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
                         </div>
-                    </form>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" rows="2" disabled>{{ listing.address }}</textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Branch</label>
+                            <input type="text" class="form-control" value="{{ listing.branch.name }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Assigned Salesman</label>
+                            <input type="text" class="form-control"
+                                value="{{ listing.assigned_salesman.get_full_name }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Comments</label>
+                            <textarea class="form-control" rows="3"
+                                disabled>{{ listing.comments|default:"No comments" }}</textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Property Details Tab -->
-        <div class="tab-pane fade" id="property-details">
-            {% if property_details %}
-                {% if listing.type == 'Villa' %}
+            <!-- Property Details -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Property Details</h5>
+                </div>
+                <div class="card-body">
+                    {% if property_details %}
+                    {% if listing.type == 'Villa' %}
                     {% include 'inventory/partials/villa_detail.html' %}
-                {% elif listing.type == 'Apartment' %}
+                    {% elif listing.type == 'Apartment' %}
                     {% include 'inventory/partials/apartment_detail.html' %}
-                {% elif listing.type == 'Warehouse' %}
+                    {% elif listing.type == 'Warehouse' %}
                     {% include 'inventory/partials/warehouse_detail.html' %}
-                {% elif listing.type == 'Retail' %}
+                    {% elif listing.type == 'Retail' %}
                     {% include 'inventory/partials/retail_detail.html' %}
-                {% elif listing.type == 'Office' %}
+                    {% elif listing.type == 'Office' %}
                     {% include 'inventory/partials/office_detail.html' %}
-                {% endif %}
-            {% else %}
-                <div class="alert alert-warning">No property details available.</div>
-            {% endif %}
-        </div>
-
-        <!-- Lead Information Tab -->
-        {% if stage != 'created' %}
-        <div class="tab-pane fade" id="lead-info">
-            <div class="card">
-                <div class="card-body">
-                    <form>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Lead Status</label>
-                                <input type="text" class="form-control" value="{{ listing.get_lead_status_display }}" disabled>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Approved By</label>
-                                <input type="text" class="form-control" value="{{ listing.lead_approved_by.get_full_name|default:'' }}" disabled>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Approved At</label>
-                                <input type="text" class="form-control" value="{{ listing.lead_approved_at|date:'Y-m-d H:i'|default:'' }}" disabled>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Proposed Price</label>
-                                <input type="text" class="form-control" value="{{ listing.proposed_price|default:'' }}" disabled>
-                            </div>
-                        </div>
-                    </form>
+                    {% endif %}
+                    {% else %}
+                    <div class="alert alert-warning">No property details available.</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        {% endif %}
 
-        <!-- Opportunity Information Tab -->
-        {% if stage in 'prospecting negotiating final_approval processing closed_won closed_lost' %}
-        <div class="tab-pane fade" id="opportunity-info">
+        <!-- First Approval Tab: Lead Information -->
+        <div class="tab-pane fade {% if stage == 'first_approval' %}show active{% endif %}" id="first-approval"
+            role="tabpanel">
             <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Lead Information</h5>
+                </div>
                 <div class="card-body">
-                    <form>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Opportunity Status</label>
-                                <input type="text" class="form-control" value="{{ listing.get_opp_status_display }}" disabled>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Approved By</label>
-                                <input type="text" class="form-control" value="{{ listing.opp_approved_by.get_full_name|default:'' }}" disabled>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Lead Status</label>
+                            <input type="text" class="form-control" value="{{ listing.get_lead_status_display }}"
+                                disabled>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Approved At</label>
-                                <input type="text" class="form-control" value="{{ listing.opp_approved_at|date:'Y-m-d H:i'|default:'' }}" disabled>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Approved By</label>
+                            <input type="text" class="form-control"
+                                value="{{ listing.lead_approved_by.get_full_name|default:'' }}" disabled>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Negotiated Price</label>
-                                <input type="text" class="form-control" value="$ {{ listing.opp_price|default:'' }}" disabled>
-                            </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Approved At</label>
+                            <input type="text" class="form-control"
+                                value="{{ listing.lead_approved_at|date:'Y-m-d H:i'|default:'' }}" disabled>
                         </div>
-                    </form>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Proposed Price</label>
+                            <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        {% endif %}
 
-        <!-- Sale Information Tab -->
-        {% if stage in 'processing closed_won closed_lost' %}
-        <div class="tab-pane fade" id="sale-info">
+        <!-- Prospecting Tab: Basic Info Only -->
+        <div class="tab-pane fade {% if stage == 'prospecting' %}show active{% endif %}" id="prospecting"
+            role="tabpanel">
             <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Prospecting - Basic Information</h5>
+                </div>
                 <div class="card-body">
-                    <form>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Sale Status</label>
-                                <input type="text" class="form-control" value="{{ listing.get_sale_status_display }}" disabled>
-                            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Listing ID</label>
+                            <input type="text" class="form-control" value="{{ listing.id }}" disabled>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Closed At</label>
-                                <input type="text" class="form-control" value="{{ listing.sale_closed_at|date:'Y-m-d H:i'|default:'' }}" disabled>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Final Price</label>
-                                <input type="text" class="form-control" value="$ {{ listing.sale_price|default:'' }}" disabled>
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" value="{{ listing.title }}" disabled>
                         </div>
-                    </form>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Property Type</label>
+                            <input type="text" class="form-control" value="{{ listing.get_type_display }}" disabled>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" value="{{ listing.city }}" disabled>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Proposed Price</label>
+                            <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Opportunity Status</label>
+                            <input type="text" class="form-control" value="{{ listing.get_opp_status_display }}"
+                                disabled>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        {% endif %}
+
+        <!-- Negotiating Tab: Basic Info Only -->
+        <div class="tab-pane fade {% if stage == 'negotiating' %}show active{% endif %}" id="negotiating"
+            role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Negotiating - Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Listing ID</label>
+                            <input type="text" class="form-control" value="{{ listing.id }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" value="{{ listing.title }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Property Type</label>
+                            <input type="text" class="form-control" value="{{ listing.get_type_display }}" disabled>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" value="{{ listing.city }}" disabled>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Proposed Price</label>
+                            <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Opportunity Status</label>
+                            <input type="text" class="form-control" value="{{ listing.get_opp_status_display }}"
+                                disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Negotiated Price</label>
+                            <input type="text" class="form-control"
+                                value="$ {{ listing.opp_price|default:listing.proposed_price }}" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Approval Tab: Opportunity Information -->
+        <div class="tab-pane fade {% if stage == 'final_approval' %}show active{% endif %}" id="final-approval"
+            role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Opportunity Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Opportunity Status</label>
+                            <input type="text" class="form-control" value="{{ listing.get_opp_status_display }}"
+                                disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Approved By</label>
+                            <input type="text" class="form-control"
+                                value="{{ listing.opp_approved_by.get_full_name|default:'' }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Approved At</label>
+                            <input type="text" class="form-control"
+                                value="{{ listing.opp_approved_at|date:'Y-m-d H:i'|default:'' }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Negotiated Price</label>
+                            <input type="text" class="form-control" value="$ {{ listing.opp_price|default:'' }}"
+                                disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Tab: Basic Info Only -->
+        <div class="tab-pane fade {% if stage == 'processing' %}show active{% endif %}" id="processing" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Processing - Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Listing ID</label>
+                            <input type="text" class="form-control" value="{{ listing.id }}" disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" value="{{ listing.title }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Sale Status</label>
+                            <input type="text" class="form-control" value="{{ listing.get_sale_status_display }}"
+                                disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Final Price</label>
+                            <input type="text" class="form-control"
+                                value="$ {{ listing.sale_price|default:listing.opp_price|default:listing.proposed_price }}"
+                                disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Closed Tab: Sale Information -->
+        <div class="tab-pane fade {% if stage == 'closed_won' or stage == 'closed_lost' %}show active{% endif %}"
+            id="closed" role="tabpanel">
+            <div class="card">
+                <div
+                    class="card-header {% if stage == 'closed_won' %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <h5 class="mb-0">Sale Information - {{ listing.get_sale_status_display }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Sale Status</label>
+                            <input type="text" class="form-control" value="{{ listing.get_sale_status_display }}"
+                                disabled>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Closed At</label>
+                            <input type="text" class="form-control"
+                                value="{{ listing.sale_closed_at|date:'Y-m-d H:i'|default:'' }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Final Price</label>
+                            <input type="text" class="form-control" value="$ {{ listing.sale_price|default:'' }}"
+                                disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="mt-4">
         <a href="javascript:history.back()" class="btn btn-secondary">Back to Listings</a>
     </div>
 </div>
+
+{% block styles %}
+<style>
+    .nav-pills .nav-link.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
 {% endblock %}
