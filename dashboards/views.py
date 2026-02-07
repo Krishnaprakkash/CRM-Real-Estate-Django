@@ -28,6 +28,12 @@ def salesman_dashboard(request):
             action = request.POST.get('action')
             stage = request.POST.get('stage', 'lead')  
             rejection_reason = request.POST.get('rejection-reason', '')
+            
+            if action == 'delete':
+                count = listings_to_update.count()
+                listings_to_update.delete()
+                messages.success(request, f'Successfully deleted {count} listing(s).')
+                return redirect('dashboards:manager_dashboard')
 
             for listing in listings_to_update:       
                 if stage == 'opportunity':
@@ -61,6 +67,9 @@ def salesman_dashboard(request):
                         listing.sale_closed_at = timezone.now()
                     
                 listing.save()
+            
+            if action != 'delete':
+                messages.success(request, f"{action.capitalize()}d {len(selected_ids)} listings in {stage} stage.")
 
             messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
             
@@ -121,6 +130,12 @@ def manager_dashboard(request):
             action = request.POST.get('action')
             stage = request.POST.get('stage', 'lead')  
             rejection_reason = request.POST.get('rejection-reason', '')
+            
+            if action == 'delete':
+                count = listings_to_update.count()
+                listings_to_update.delete()
+                messages.success(request, f'Successfully deleted {count} listing(s).')
+                return redirect('dashboards:manager_dashboard')
 
             for listing in listings_to_update:
                 if stage == 'lead':
@@ -173,6 +188,9 @@ def manager_dashboard(request):
                         listing.sale_price = None
                 
                 listing.save()
+            
+            if action != 'delete':
+                messages.success(request, f"{action.capitalize()}d {len(selected_ids)} listings in {stage} stage.")
 
             messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
             

@@ -88,6 +88,30 @@
                 return;
             }
 
+            if (action === 'delete') {
+                const confirmMsg = 'Are you sure you want to DELETE ${selected.length} listing(s)?\n\nThis action CANNOT BE UNDONE.'
+                if (!confirm(confirmMsg)) {
+                    return;
+                }
+            }
+
+            if (suffix === 'opps' && action !== 'delete') {
+                const invalidItems = [];
+                selected.forEach((checkbox) => {
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        const columnValue = row.cells[5]?.textContent?.trim();
+                        if (columnValue !== 'Pending Approval') {
+                            const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
+                            invalidItems.push({ id: itemId, value: columnValue })
+                        }
+                    }
+                });
+                if (invalidItems.length > 0) {
+                    alert('Cannot perform batch action. ${invalidItems.length} item(s) have not been submitted for approval.')
+                } 
+            }
+
             if (suffix === 'opps') {
                 const invalidItems = [];
                 const invalidItems1 = [];
@@ -141,6 +165,30 @@
             if (selected.length === 0) {
                 alert(`Please select at least one listing first!`);
                 return;
+            }
+
+            if (action === 'delete') {
+                const confirmMsg = 'Are you sure you want to DELETE ${selected.length} listing(s)?\n\nThis action CANNOT BE UNDONE.'
+                if (!confirm(confirmMsg)) {
+                    return;
+                }
+            }
+
+            if (suffix === 'opps' && action !== 'delete') {
+                const invalidItems = [];
+                selected.forEach((checkbox) => {
+                    const row = checkbox.closest('tr');
+                    if (row) {
+                        const columnValue = row.cells[4]?.textContent?.trim();
+                        if (columnValue !== 'Pending Approval') {
+                            const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
+                            invalidItems.push({ id: itemId, value: columnValue })
+                        }
+                    }
+                });
+                if (invalidItems.length > 0) {
+                    alert('Cannot perform batch action. ${invalidItems.length} item(s) have not been submitted for approval.')
+                } 
             }
 
             // Validation for submitting opportunities

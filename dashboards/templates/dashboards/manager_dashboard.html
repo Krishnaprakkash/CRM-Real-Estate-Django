@@ -46,6 +46,9 @@
                 <button type="button" onclick="setAction('pending','leads')">
                     Mark Pending
                 </button>
+                <button type="button" onclick="setAction('delete','leads')">
+                    Delete Selected
+                </button>
                 {% if perms.inventory.add_listing %}
                 <div>
                     <a href="{% url 'inventory:listing_create_manager' %}">
@@ -140,6 +143,9 @@
                 <button type="button" onclick="setAction('pending','opps')">
                     Mark Pending
                 </button>
+                <button type="button" onclick="setAction('delete','opps')">
+                    Delete Selected
+                </button>
                 {% if perms.inventory.add_listing %}
                 <div>
                     <a href="{% url 'inventory:listing_create_manager' %}">
@@ -226,6 +232,9 @@
             </div>
         </div>
         <div>
+            <button type="button" onclick="setAction('delete','opps')">
+                Delete Selected
+            </button>
             {% if perms.inventory.add_listing %}
             <div>
                 <a href="{% url 'inventory:listing_create_manager' %}">
