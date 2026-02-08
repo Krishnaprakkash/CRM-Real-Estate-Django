@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect, get_object_or_404  # Added get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404 
 from .forms import SalesmanListingForm, ManagerListingForm, VillaDetailsForm, ApartmentDetailsForm, WarehouseDetailsForm, OfficeDetailsForm, RetailDetailsForm
 from .models import Listing, VillaDetails, ApartmentDetails, WarehouseDetails, OfficeDetails, RetailDetails
+from accounts.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
-from django.template.loader import render_to_string  # Added missing import
-from django.http import JsonResponse  # Added missing import
+from django.template.loader import render_to_string  
+from django.http import JsonResponse 
+from django.db.models import Q
 
 # Create your views here.
 
@@ -166,7 +168,60 @@ def listings_visible_to(user):
 @login_required
 def listing_list(request):
     listings = listings_visible_to(request.user)
-    return render(request, 'inventory/listing_list.html', {'listings': listings})
+    
+    property_type = request.GET.get('type', '')
+    city = request.GET.get('city', '')
+    salesman_filter = request.GET.get('salesman', '')
+    
+    if property_type:
+        listings = listings.filter(type=property_type)
+    if city:
+        listings = listings.filter(city__icontains=city)
+    if salesman_filter:
+        listings = listings.filter(assigned_salesman_id=salesman_filter)
+        
+    available_types = listings.values_list('type', flat=True).distinct()
+    available_cities = listings.values_list('city', flat=True).distinct()
+    
+    salesmen = None
+    if request.user.role == 'Manager':
+        salesmen = User.objects.filter(
+            branch = request.user.branch,
+            role = 'Salesman').order_by('first_name', 'last_name')
+        
+    lead_count = listings.filter(
+        Q(lead_status=Listing.leadStatusChoices.PENDING) |
+        Q(lead_status=Listing.leadStatusChoices.APPROVED) |
+        Q(lead_status=Listing.leadStatusChoices.REJECTED)).count()
+    
+    opp_count = listings.filter(
+        Q(opp_status=Listing.oppStatusChoices.PENDING) |
+        Q(opp_status=Listing.oppStatusChoices.PROSPECTING) |
+        Q(opp_status=Listing.oppStatusChoices.NEGOTIATING) |
+        Q(opp_status=Listing.oppStatusChoices.APPROVED) |
+        Q(opp_status=Listing.oppStatusChoices.REJECTED)).count()
+    
+    sale_count = listings.filter(
+        Q(sale_status=Listing.saleStatusChoices.PROCESSING) |
+        Q(sale_status=Listing.saleStatusChoices.CLOSED_WON) |
+        Q(sale_status=Listing.saleStatusChoices.CLOSED_LOST)).count()
+        
+    context = {
+        'listings': listings,
+        'available_types': available_types,
+        'available_cities': available_cities,
+        'salesmen': salesmen,
+        'filters': {
+            'type': property_type,
+            'city': city,
+            'salesman': salesman_filter
+        },
+        'total_count': listings.count(),
+        'lead_count': lead_count,
+        'opp_count': opp_count,
+        'sale_count': sale_count
+    } 
+    return render(request, 'inventory/listing_list.html', context)
 
 @login_required
 def listing_detail(request, pk):
@@ -261,7 +316,7 @@ def listing_edit(request, pk):
     return render(request, 'inventory/listing_edit.html', context)
 
 @login_required
-@user_passes_test(is_manager)
+@user_passes_test(is_manager_or_salesman)
 def listing_delete(request, pk):
     listings = listings_visible_to(request.user)
     listing = get_object_or_404(listings, pk=pk)
@@ -270,7 +325,11 @@ def listing_delete(request, pk):
         listing_title = listing.title
         listing.delete()
         messages.success(request, f'Listing {listing_title} successfully deleted.')
-        return redirect('dashboards:manager_dashboard')
+        
+        if request.user.role == 'Manager':
+            return redirect('dashboards:manager_dashboard')
+        elif request.user.role == 'Salesman':
+            return redirect('dashboards:salesman_dashboard')
     
     return render(request, 'inventory/listing_confirm_delete.html', {'listing': listing})
 

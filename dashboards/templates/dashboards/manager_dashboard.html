@@ -50,11 +50,11 @@
                     Delete Selected
                 </button>
                 {% if perms.inventory.add_listing %}
-                <div>
-                    <a href="{% url 'inventory:listing_create_manager' %}">
-                        Create New Listing
-                    </a>
-                </div>
+                    <button>
+                        <a href="{% url 'inventory:listing_create_manager' %}">
+                            Create New Listing
+                        </a>
+                    </button>
                 {% endif %}
             </div>
         </div>
@@ -147,11 +147,11 @@
                     Delete Selected
                 </button>
                 {% if perms.inventory.add_listing %}
-                <div>
-                    <a href="{% url 'inventory:listing_create_manager' %}">
-                        Create New Listing
-                    </a>
-                </div>
+                    <button>
+                        <a href="{% url 'inventory:listing_create_manager' %}">
+                            Create New Listing
+                        </a>
+                    </button>
                 {% endif %}
             </div>
         </div>
@@ -236,11 +236,11 @@
                 Delete Selected
             </button>
             {% if perms.inventory.add_listing %}
-            <div>
+            <button>
                 <a href="{% url 'inventory:listing_create_manager' %}">
                     Create New Listing
                 </a>
-            </div>
+            </button>
             {% endif %}
         </div>
         <div>

@@ -30,12 +30,15 @@
             </div>
         </div>
         <div>
+            <button type="button" onclick="setAction('delete','leads')">
+                Delete Selected
+            </button>
             {% if perms.inventory.add_listing %}
-            <div>
+            <button>
                 <a href="{% url 'inventory:listing_create_salesman' %}">
                     Create New Listing
                 </a>
-            </div>
+            </button>
             {% endif %}
         </div>
         <div>
@@ -48,6 +51,7 @@
                         <th>Type</th>
                         <th>Price</th>
                         <th>Status</th>
+                        <th><input type="checkbox" id="select_all" onchange="toggleSelectAll(this)"> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,6 +65,9 @@
                             <span>
                                 {{ listing.get_lead_status_display }}
                             </span>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
                     </tr>
                     {% endfor %}
@@ -107,15 +114,18 @@
                 <button type="button" onclick="setSalesmanAction('submit','opps')">
                     Submit for Approval
                 </button>
+                <button type="button" onclick="setAction('delete','leads')">
+                    Delete Selected
+                </button>
                 {% if perms.inventory.add_listing %}
-                <div>
-                    <a href="{% url 'inventory:listing_create_manager' %}">
+                <button>
+                    <a href="{% url 'inventory:listing_create_salesman' %}">
                         Create New Listing
                     </a>
-                </div>
+                </button>
                 {% endif %}
+                </div>
             </div>
-        </div>
         <div>
             {% if listings %}
             <table id="salesman-opps-table">
@@ -191,12 +201,15 @@
                 <button type="button" onclick="setSalesmanAction('lost','sale')">
                     Closed Lost
                 </button>
+                <button type="button" onclick="setAction('delete','leads')">
+                    Delete Selected
+                </button>
                 {% if perms.inventory.add_listing %}
-                <div>
-                    <a href="{% url 'inventory:listing_create_manager' %}">
+                <button>
+                    <a href="{% url 'inventory:listing_create_salesman' %}">
                         Create New Listing
                     </a>
-                </div>
+                </button>
                 {% endif %}
             </div>
         </div>

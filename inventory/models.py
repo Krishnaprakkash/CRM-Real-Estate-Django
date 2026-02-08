@@ -58,7 +58,6 @@ class Listing(models.Model):
     # Opportunity status fields
     opp_status = models.TextField(
         choices=oppStatusChoices.choices,
-        default=oppStatusChoices.PENDING,
         null=True, blank=True
     )
     opp_approved_by = models.ForeignKey(
@@ -74,7 +73,6 @@ class Listing(models.Model):
     # Sale status fields
     sale_status = models.TextField(
         choices=saleStatusChoices.choices,
-        default=saleStatusChoices.PROCESSING,
         null=True, blank=True
     )
     sale_closed_at = models.DateTimeField(null=True, blank=True)

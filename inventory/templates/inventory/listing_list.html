@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}My Listings{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Inventory View</h1>
+        <div>
+            {% if user.role == 'Manager' %}
+                <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Create New Listing
+                </a>
+            {% elif user.role == 'Salesman' %}
+                <a href="{% url 'inventory:listing_create_salesman' %}" class="btn btn-success">
+                    <i class="bi bi-plus-circle"></i> Create New Listing
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body py-3 px-4">
+                <h3 class="card-title mb-1">Total</h3>
+                <h4 class="mb-0">{{ total_count }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body py-3 px-4">
+                <h3 class="card-title mb-1">Leads</h3>
+                <h4 class="mb-0">{{ lead_count }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body py-3 px-4">
+                <h3 class="card-title mb-1">Opportunities</h3>
+                <h4 class="mb-0">{{ opp_count }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body py-3 px-4">
+                <h3 class="card-title mb-1">Sales</h3>
+                <h4 class="mb-0">{{ sale_count }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-funnel"></i> Filters
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" id="filter-form">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="type" class="form-label">Property Type</label>
+                        <select name="type" id="type" class="form-select">
+                            <option value="">All Types</option>
+                            {% for type in available_types %}
+                            <option value="{{ type }}" {% if filters.type == type %}selected{% endif %}>
+                                {{ type }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <select name="city" id="city" class="form-select">
+                            <option value="">All Cities</option>
+                            {% for city in available_cities %}
+                            <option value="{{ city }}" {% if filters.city == city %}selected{% endif %}>
+                                {{ city }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    {% if user.role == 'Manager' and salesmen %}
+                    <div class="col-md-3 mb-3">
+                        <label for="salesman" class="form-label">Salesman</label>
+                        <select name="salesman" id="salesman" class="form-select">
+                            <option value="">All Salesmen</option>
+                            {% for salesman in salesmen %}
+                            <option value="{{ salesman.id }}" {% if filters.salesman == salesman.id|stringformat:"s" %}selected{% endif %}>
+                                {{ salesman.get_full_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Apply Filters
+                    </button>
+                    <a href="{% url 'inventory:listing_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Listings Table -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Listings</h5>
+        </div>
+        <div class="card-body">
+            {% if listings %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped" id="listings-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>City</th>
+                            <th>Price</th>
+                            {% if user.role == 'Manager' %}
+                            <th>Salesman</th>
+                            {% endif %}
+                            <th>Stage</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for listing in listings %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'inventory:listing_detail' listing.pk %}" class="fw-bold">
+                                    {{ listing.id }}
+                                </a>
+                            </td>
+                            <td>{{ listing.title }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ listing.get_type_display }}
+                                </span>
+                            </td>
+                            <td>{{ listing.city }}</td>
+                            <td class="text-end">${{ listing.proposed_price|floatformat:0 }}</td>
+                            {% if user.role == 'Manager' %}
+                            <td>{{ listing.assigned_salesman.get_full_name|default:"—" }}</td>
+                            {% endif %}
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ listing.stage_display }}
+                                </span>
+                            </td>
+                            <td>{{ listing.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'inventory:listing_detail' listing.pk %}" 
+                                       class="btn btn-sm btn-info" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if user.role == 'Manager' or listing.assigned_salesman == user %}
+                                    <a href="{% url 'inventory:listing_edit' listing.pk %}" 
+                                       class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if user.role == 'Manager' or listing.assigned_salesman == user %}
+                                    <a href="{% url 'inventory:listing_delete' listing.pk %}" 
+                                       class="btn btn-sm btn-danger" title="Delete"
+                                       onclick="return confirm('Are you sure you want to delete this listing?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> No listings found matching your criteria.
+                {% if user.role == 'Manager' %}
+                    <a href="{% url 'inventory:listing_create_manager' %}" class="alert-link">Create your first listing</a>
+                {% elif user.role == 'Salesman' %}
+                    <a href="{% url 'inventory:listing_create_salesman' %}" class="alert-link">Create your first listing</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    $('#listings-table').DataTable({
+        order: [[0, 'desc']], // Sort by ID descending
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+        columnDefs: [
+            { orderable: false, targets: -1 } // Disable sorting on Actions column
+        ]
+    });
+});
+</script>
+{% endblock %}

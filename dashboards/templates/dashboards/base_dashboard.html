@@ -5,6 +5,11 @@
 {% block content %}
 <div class="d-flex align-items-center gap-4 mb-4">
     <h1 class="flex-grow-1 mb-0 ms-2">Welcome {{ user.get_full_name }}</h1>
+    <button>
+        <a href="{% url 'inventory:listing_list' %}">
+            Inventory
+        </a>
+    </button>
     <div class="card flex-shrink-1 mt-2 me-2">
         <div class="card-body py-3 px-4">
             <h3 class="card-title mb-1">Listings</h3>

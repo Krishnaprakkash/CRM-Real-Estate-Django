@@ -33,7 +33,7 @@ def salesman_dashboard(request):
                 count = listings_to_update.count()
                 listings_to_update.delete()
                 messages.success(request, f'Successfully deleted {count} listing(s).')
-                return redirect('dashboards:manager_dashboard')
+                return redirect('dashboards:salesman_dashboard')
 
             for listing in listings_to_update:       
                 if stage == 'opportunity':
