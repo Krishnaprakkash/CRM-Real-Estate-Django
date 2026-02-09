@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
+{% load compress %}
+{% load static %}
 
 {% block title %}{{ Edit Listing }}{% endblock %}
 
+{% block extra_css %}
+{% compress css %}
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+{% endcompress %}
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 listing-edit-form">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ title }}</h1>
         <a href="{% url 'inventory:listing_detail' listing.pk %}" class="btn btn-secondary">
@@ -117,7 +125,7 @@
         </div>
         
         <!-- Action Buttons -->
-        <div class="d-flex justify-content-between mb-4">
+        <div class="listing-edit-actions">
             <div>
                 <button type="submit" class="btn btn-primary btn-lg">
                     <i class="bi bi-save"></i> {{ submit_text }}
@@ -137,9 +145,10 @@
         </div>
     </form>
 </div>
+{% endblock %}
 
-<script>
-// Disable type field since it can't be changed after creation
-document.getElementById('{{ form.type.id_for_label }}').disabled = true;
-</script>
+{% block extra_js %}
+{% compress js %}
+    <script src="{% static 'js/forms.js' %}"></script>
+{% endcompress %}
 {% endblock %}

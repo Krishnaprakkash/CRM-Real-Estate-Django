@@ -1,74 +1,187 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}{{ dashboard_title }}{% endblock %}
+{% block title %}{{ dashboard_title|default:"Dashboard" }}{% endblock %}
+{% block page_title %}{{ page_title|default:"Dashboard" }}{% endblock %}
+{% block page_subtitle %}{{ page_subtitle|default:"" }}{% endblock %}
 
-{% block content %}
-<div class="d-flex align-items-center gap-4 mb-4">
-    <h1 class="flex-grow-1 mb-0 ms-2">Welcome {{ user.get_full_name }}</h1>
-    <button>
-        <a href="{% url 'inventory:listing_list' %}">
-            Inventory
-        </a>
-    </button>
-    <div class="card flex-shrink-1 mt-2 me-2">
-        <div class="card-body py-3 px-4">
-            <h3 class="card-title mb-1">Listings</h3>
-            <h4 class="mb-1">{{ listings|length }}</h4>
-        </div>
-    </div>
-
-    <div class="stats-group" id="stats-lead">
-        <div class="card flex-shrink-1 mt-2 me-2">
-            <div class="card-body py-3 px-4">
-                <h3 class="card-title mb-1">Total: {{ lead_count }}</h3>
-                <h3 class="card-title mb-1">Active: {{ lead_active_count }}</h3>
-                <h3 class="card-title mb-1">Approved: {{ lead_approved_count }}</h3>
-                <h3 class="card-title mb-1">Rejected: {{ lead_rejected_count }}</h3>
-            </div>
-        </div>
-    </div>
-
-    <div class="stats-group" id="stats-opportunity" style="display: none;">
-        <div class="card flex-shrink-1 mt-2 me-2">
-            <div class="card-body py-3 px-4">
-                <h3 class="card-title mb-1">Total: {{ opp_count }}</h3>
-                <h3 class="card-title mb-1">Active: {{ opp_active_count }}</h3>
-                <h3 class="card-title mb-1">Approved: {{ opp_approved_count }}</h3>
-                <h3 class="card-title mb-1">Rejected: {{ opp_rejected_count }}</h3>
-            </div>
-        </div>
-    </div>
-
-    <div class="stats-group" id="stats-sale" style="display: none;">
-        <div class="card flex-shrink-1 mt-2 me-2">
-            <div class="card-body py-3 px-4">
-                <h3 class="card-title mb-1">Total: {{ sale_count }}</h3>
-                <h3 class="card-title mb-1">Active: {{ sale_active_count }}</h3>
-                <h3 class="card-title mb-1">Won: {{ sale_won_count }}</h3>
-                <h3 class="card-title mb-1">Lost: {{ sale_lost_count }}</h3>
-                
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="menu">
-    <button class="tablinks" onclick="switchTab(event, 'lead')">Leads</button>
-    <button class="tablinks" onclick="switchTab(event, 'opportunity')">Opportunities</button>
-    <button class="tablinks" onclick="switchTab(event, 'sale')">Sales</button>
-</div>
-
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/components.css' %}">
 {% endblock %}
 
-{% block styles %}
-<style>
-.stats-group {
-    display: flex;
-    gap: 0.5rem;
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <h1 class="dashboard-welcome">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+    
+    <a href="{% url 'inventory:listing_list' %}" class="btn-inventory">
+        <i class="bi bi-box-seam"></i> View Inventory
+    </a>
+    
+    <div class="stats-overview-card">
+        <div class="stats-title">Total Listings</div>
+        <div class="stats-value">{{ listings|length }}</div>
+    </div>
+</div>
+
+<!-- Stats Groups (Dynamic based on tab selection) -->
+<div class="stats-group active" id="stats-leads">
+    <div class="stats-card total">
+        <div class="stats-label">
+            <i class="bi bi-funnel"></i> Total Leads
+        </div>
+        <div class="stats-number">{{ lead_count }}</div>
+    </div>
+    
+    <div class="stats-card active">
+        <div class="stats-label">
+            <i class="bi bi-clock"></i> Pending
+        </div>
+        <div class="stats-number">{{ lead_active_count }}</div>
+    </div>
+    
+    <div class="stats-card approved">
+        <div class="stats-label">
+            <i class="bi bi-check-circle"></i> Approved
+        </div>
+        <div class="stats-number">{{ lead_approved_count }}</div>
+    </div>
+    
+    <div class="stats-card rejected">
+        <div class="stats-label">
+            <i class="bi bi-x-circle"></i> Rejected
+        </div>
+        <div class="stats-number">{{ lead_rejected_count }}</div>
+    </div>
+</div>
+
+<div class="stats-group" id="stats-opps">
+    <div class="stats-card total">
+        <div class="stats-label">
+            <i class="bi bi-lightning"></i> Total Opportunities
+        </div>
+        <div class="stats-number">{{ opp_count }}</div>
+    </div>
+    
+    <div class="stats-card active">
+        <div class="stats-label">
+            <i class="bi bi-activity"></i> Active
+        </div>
+        <div class="stats-number">{{ opp_active_count }}</div>
+    </div>
+    
+    <div class="stats-card approved">
+        <div class="stats-label">
+            <i class="bi bi-check-circle"></i> Approved
+        </div>
+        <div class="stats-number">{{ opp_approved_count }}</div>
+    </div>
+    
+    <div class="stats-card rejected">
+        <div class="stats-label">
+            <i class="bi bi-x-circle"></i> Rejected
+        </div>
+        <div class="stats-number">{{ opp_rejected_count }}</div>
+    </div>
+</div>
+
+<div class="stats-group" id="stats-sale">
+    <div class="stats-card total">
+        <div class="stats-label">
+            <i class="bi bi-cash-stack"></i> Total Sales
+        </div>
+        <div class="stats-number">{{ sale_count }}</div>
+    </div>
+    
+    <div class="stats-card pending">
+        <div class="stats-label">
+            <i class="bi bi-hourglass"></i> Processing
+        </div>
+        <div class="stats-number">{{ sale_active_count }}</div>
+    </div>
+    
+    <div class="stats-card won">
+        <div class="stats-label">
+            <i class="bi bi-trophy"></i> Won
+        </div>
+        <div class="stats-number">{{ sale_won_count }}</div>
+    </div>
+    
+    <div class="stats-card lost">
+        <div class="stats-label">
+            <i class="bi bi-x-lg"></i> Lost
+        </div>
+        <div class="stats-number">{{ sale_lost_count }}</div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-menu">
+    <button class="tab-button active" onclick="switchTab(event, 'leads')">
+        <i class="bi bi-funnel"></i> Leads
+    </button>
+    <button class="tab-button" onclick="switchTab(event, 'opps')">
+        <i class="bi bi-lightning"></i> Opportunities
+    </button>
+    <button class="tab-button" onclick="switchTab(event, 'sale')">
+        <i class="bi bi-cash-stack"></i> Sales
+    </button>
+</div>
+
+<!-- Tab Content -->
+<div class="tab-content active" id="leads">
+    {% block leads_content %}
+    <!-- Leads table will go here in child templates -->
+    {% endblock %}
+</div>
+
+<div class="tab-content" id="opps">
+    {% block opportunities_content %}
+    <!-- Opportunities table will go here in child templates -->
+    {% endblock %}
+</div>
+
+<div class="tab-content" id="sale">
+    {% block sales_content %}
+    <!-- Sales table will go here in child templates -->
+    {% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Override the switchTab function for this specific template
+function switchTab(evt, tabName) {
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Hide all stats groups
+    document.querySelectorAll('.stats-group').forEach(group => {
+        group.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    const selectedContent = document.getElementById(tabName);
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+    }
+    
+    // Show corresponding stats group
+    const statsElement = document.getElementById('stats-' + tabName);
+    if (statsElement) {
+        statsElement.classList.add('active');
+    }
+    
+    // Add active class to clicked button
+    evt.currentTarget.classList.add('active');
 }
-.tablinks.active {
-    background-color: #007bff;
-    color: white;
-}
-</style>
+</script>
 {% endblock %}

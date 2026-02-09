@@ -1,194 +1,322 @@
-{% extends 'dashboards/base_dashboard.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Manager Dashboard{% endblock %}
+{% block page_title %}Team Pipeline{% endblock %}
+{% block page_subtitle %}Manage your team's leads, opportunities, and sales{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/components.css' %}">
+{% endblock %}
 
 {% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <h1 class="dashboard-welcome">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+    
+    <a href="{% url 'inventory:listing_list' %}" class="btn-inventory">
+        <i class="bi bi-box-seam"></i> View Inventory
+    </a>
+    
+    <div class="stats-overview-card">
+        <div class="stats-title">Total Listings</div>
+        <div class="stats-value">{{ listings|length }}</div>
+    </div>
+</div>
 
-{{ block.super }}
+<!-- Stats Groups -->
+<div class="stats-group active" id="stats-leads">
+    <div class="stats-card total">
+        <div class="stats-label"><i class="bi bi-funnel"></i> Total Leads</div>
+        <div class="stats-number">{{ lead_count }}</div>
+    </div>
+    <div class="stats-card pending">
+        <div class="stats-label"><i class="bi bi-clock"></i> Pending</div>
+        <div class="stats-number">{{ lead_active_count }}</div>
+    </div>
+    <div class="stats-card approved">
+        <div class="stats-label"><i class="bi bi-check-circle"></i> Approved</div>
+        <div class="stats-number">{{ lead_approved_count }}</div>
+    </div>
+    <div class="stats-card rejected">
+        <div class="stats-label"><i class="bi bi-x-circle"></i> Rejected</div>
+        <div class="stats-number">{{ lead_rejected_count }}</div>
+    </div>
+</div>
 
-<div id="lead" class="tabcontent" style="display: block;">
+<div class="stats-group" id="stats-opps">
+    <div class="stats-card total">
+        <div class="stats-label"><i class="bi bi-lightning"></i> Total Opportunities</div>
+        <div class="stats-number">{{ opp_count }}</div>
+    </div>
+    <div class="stats-card pending">
+        <div class="stats-label"><i class="bi bi-activity"></i> Active</div>
+        <div class="stats-number">{{ opp_active_count }}</div>
+    </div>
+    <div class="stats-card approved">
+        <div class="stats-label"><i class="bi bi-check-circle"></i> Approved</div>
+        <div class="stats-number">{{ opp_approved_count }}</div>
+    </div>
+    <div class="stats-card rejected">
+        <div class="stats-label"><i class="bi bi-x-circle"></i> Rejected</div>
+        <div class="stats-number">{{ opp_rejected_count }}</div>
+    </div>
+</div>
+
+<div class="stats-group" id="stats-sale">
+    <div class="stats-card total">
+        <div class="stats-label"><i class="bi bi-cash-stack"></i> Total Sales</div>
+        <div class="stats-number">{{ sale_count }}</div>
+    </div>
+    <div class="stats-card pending">
+        <div class="stats-label"><i class="bi bi-hourglass"></i> Processing</div>
+        <div class="stats-number">{{ sale_active_count }}</div>
+    </div>
+    <div class="stats-card won">
+        <div class="stats-label"><i class="bi bi-trophy"></i> Won</div>
+        <div class="stats-number">{{ sale_won_count }}</div>
+    </div>
+    <div class="stats-card lost">
+        <div class="stats-label"><i class="bi bi-x-lg"></i> Lost</div>
+        <div class="stats-number">{{ sale_lost_count }}</div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-menu">
+    <button class="tab-button active" onclick="switchTab(event, 'leads')">
+        <i class="bi bi-funnel"></i> Leads
+    </button>
+    <button class="tab-button" onclick="switchTab(event, 'opps')">
+        <i class="bi bi-lightning"></i> Opportunities
+    </button>
+    <button class="tab-button" onclick="switchTab(event, 'sale')">
+        <i class="bi bi-cash-stack"></i> Sales
+    </button>
+</div>
+
+<!-- ==================== LEADS TAB ==================== -->
+<div id="leads" class="tab-content active">
     <form method="post" id="batch-form-leads">
         {% csrf_token %}
         <input type="hidden" name="action" id="batch-action-leads" value="">
         <input type="hidden" name="rejection-reason" id="rejection-reason-leads" value="">
         <input type="hidden" name="stage" id="stage-leads" value="lead">
-        <div>
-            <div>
-                <label>Property Type:</label>
-                <select id="typeFilterLeads">
-                    <option value="">All Types</option>
-                </select>
-            </div>
-            <div>
-                <label>Status:</label>
-                <select id="statusFilterLeads">
-                    <option value="">All Status</option>
-                </select>
-            </div>
-            <div>
-                <label>Salesman:</label>
-                <select id="salesmanFilterLeads">
-                    <option value="">All Salesmen</option>
-                </select>
-            </div>
-            <div>
-                <button type="button" id="clearFiltersLeads">Clear Filters</button>
-            </div>
-        </div>
-        <div>
-            <div>
-                <button type="button" onclick="setAction('approve','leads')">
-                    Approve Selected
-                </button>
-                <button type="button" onclick="setAction('reject','leads')">
-                    Reject Selected
-                </button>
-                <button type="button" onclick="setAction('pending','leads')">
-                    Mark Pending
-                </button>
-                <button type="button" onclick="setAction('delete','leads')">
-                    Delete Selected
-                </button>
-                {% if perms.inventory.add_listing %}
-                    <button>
-                        <a href="{% url 'inventory:listing_create_manager' %}">
-                            Create New Listing
-                        </a>
+        
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="typeFilterLeads">Property Type</label>
+                    <select id="typeFilterLeads">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilterLeads">Status</label>
+                    <select id="statusFilterLeads">
+                        <option value="">All Status</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="salesmanFilterLeads">Salesman</label>
+                    <select id="salesmanFilterLeads">
+                        <option value="">All Salesmen</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button type="button" id="clearFiltersLeads" class="btn-clear">
+                        <i class="bi bi-x-circle"></i> Clear Filters
                     </button>
-                {% endif %}
+                </div>
             </div>
         </div>
-        <div>
+        
+        <!-- Actions -->
+        <div class="actions-container">
+            <button type="button" class="action-btn btn-approve" onclick="setAction('approve','leads')">
+                <i class="bi bi-check-circle"></i> Approve
+            </button>
+            <button type="button" class="action-btn btn-reject" onclick="setAction('reject','leads')">
+                <i class="bi bi-x-circle"></i> Reject
+            </button>
+            <button type="button" class="action-btn btn-pending" onclick="setAction('pending','leads')">
+                <i class="bi bi-clock"></i> Mark Pending
+            </button>
+            <button type="button" class="action-btn btn-delete" onclick="setAction('delete','leads')">
+                <i class="bi bi-trash"></i> Delete
+            </button>
+            {% if perms.inventory.add_listing %}
+            <a href="{% url 'inventory:listing_create_manager' %}" class="action-btn btn-create">
+                <i class="bi bi-plus-circle"></i> New Listing
+            </a>
+            {% endif %}
+        </div>
+        
+        <!-- Table -->
+        <div class="table-container">
             {% if listings %}
-            <table id="manager-leads-table">
+            <table id="manager-leads-table" class="data-table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="select_all_leads" onchange="toggleSelectAll(this)"></th>
                         <th>ID</th>
                         <th>Title</th>
                         <th>Type</th>
                         <th>Price</th>
                         <th>Salesman</th>
                         <th>Status</th>
-                        <th><input type="checkbox" id="select_all" onchange="toggleSelectAll(this)"> </th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for listing in listings %}
+                    {% if listing.lead_status %}
                     <tr>
                         <td>
-                            <a href="{% url 'inventory:listing_detail' listing.pk %}">
-                                {{ listing.id }}
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                        </td>
+                        <td>
+                            <a href="{% url 'inventory:listing_detail' listing.pk %}" class="id-link">
+                                #{{ listing.id }}
                             </a>
                         </td>
                         <td>{{ listing.title }}</td>
                         <td>{{ listing.get_type_display }}</td>
-                        <td>${{ listing.proposed_price|floatformat:0 }}</td>
+                        <td class="price-cell">₹{{ listing.proposed_price|floatformat:0 }}</td>
                         <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username|default:"—" }}</td>
                         <td>
-                            <span>
-                                {{ listing.get_lead_status_display }}
-                            </span>
-                        </td>
-                        <td>
-                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                            {% if listing.lead_status == "Pending" %}
+                            <span class="status-badge pending">Pending</span>
+                            {% elif listing.lead_status == "Approved" %}
+                            <span class="status-badge approved">Approved</span>
+                            {% elif listing.lead_status == "Rejected" %}
+                            <span class="status-badge rejected">Rejected</span>
+                            {% else %}
+                            <span class="status-badge">{{ listing.get_lead_status_display }}</span>
+                            {% endif %}
                         </td>
                     </tr>
+                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
             {% else %}
-            <p>No listings found.</p>
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h4>No Leads Found</h4>
+                <p>There are no leads to display at the moment.</p>
+            </div>
             {% endif %}
         </div>
     </form>
 </div>
 
-<div id="opportunity" class="tabcontent" style="display: none;">
+<!-- ==================== OPPORTUNITIES TAB ==================== -->
+<div id="opps" class="tab-content">
     <form method="post" id="batch-form-opps">
         {% csrf_token %}
         <input type="hidden" name="action" id="batch-action-opps" value="">
         <input type="hidden" name="rejection-reason" id="rejection-reason-opps" value="">
         <input type="hidden" name="stage" id="stage-opps" value="opportunity">
-        <div>
-            <div>
-                <label>Property Type:</label>
-                <select id="typeFilterOpps">
-                    <option value="">All Types</option>
-                </select>
-            </div>
-            <div>
-                <label>Status:</label>
-                <select id="statusFilterOpps">
-                    <option value="">All Status</option>
-                </select>
-            </div>
-            <div>
-                <label>Salesman:</label>
-                <select id="salesmanFilterOpps">
-                    <option value="">All Salesmen</option>
-                </select>
-            </div>
-            <div>
-                <button type="button" id="clearFiltersOpps">Clear Filters</button>
-            </div>
-        </div>
-        <div>
-            <div>
-                <button type="button" onclick="setAction('approve','opps')">
-                    Approve Selected
-                </button>
-                <button type="button" onclick="setAction('reject','opps')">
-                    Reject Selected
-                </button>
-                <button type="button" onclick="setAction('pending','opps')">
-                    Mark Pending
-                </button>
-                <button type="button" onclick="setAction('delete','opps')">
-                    Delete Selected
-                </button>
-                {% if perms.inventory.add_listing %}
-                    <button>
-                        <a href="{% url 'inventory:listing_create_manager' %}">
-                            Create New Listing
-                        </a>
+        
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="typeFilterOpps">Property Type</label>
+                    <select id="typeFilterOpps">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilterOpps">Status</label>
+                    <select id="statusFilterOpps">
+                        <option value="">All Status</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="salesmanFilterOpps">Salesman</label>
+                    <select id="salesmanFilterOpps">
+                        <option value="">All Salesmen</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button type="button" id="clearFiltersOpps" class="btn-clear">
+                        <i class="bi bi-x-circle"></i> Clear Filters
                     </button>
-                {% endif %}
+                </div>
             </div>
         </div>
-        <div>
+        
+        <!-- Actions -->
+        <div class="actions-container">
+            <button type="button" class="action-btn btn-approve" onclick="setAction('approve','opps')">
+                <i class="bi bi-check-circle"></i> Approve
+            </button>
+            <button type="button" class="action-btn btn-reject" onclick="setAction('reject','opps')">
+                <i class="bi bi-x-circle"></i> Reject
+            </button>
+            <button type="button" class="action-btn btn-pending" onclick="setAction('pending','opps')">
+                <i class="bi bi-clock"></i> Mark Pending
+            </button>
+            <button type="button" class="action-btn btn-delete" onclick="setAction('delete','opps')">
+                <i class="bi bi-trash"></i> Delete
+            </button>
+            {% if perms.inventory.add_listing %}
+            <a href="{% url 'inventory:listing_create_manager' %}" class="action-btn btn-create">
+                <i class="bi bi-plus-circle"></i> New Listing
+            </a>
+            {% endif %}
+        </div>
+        
+        <!-- Table -->
+        <div class="table-container">
             {% if listings %}
-            <table id="manager-opps-table">
+            <table id="manager-opps-table" class="data-table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="select_all_opps" onchange="toggleSelectAll(this)"></th>
                         <th>ID</th>
                         <th>Title</th>
                         <th>Type</th>
                         <th>Price</th>
                         <th>Salesman</th>
                         <th>Status</th>
-                        <th><input type="checkbox" id="select_all_opps" onchange="toggleSelectAll(this)"> </th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for listing in listings %}
-                    {% if listing.lead_status == "Approved" %}
+                    {% if listing.opp_status %}
                     <tr>
                         <td>
-                            <a href="{% url 'inventory:listing_detail' listing.pk %}">
-                                {{ listing.id }}
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                        </td>
+                        <td>
+                            <a href="{% url 'inventory:listing_detail' listing.pk %}" class="id-link">
+                                #{{ listing.id }}
                             </a>
                         </td>
                         <td>{{ listing.title }}</td>
                         <td>{{ listing.get_type_display }}</td>
-                        <td>${{ listing.proposed_price|floatformat:0 }}</td>
+                        <td class="price-cell">₹{{ listing.opp_price|floatformat:0|default:listing.proposed_price|floatformat:0 }}</td>
                         <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username|default:"—" }}</td>
                         <td>
-                            <span>
-                                {{ listing.get_opp_status_display }}
-                            </span>
-                        </td>
-                        <td>
-                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                            {% if listing.opp_status == "Prospecting" %}
+                            <span class="status-badge prospecting">Prospecting</span>
+                            {% elif listing.opp_status == "Negotiating" %}
+                            <span class="status-badge negotiating">Negotiating</span>
+                            {% elif listing.opp_status == "Pending" %}
+                            <span class="status-badge pending">Pending Approval</span>
+                            {% elif listing.opp_status == "Approved" %}
+                            <span class="status-badge approved">Approved</span>
+                            {% elif listing.opp_status == "Rejected" %}
+                            <span class="status-badge rejected">Rejected</span>
+                            {% else %}
+                            <span class="status-badge">{{ listing.get_opp_status_display }}</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endif %}
@@ -196,87 +324,107 @@
                 </tbody>
             </table>
             {% else %}
-            <p>No listings found.</p>
+            <div class="empty-state">
+                <i class="bi bi-lightning"></i>
+                <h4>No Opportunities Found</h4>
+                <p>There are no opportunities to display at the moment.</p>
+            </div>
             {% endif %}
         </div>
     </form>
 </div>
 
-<div id="sale" class="tabcontent" style="display: none">
+<!-- ==================== SALES TAB ==================== -->
+<div id="sale" class="tab-content">
     <form method="post" id="batch-form-sale">
         {% csrf_token %}
         <input type="hidden" name="action" id="batch-action-sale" value="">
         <input type="hidden" name="rejection-reason" id="rejection-reason-sale" value="">
         <input type="hidden" name="stage" id="stage-sale" value="sale">
-        <div>
-            <div>
-                <label>Property Type:</label>
-                <select id="typeFilterSale">
-                    <option value="">All Types</option>
-                </select>
-            </div>
-            <div>
-                <label>Status:</label>
-                <select id="statusFilterSale">
-                    <option value="">All Status</option>
-                </select>
-            </div>
-            <div>
-                <label>Salesman:</label>
-                <select id="salesmanFilterSale">
-                    <option value="">All Salesmen</option>
-                </select>
-            </div>
-            <div>
-                <button type="button" id="clearFiltersSale">Clear Filters</button>
+        
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="typeFilterSale">Property Type</label>
+                    <select id="typeFilterSale">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilterSale">Status</label>
+                    <select id="statusFilterSale">
+                        <option value="">All Status</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="salesmanFilterSale">Salesman</label>
+                    <select id="salesmanFilterSale">
+                        <option value="">All Salesmen</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button type="button" id="clearFiltersSale" class="btn-clear">
+                        <i class="bi bi-x-circle"></i> Clear Filters
+                    </button>
+                </div>
             </div>
         </div>
-        <div>
-            <button type="button" onclick="setAction('delete','opps')">
-                Delete Selected
+        
+        <!-- Actions -->
+        <div class="actions-container">
+            <button type="button" class="action-btn btn-delete" onclick="setAction('delete','sale')">
+                <i class="bi bi-trash"></i> Delete Selected
             </button>
             {% if perms.inventory.add_listing %}
-            <button>
-                <a href="{% url 'inventory:listing_create_manager' %}">
-                    Create New Listing
-                </a>
-            </button>
+            <a href="{% url 'inventory:listing_create_manager' %}" class="action-btn btn-create">
+                <i class="bi bi-plus-circle"></i> New Listing
+            </a>
             {% endif %}
         </div>
-        <div>
+        
+        <!-- Table -->
+        <div class="table-container">
             {% if listings %}
-            <table id="manager-sales-table">
+            <table id="manager-sales-table" class="data-table">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="select_all_sale" onchange="toggleSelectAll(this)"></th>
                         <th>ID</th>
                         <th>Title</th>
                         <th>Type</th>
                         <th>Price</th>
                         <th>Salesman</th>
                         <th>Status</th>
-                        <th><input type="checkbox" id="select_all_sales" onchange="toggleSelectAll(this)"> </th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for listing in listings %}
-                    {% if listing.opp_status == "Approved" %}
+                    {% if listing.sale_status %}
                     <tr>
                         <td>
-                            <a href="{% url 'inventory:listing_detail' listing.pk %}">
-                                {{ listing.id }}
+                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                        </td>
+                        <td>
+                            <a href="{% url 'inventory:listing_detail' listing.pk %}" class="id-link">
+                                #{{ listing.id }}
                             </a>
                         </td>
                         <td>{{ listing.title }}</td>
                         <td>{{ listing.get_type_display }}</td>
-                        <td>${{ listing.proposed_price|floatformat:0 }}</td>
+                        <td class="price-cell">₹{{ listing.sale_price|floatformat:0|default:listing.opp_price|floatformat:0 }}</td>
                         <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username|default:"—" }}</td>
                         <td>
-                            <span>
-                                {{ listing.get_sale_status_display }}
-                            </span>
-                        </td>
-                        <td>
-                            <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
+                            {% if listing.sale_status == "Processing" %}
+                            <span class="status-badge processing">Processing</span>
+                            {% elif listing.sale_status == "Closed Won" %}
+                            <span class="status-badge won">Closed Won</span>
+                            {% elif listing.sale_status == "Closed Lost" %}
+                            <span class="status-badge lost">Closed Lost</span>
+                            {% else %}
+                            <span class="status-badge">{{ listing.get_sale_status_display }}</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endif %}
@@ -284,10 +432,50 @@
                 </tbody>
             </table>
             {% else %}
-            <p>No listings found.</p>
+            <div class="empty-state">
+                <i class="bi bi-cash-stack"></i>
+                <h4>No Sales Found</h4>
+                <p>There are no sales to display at the moment.</p>
+            </div>
             {% endif %}
         </div>
     </form>
 </div>
+{% endblock %}
 
+{% block extra_js %}
+<script>
+// Tab switching with stats group toggle
+function switchTab(evt, tabName) {
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Hide all stats groups
+    document.querySelectorAll('.stats-group').forEach(group => {
+        group.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    const selectedContent = document.getElementById(tabName);
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+    }
+    
+    // Show corresponding stats group
+    const statsElement = document.getElementById('stats-' + tabName);
+    if (statsElement) {
+        statsElement.classList.add('active');
+    }
+    
+    // Add active class to clicked button
+    evt.currentTarget.classList.add('active');
+}
+</script>
 {% endblock %}

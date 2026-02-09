@@ -1,17 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
-</head>
-<body>
-    <h1>Login</h1>
-    <form method="post" action="/accounts/login/" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
-    
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block title %}Login{% endblock %}
+
+{% block extra_css %}
+{% compress css %}
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endcompress %}
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <!-- Header -->
+        <div class="auth-header">
+            <div class="logo">
+                <i class="bi bi-building"></i>
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Sign in to your CRM account</p>
+        </div>
+        
+        <!-- Messages -->
+        {% if messages %}
+        <div class="auth-messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Login Form -->
+        <div class="auth-body">
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+                
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">
+                        <i class="bi bi-person"></i> Username
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}">
+                        <i class="bi bi-lock"></i> Password
+                    </label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" name="remember_me" id="remember_me">
+                    <label for="remember_me">Remember me</label>
+                </div>
+                
+                <button type="submit" class="btn-login">
+                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                </button>
+            </form>
+        </div>
+        
+        <!-- Footer -->
+        <div class="auth-footer">
+            <p>Forgot your password? <a href="#">Reset it here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

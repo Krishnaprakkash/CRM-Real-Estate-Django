@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
+{% load compress %}
+{% load static %}
 
 {% block title %}My Listings{% endblock %}
 
+{% block extra_css %}
+{% compress css %}
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+{% endcompress %}
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid mt-4 listing-list-page">
+    <div class="page-header-actions">
         <h1>Inventory View</h1>
         <div>
             {% if user.role == 'Manager' %}
@@ -19,45 +27,45 @@
         </div>
     </div>
 
-    <div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body py-3 px-4">
-                <h3 class="card-title mb-1">Total</h3>
-                <h4 class="mb-0">{{ total_count }}</h4>
+    <!-- Stats Cards -->
+    <div class="row stats-cards-row">
+        <div class="col-md-3">
+            <div class="card stats-card total">
+                <div class="card-body py-3 px-4">
+                    <h3 class="card-title mb-1">Total</h3>
+                    <h4 class="mb-0">{{ total_count }}</h4>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body py-3 px-4">
-                <h3 class="card-title mb-1">Leads</h3>
-                <h4 class="mb-0">{{ lead_count }}</h4>
+        <div class="col-md-3">
+            <div class="card stats-card leads">
+                <div class="card-body py-3 px-4">
+                    <h3 class="card-title mb-1">Leads</h3>
+                    <h4 class="mb-0">{{ lead_count }}</h4>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body py-3 px-4">
-                <h3 class="card-title mb-1">Opportunities</h3>
-                <h4 class="mb-0">{{ opp_count }}</h4>
+        <div class="col-md-3">
+            <div class="card stats-card opportunities">
+                <div class="card-body py-3 px-4">
+                    <h3 class="card-title mb-1">Opportunities</h3>
+                    <h4 class="mb-0">{{ opp_count }}</h4>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body py-3 px-4">
-                <h3 class="card-title mb-1">Sales</h3>
-                <h4 class="mb-0">{{ sale_count }}</h4>
+        <div class="col-md-3">
+            <div class="card stats-card sales">
+                <div class="card-body py-3 px-4">
+                    <h3 class="card-title mb-1">Sales</h3>
+                    <h4 class="mb-0">{{ sale_count }}</h4>
+                </div>
             </div>
         </div>
-    </div>
-</div>
     </div>
 
     <!-- Filters Card -->
-    <div class="card mb-4">
-        <div class="card-header bg-light">
+    <div class="card filters-card mb-4">
+        <div class="card-header">
             <h5 class="mb-0">
                 <i class="bi bi-funnel"></i> Filters
             </h5>
@@ -117,8 +125,8 @@
     </div>
 
     <!-- Listings Table -->
-    <div class="card">
-        <div class="card-header bg-primary text-white">
+    <div class="card listings-table-card">
+        <div class="card-header">
             <h5 class="mb-0">Listings</h5>
         </div>
         <div class="card-body">
@@ -184,6 +192,7 @@
                                         <i class="bi bi-trash"></i>
                                     </a>
                                     {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -191,13 +200,16 @@
                 </table>
             </div>
             {% else %}
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> No listings found matching your criteria.
-                {% if user.role == 'Manager' %}
-                    <a href="{% url 'inventory:listing_create_manager' %}" class="alert-link">Create your first listing</a>
-                {% elif user.role == 'Salesman' %}
-                    <a href="{% url 'inventory:listing_create_salesman' %}" class="alert-link">Create your first listing</a>
-                {% endif %}
+            <div class="alert empty-state-alert">
+                <i class="bi bi-info-circle"></i>
+                <div>
+                    No listings found matching your criteria.
+                    {% if user.role == 'Manager' %}
+                        <a href="{% url 'inventory:listing_create_manager' %}" class="alert-link">Create your first listing</a>
+                    {% elif user.role == 'Salesman' %}
+                        <a href="{% url 'inventory:listing_create_salesman' %}" class="alert-link">Create your first listing</a>
+                    {% endif %}
+                </div>
             </div>
             {% endif %}
         </div>
@@ -205,17 +217,8 @@
 </div>
 {% endblock %}
 
-{% block scripts %}
-<script>
-$(document).ready(function() {
-    $('#listings-table').DataTable({
-        order: [[0, 'desc']], // Sort by ID descending
-        pageLength: 25,
-        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-        columnDefs: [
-            { orderable: false, targets: -1 } // Disable sorting on Actions column
-        ]
-    });
-});
-</script>
+{% block extra_js %}
+{% compress js %}
+    <script src="{% static 'js/datatables.js' %}"></script>
+{% endcompress %}
 {% endblock %}

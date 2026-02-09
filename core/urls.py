@@ -14,13 +14,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# core/urls.py
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
+
+def home_view(request):
+    """Redirect to dashboard if logged in, otherwise to login"""
+    if request.user.is_authenticated:
+        return redirect('dashboards:home')
+    return redirect('accounts:login')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('dashboard/', include('dashboards.urls')),
     path('accounts/', include('accounts.urls')),
     path('inventory/', include('inventory.urls')),
-    path('', include('accounts.urls'))
+    path('', home_view, name='home'),  # Root URL handler
 ]

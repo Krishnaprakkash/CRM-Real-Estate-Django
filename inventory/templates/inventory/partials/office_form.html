@@ -1,337 +1,360 @@
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Office Type & Configuration</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <label for="{{ form.office_type.id_for_label }}" class="form-label">
-            {{ form.office_type.label }}
-        </label>
-        {{ form.office_type }}
-        {% if form.office_type.errors %}
-            <div class="text-danger small">{{ form.office_type.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <label for="{{ form.furnishing_status.id_for_label }}" class="form-label">
-            {{ form.furnishing_status.label }}
-        </label>
-        {{ form.furnishing_status }}
-        {% if form.furnishing_status.errors %}
-            <div class="text-danger small">{{ form.furnishing_status.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <label for="{{ form.workstation_capacity.id_for_label }}" class="form-label">
-            {{ form.workstation_capacity.label }}
-        </label>
-        {{ form.workstation_capacity }}
-        {% if form.workstation_capacity.errors %}
-            <div class="text-danger small">{{ form.workstation_capacity.errors.0 }}</div>
-        {% endif %}
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Area Details</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label for="{{ form.carpet_area_sqft.id_for_label }}" class="form-label">
-            {{ form.carpet_area_sqft.label }}
-        </label>
-        {{ form.carpet_area_sqft }}
-        {% if form.carpet_area_sqft.errors %}
-            <div class="text-danger small">{{ form.carpet_area_sqft.errors.0 }}</div>
-        {% endif %}
-        <small class="form-text text-muted">Square feet</small>
-    </div>
-    
-    <div class="col-md-6 mb-3">
-        <label for="{{ form.built_up_area_sqft.id_for_label }}" class="form-label">
-            {{ form.built_up_area_sqft.label }}
-        </label>
-        {{ form.built_up_area_sqft }}
-        {% if form.built_up_area_sqft.errors %}
-            <div class="text-danger small">{{ form.built_up_area_sqft.errors.0 }}</div>
-        {% endif %}
-        <small class="form-text text-muted">Square feet</small>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Room Configuration</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-3 mb-3">
-        <label for="{{ form.number_of_cabins.id_for_label }}" class="form-label">
-            {{ form.number_of_cabins.label }}
-        </label>
-        {{ form.number_of_cabins }}
-        {% if form.number_of_cabins.errors %}
-            <div class="text-danger small">{{ form.number_of_cabins.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-3 mb-3">
-        <label for="{{ form.conference_rooms.id_for_label }}" class="form-label">
-            {{ form.conference_rooms.label }}
-        </label>
-        {{ form.conference_rooms }}
-        {% if form.conference_rooms.errors %}
-            <div class="text-danger small">{{ form.conference_rooms.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-3 mb-3">
-        <label for="{{ form.meeting_rooms.id_for_label }}" class="form-label">
-            {{ form.meeting_rooms.label }}
-        </label>
-        {{ form.meeting_rooms }}
-        {% if form.meeting_rooms.errors %}
-            <div class="text-danger small">{{ form.meeting_rooms.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-3 mb-3">
-        <div class="form-check mt-4">
-            {{ form.reception_area }}
-            <label class="form-check-label" for="{{ form.reception_area.id_for_label }}">
-                {{ form.reception_area.label }}
-            </label>
+<div class="property-form-partial">
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-briefcase"></i> Office Type & Configuration
+            </h5>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Building Information</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-3 mb-3">
-        <label for="{{ form.floor_number.id_for_label }}" class="form-label">
-            {{ form.floor_number.label }}
-        </label>
-        {{ form.floor_number }}
-        {% if form.floor_number.errors %}
-            <div class="text-danger small">{{ form.floor_number.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-3 mb-3">
-        <label for="{{ form.total_floors.id_for_label }}" class="form-label">
-            {{ form.total_floors.label }}
-        </label>
-        {{ form.total_floors }}
-        {% if form.total_floors.errors %}
-            <div class="text-danger small">{{ form.total_floors.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-3 mb-3">
-        <label for="{{ form.building_name.id_for_label }}" class="form-label">
-            {{ form.building_name.label }}
-        </label>
-        {{ form.building_name }}
-        {% if form.building_name.errors %}
-            <div class="text-danger small">{{ form.building_name.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-3 mb-3">
-        <label for="{{ form.building_grade.id_for_label }}" class="form-label">
-            {{ form.building_grade.label }}
-        </label>
-        {{ form.building_grade }}
-        {% if form.building_grade.errors %}
-            <div class="text-danger small">{{ form.building_grade.errors.0 }}</div>
-        {% endif %}
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-3 mb-3">
-        <label for="{{ form.lifts.id_for_label }}" class="form-label">
-            {{ form.lifts.label }}
-        </label>
-        {{ form.lifts }}
-        {% if form.lifts.errors %}
-            <div class="text-danger small">{{ form.lifts.errors.0 }}</div>
-        {% endif %}
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Facilities & Amenities</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-3 mb-3">
-        <div class="form-check">
-            {{ form.pantry }}
-            <label class="form-check-label" for="{{ form.pantry.id_for_label }}">
-                {{ form.pantry.label }}
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="{{ form.office_type.id_for_label }}" class="form-label">
+                {{ form.office_type.label }}
             </label>
+            {{ form.office_type }}
+            {% if form.office_type.errors %}
+                <div class="text-danger">{{ form.office_type.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="{{ form.furnishing_status.id_for_label }}" class="form-label">
+                {{ form.furnishing_status.label }}
+            </label>
+            {{ form.furnishing_status }}
+            {% if form.furnishing_status.errors %}
+                <div class="text-danger">{{ form.furnishing_status.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label for="{{ form.workstation_capacity.id_for_label }}" class="form-label">
+                {{ form.workstation_capacity.label }}
+            </label>
+            {{ form.workstation_capacity }}
+            {% if form.workstation_capacity.errors %}
+                <div class="text-danger">{{ form.workstation_capacity.errors.0 }}</div>
+            {% endif %}
         </div>
     </div>
-    
-    <div class="col-md-3 mb-3">
-        <div class="form-check">
-            {{ form.cafeteria }}
-            <label class="form-check-label" for="{{ form.cafeteria.id_for_label }}">
-                {{ form.cafeteria.label }}
-            </label>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-rulers"></i> Area Details
+            </h5>
         </div>
     </div>
-    
-    <div class="col-md-3 mb-3">
-        <div class="form-check">
-            {{ form.server_room }}
-            <label class="form-check-label" for="{{ form.server_room.id_for_label }}">
-                {{ form.server_room.label }}
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="{{ form.carpet_area_sqft.id_for_label }}" class="form-label">
+                {{ form.carpet_area_sqft.label }}
             </label>
+            {{ form.carpet_area_sqft }}
+            {% if form.carpet_area_sqft.errors %}
+                <div class="text-danger">{{ form.carpet_area_sqft.errors.0 }}</div>
+            {% endif %}
+            <small class="form-text text-muted">Square feet</small>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="{{ form.built_up_area_sqft.id_for_label }}" class="form-label">
+                {{ form.built_up_area_sqft.label }}
+            </label>
+            {{ form.built_up_area_sqft }}
+            {% if form.built_up_area_sqft.errors %}
+                <div class="text-danger">{{ form.built_up_area_sqft.errors.0 }}</div>
+            {% endif %}
+            <small class="form-text text-muted">Square feet (optional)</small>
         </div>
     </div>
-    
-    <div class="col-md-3 mb-3">
-        <div class="form-check">
-            {{ form.central_ac }}
-            <label class="form-check-label" for="{{ form.central_ac.id_for_label }}">
-                {{ form.central_ac.label }}
-            </label>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-door-open"></i> Room Configuration
+            </h5>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Parking</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label for="{{ form.parking_type.id_for_label }}" class="form-label">
-            {{ form.parking_type.label }}
-        </label>
-        {{ form.parking_type }}
-        {% if form.parking_type.errors %}
-            <div class="text-danger small">{{ form.parking_type.errors.0 }}</div>
-        {% endif %}
-    </div>
-    
-    <div class="col-md-6 mb-3">
-        <label for="{{ form.car_parking_spaces.id_for_label }}" class="form-label">
-            {{ form.car_parking_spaces.label }}
-        </label>
-        {{ form.car_parking_spaces }}
-        {% if form.car_parking_spaces.errors %}
-            <div class="text-danger small">{{ form.car_parking_spaces.errors.0 }}</div>
-        {% endif %}
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Power & Infrastructure</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <label for="{{ form.power_load_kva.id_for_label }}" class="form-label">
-            {{ form.power_load_kva.label }}
-        </label>
-        {{ form.power_load_kva }}
-        {% if form.power_load_kva.errors %}
-            <div class="text-danger small">{{ form.power_load_kva.errors.0 }}</div>
-        {% endif %}
-        <small class="form-text text-muted">KVA</small>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="form-check mt-4">
-            {{ form.power_backup }}
-            <label class="form-check-label" for="{{ form.power_backup.id_for_label }}">
-                {{ form.power_backup.label }}
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label for="{{ form.number_of_cabins.id_for_label }}" class="form-label">
+                {{ form.number_of_cabins.label }}
             </label>
+            {{ form.number_of_cabins }}
+            {% if form.number_of_cabins.errors %}
+                <div class="text-danger">{{ form.number_of_cabins.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <label for="{{ form.conference_rooms.id_for_label }}" class="form-label">
+                {{ form.conference_rooms.label }}
+            </label>
+            {{ form.conference_rooms }}
+            {% if form.conference_rooms.errors %}
+                <div class="text-danger">{{ form.conference_rooms.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <label for="{{ form.meeting_rooms.id_for_label }}" class="form-label">
+                {{ form.meeting_rooms.label }}
+            </label>
+            {{ form.meeting_rooms }}
+            {% if form.meeting_rooms.errors %}
+                <div class="text-danger">{{ form.meeting_rooms.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <label class="form-label d-block">&nbsp;</label>
+            <div class="form-check">
+                {{ form.reception_area }}
+                <label class="form-check-label" for="{{ form.reception_area.id_for_label }}">
+                    <i class="bi bi-person-workspace"></i> {{ form.reception_area.label }}
+                </label>
+            </div>
         </div>
     </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="form-check mt-4">
-            {{ form.fiber_optic }}
-            <label class="form-check-label" for="{{ form.fiber_optic.id_for_label }}">
-                {{ form.fiber_optic.label }}
-            </label>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-building"></i> Building Information
+            </h5>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Security & Safety</h5>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <div class="form-check">
-            {{ form.access_24x7 }}
-            <label class="form-check-label" for="{{ form.access_24x7.id_for_label }}">
-                {{ form.access_24x7.label }}
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label for="{{ form.floor_number.id_for_label }}" class="form-label">
+                {{ form.floor_number.label }}
             </label>
+            {{ form.floor_number }}
+            {% if form.floor_number.errors %}
+                <div class="text-danger">{{ form.floor_number.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <label for="{{ form.total_floors.id_for_label }}" class="form-label">
+                {{ form.total_floors.label }}
+            </label>
+            {{ form.total_floors }}
+            {% if form.total_floors.errors %}
+                <div class="text-danger">{{ form.total_floors.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <label for="{{ form.building_name.id_for_label }}" class="form-label">
+                {{ form.building_name.label }}
+            </label>
+            {{ form.building_name }}
+            {% if form.building_name.errors %}
+                <div class="text-danger">{{ form.building_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <label for="{{ form.building_grade.id_for_label }}" class="form-label">
+                {{ form.building_grade.label }}
+            </label>
+            {{ form.building_grade }}
+            {% if form.building_grade.errors %}
+                <div class="text-danger">{{ form.building_grade.errors.0 }}</div>
+            {% endif %}
         </div>
     </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="form-check">
-            {{ form.security_24x7 }}
-            <label class="form-check-label" for="{{ form.security_24x7.id_for_label }}">
-                {{ form.security_24x7.label }}
+
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label for="{{ form.lifts.id_for_label }}" class="form-label">
+                {{ form.lifts.label }}
             </label>
+            {{ form.lifts }}
+            {% if form.lifts.errors %}
+                <div class="text-danger">{{ form.lifts.errors.0 }}</div>
+            {% endif %}
         </div>
     </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="form-check">
-            {{ form.fire_safety_system }}
-            <label class="form-check-label" for="{{ form.fire_safety_system.id_for_label }}">
-                {{ form.fire_safety_system.label }}
-            </label>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-stars"></i> Facilities & Amenities
+            </h5>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-12 mb-3">
-        <h5 class="border-bottom pb-2">Maintenance</h5>
+    <div class="amenities-form-grid">
+        <div class="amenity-checkbox-wrapper">
+            <div class="form-check">
+                {{ form.pantry }}
+                <label class="form-check-label" for="{{ form.pantry.id_for_label }}">
+                    <i class="bi bi-cup-hot"></i> {{ form.pantry.label }}
+                </label>
+            </div>
+        </div>
+        
+        <div class="amenity-checkbox-wrapper">
+            <div class="form-check">
+                {{ form.cafeteria }}
+                <label class="form-check-label" for="{{ form.cafeteria.id_for_label }}">
+                    <i class="bi bi-shop"></i> {{ form.cafeteria.label }}
+                </label>
+            </div>
+        </div>
+        
+        <div class="amenity-checkbox-wrapper">
+            <div class="form-check">
+                {{ form.server_room }}
+                <label class="form-check-label" for="{{ form.server_room.id_for_label }}">
+                    <i class="bi bi-server"></i> {{ form.server_room.label }}
+                </label>
+            </div>
+        </div>
+        
+        <div class="amenity-checkbox-wrapper">
+            <div class="form-check">
+                {{ form.central_ac }}
+                <label class="form-check-label" for="{{ form.central_ac.id_for_label }}">
+                    <i class="bi bi-wind"></i> {{ form.central_ac.label }}
+                </label>
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <label for="{{ form.maintenance_per_sqft.id_for_label }}" class="form-label">
-            {{ form.maintenance_per_sqft.label }}
-        </label>
-        {{ form.maintenance_per_sqft }}
-        {% if form.maintenance_per_sqft.errors %}
-            <div class="text-danger small">{{ form.maintenance_per_sqft.errors.0 }}</div>
-        {% endif %}
-        <small class="form-text text-muted">Per square foot</small>
+    <div class="row mt-4">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-car-front"></i> Parking
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="{{ form.parking_type.id_for_label }}" class="form-label">
+                {{ form.parking_type.label }}
+            </label>
+            {{ form.parking_type }}
+            {% if form.parking_type.errors %}
+                <div class="text-danger">{{ form.parking_type.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label for="{{ form.car_parking_spaces.id_for_label }}" class="form-label">
+                {{ form.car_parking_spaces.label }}
+            </label>
+            {{ form.car_parking_spaces }}
+            {% if form.car_parking_spaces.errors %}
+                <div class="text-danger">{{ form.car_parking_spaces.errors.0 }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-lightning-charge"></i> Power & Infrastructure
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="{{ form.power_load_kva.id_for_label }}" class="form-label">
+                {{ form.power_load_kva.label }}
+            </label>
+            {{ form.power_load_kva }}
+            {% if form.power_load_kva.errors %}
+                <div class="text-danger">{{ form.power_load_kva.errors.0 }}</div>
+            {% endif %}
+            <small class="form-text text-muted">KVA (optional)</small>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label class="form-label d-block">&nbsp;</label>
+            <div class="form-check">
+                {{ form.power_backup }}
+                <label class="form-check-label" for="{{ form.power_backup.id_for_label }}">
+                    <i class="bi bi-battery-charging"></i> {{ form.power_backup.label }}
+                </label>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <label class="form-label d-block">&nbsp;</label>
+            <div class="form-check">
+                {{ form.fiber_optic }}
+                <label class="form-check-label" for="{{ form.fiber_optic.id_for_label }}">
+                    <i class="bi bi-hdd-network"></i> {{ form.fiber_optic.label }}
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-shield-check"></i> Security & Safety
+            </h5>
+        </div>
+    </div>
+
+    <div class="amenities-form-grid">
+        <div class="amenity-checkbox-wrapper">
+            <div class="form-check">
+                {{ form.access_24x7 }}
+                <label class="form-check-label" for="{{ form.access_24x7.id_for_label }}">
+                    <i class="bi bi-clock"></i> {{ form.access_24x7.label }}
+                </label>
+            </div>
+        </div>
+        
+        <div class="amenity-checkbox-wrapper">
+            <div class="form-check">
+                {{ form.security_24x7 }}
+                <label class="form-check-label" for="{{ form.security_24x7.id_for_label }}">
+                    <i class="bi bi-shield-fill-check"></i> {{ form.security_24x7.label }}
+                </label>
+            </div>
+        </div>
+        
+        <div class="amenity-checkbox-wrapper">
+            <div class="form-check">
+                {{ form.fire_safety_system }}
+                <label class="form-check-label" for="{{ form.fire_safety_system.id_for_label }}">
+                    <i class="bi bi-fire"></i> {{ form.fire_safety_system.label }}
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12 mb-3">
+            <h5 class="property-form-section-header">
+                <i class="bi bi-wrench"></i> Maintenance
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="{{ form.maintenance_per_sqft.id_for_label }}" class="form-label">
+                {{ form.maintenance_per_sqft.label }}
+            </label>
+            {{ form.maintenance_per_sqft }}
+            {% if form.maintenance_per_sqft.errors %}
+                <div class="text-danger">{{ form.maintenance_per_sqft.errors.0 }}</div>
+            {% endif %}
+            <small class="form-text text-muted">Per square foot (optional)</small>
+        </div>
     </div>
 </div>

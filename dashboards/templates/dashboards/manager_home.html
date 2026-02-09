@@ -1,325 +1,13 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load compress %}
 
 {% block title %}Home - Manager{% endblock %}
 {% block page_title %}Welcome, {{ request.user.first_name }}!{% endblock %}
 {% block page_subtitle %}Team Overview - {{ request.user.branch.name }}{% endblock %}
 
-{% block styles %}
-{{ block.super }}
-<style>
-    /* ===== CHART CONTAINERS ===== */
-    .chart-card {
-        background: white;
-        border-radius: 12px;
-        padding: 25px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-        text-align: center;
-        height: 100%;
-    }
-    
-    .chart-card .card-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    /* ===== HALF DONUT CHART ===== */
-    .half-donut-wrapper {
-        position: relative;
-        width: 200px;
-        height: 110px;
-        margin: 0 auto;
-    }
-    
-    .half-donut-wrapper svg {
-        overflow: visible;
-    }
-    
-    .half-donut-wrapper .center-value {
-        position: absolute;
-        bottom: 5px;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-    }
-    
-    .half-donut-wrapper .center-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1e3c72;
-        line-height: 1;
-    }
-    
-    .half-donut-wrapper .center-label {
-        font-size: 0.75rem;
-        color: #6c757d;
-        display: block;
-    }
-    
-    .chart-legend {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-top: 15px;
-        flex-wrap: wrap;
-    }
-    
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 0.8rem;
-        color: #555;
-    }
-    
-    .legend-color {
-        width: 12px;
-        height: 12px;
-        border-radius: 3px;
-    }
-    
-    .legend-color.leads { background: #3498db; }
-    .legend-color.opportunities { background: #f39c12; }
-    .legend-color.sales { background: #27ae60; }
-    
-    /* ===== SEMI-CIRCLE PROGRESS BAR ===== */
-    .semi-circle-wrapper {
-        position: relative;
-        width: 200px;
-        height: 110px;
-        margin: 0 auto;
-    }
-    
-    .semi-circle-wrapper svg {
-        transform: rotate(-180deg);
-        overflow: visible;
-    }
-    
-    .semi-circle-wrapper .track {
-        fill: none;
-        stroke: #e9ecef;
-        stroke-width: 20;
-        stroke-linecap: round;
-    }
-    
-    .semi-circle-wrapper .progress-bar {
-        fill: none;
-        stroke-width: 20;
-        stroke-linecap: round;
-        stroke-dasharray: 251.2;
-        stroke-dashoffset: 251.2;
-        transition: stroke-dashoffset 1.5s ease-out;
-    }
-    
-    .semi-circle-wrapper .percentage-container {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
-    }
-    
-    .semi-circle-wrapper .percentage-value {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #1e3c72;
-        line-height: 1;
-    }
-    
-    .semi-circle-wrapper .percentage-label {
-        display: block;
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-top: 3px;
-    }
-    
-    .chart-card .stats-footer {
-        display: flex;
-        justify-content: space-around;
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid #eee;
-    }
-    
-    .chart-card .stat-item {
-        text-align: center;
-    }
-    
-    .chart-card .stat-value {
-        font-size: 1.2rem;
-        font-weight: 700;
-    }
-    
-    .chart-card .stat-value.won { color: #28a745; }
-    .chart-card .stat-value.lost { color: #dc3545; }
-    .chart-card .stat-value.total { color: #1e3c72; }
-    .chart-card .stat-value.actual { color: #28a745; }
-    .chart-card .stat-value.projected { color: #6c757d; }
-    
-    .chart-card .stat-label {
-        font-size: 0.7rem;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    /* ===== REVENUE CARD ===== */
-    .revenue-card {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        border-radius: 12px;
-        padding: 25px;
-        color: white;
-        text-align: center;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    
-    .revenue-card .revenue-label {
-        font-size: 0.9rem;
-        opacity: 0.9;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .revenue-card .revenue-amount {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-    
-    .revenue-card .revenue-sub {
-        font-size: 0.85rem;
-        opacity: 0.8;
-    }
-    
-    .revenue-card .team-badge {
-        display: inline-block;
-        background: rgba(255,255,255,0.2);
-        padding: 5px 15px;
-        border-radius: 20px;
-        margin-top: 10px;
-        font-size: 0.8rem;
-    }
-    
-    /* ===== KPI CARDS ===== */
-    .kpi-card {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-        height: 100%;
-    }
-    
-    .kpi-card .kpi-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #f0f0f0;
-    }
-    
-    .kpi-card .kpi-icon {
-        width: 45px;
-        height: 45px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.3rem;
-        color: white;
-    }
-    
-    .kpi-card .kpi-icon.leads { background: linear-gradient(135deg, #3498db, #2980b9); }
-    .kpi-card .kpi-icon.opportunities { background: linear-gradient(135deg, #f39c12, #e67e22); }
-    .kpi-card .kpi-icon.sales { background: linear-gradient(135deg, #27ae60, #229954); }
-    
-    .kpi-card .kpi-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #333;
-    }
-    
-    .kpi-card .kpi-total {
-        font-size: 0.85rem;
-        color: #6c757d;
-    }
-    
-    .kpi-card .kpi-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .kpi-card .kpi-list li {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-        border-bottom: 1px solid #f5f5f5;
-    }
-    
-    .kpi-card .kpi-list li:last-child {
-        border-bottom: none;
-    }
-    
-    .kpi-card .kpi-status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.9rem;
-        color: #555;
-    }
-    
-    .kpi-card .kpi-status .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-    }
-    
-    /* Status Colors */
-    .status-dot.pending { background: #f39c12; }
-    .status-dot.approved { background: #28a745; }
-    .status-dot.rejected { background: #dc3545; }
-    .status-dot.prospecting { background: #17a2b8; }
-    .status-dot.negotiating { background: #6f42c1; }
-    .status-dot.processing { background: #007bff; }
-    .status-dot.won { background: #28a745; }
-    .status-dot.lost { background: #dc3545; }
-    
-    .kpi-card .kpi-count {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1e3c72;
-        background: #f0f4f8;
-        padding: 4px 12px;
-        border-radius: 20px;
-    }
-    
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-        .half-donut-wrapper,
-        .semi-circle-wrapper {
-            width: 160px;
-            height: 90px;
-        }
-        
-        .half-donut-wrapper .center-number,
-        .semi-circle-wrapper .percentage-value {
-            font-size: 1.5rem;
-        }
-        
-        .revenue-card .revenue-amount {
-            font-size: 1.8rem;
-        }
-    }
-</style>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -349,16 +37,12 @@
                                 <stop offset="100%" stop-color="#229954"/>
                             </linearGradient>
                         </defs>
-                        <!-- Background track -->
                         <path class="track" fill="none" stroke="#e9ecef" stroke-width="20" stroke-linecap="round"
                               d="M 20 100 A 80 80 0 0 1 180 100"/>
-                        <!-- Leads segment -->
                         <path id="leads-arc" fill="none" stroke="url(#leadsGradient)" stroke-width="20" stroke-linecap="round"
                               d="M 20 100 A 80 80 0 0 1 180 100" stroke-dasharray="0 251.2"/>
-                        <!-- Opportunities segment -->
                         <path id="opps-arc" fill="none" stroke="url(#oppsGradient)" stroke-width="20" stroke-linecap="round"
                               d="M 20 100 A 80 80 0 0 1 180 100" stroke-dasharray="0 251.2"/>
-                        <!-- Sales segment -->
                         <path id="sales-arc" fill="none" stroke="url(#salesGradient)" stroke-width="20" stroke-linecap="round"
                               d="M 20 100 A 80 80 0 0 1 180 100" stroke-dasharray="0 251.2"/>
                     </svg>
@@ -396,8 +80,8 @@
                                 <stop offset="100%" stop-color="#20c997"/>
                             </linearGradient>
                         </defs>
-                        <path class="track" d="M 20 100 A 80 80 0 0 1 180 100"/>
-                        <path class="progress-bar revenue-bar" stroke="url(#revenueGradient)" d="M 20 100 A 80 80 0 0 1 180 100"/>
+                        <path class="track" d="M 180 100 A 80 80 0 0 0 20 100"/>
+                        <path class="progress-bar revenue-bar" stroke="url(#revenueGradient)" d="M 180 100 A 80 80 0 0 0 20 100"/>
                     </svg>
                     <div class="percentage-container">
                         <span class="percentage-value revenue-percentage">0%</span>
@@ -429,8 +113,8 @@
                                 <stop offset="100%" stop-color="#2a5298"/>
                             </linearGradient>
                         </defs>
-                        <path class="track" d="M 20 100 A 80 80 0 0 1 180 100"/>
-                        <path class="progress-bar won-bar" stroke="url(#wonGradient)" d="M 20 100 A 80 80 0 0 1 180 100"/>
+                        <path class="track" d="M 180 100 A 80 80 0 0 0 20 100"/>
+                        <path class="progress-bar won-bar" stroke="url(#wonGradient)" d="M 180 100 A 80 80 0 0 0 20 100"/>
                     </svg>
                     <div class="percentage-container">
                         <span class="percentage-value won-percentage">0%</span>
@@ -603,89 +287,6 @@
 </div>
 {% endblock %}
 
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // ===== ANIMATE SEMI-CIRCLE PROGRESS BARS =====
-    document.querySelectorAll('.semi-circle-wrapper').forEach(function(container) {
-        const progressBar = container.querySelector('.progress-bar');
-        const percentageDisplay = container.querySelector('.percentage-value');
-        const percentage = parseFloat(container.dataset.percentage) || 0;
-        
-        const circumference = 251.2;
-        const offset = circumference - (percentage / 100) * circumference;
-        
-        setTimeout(() => {
-            progressBar.style.strokeDashoffset = offset;
-        }, 100);
-        
-        // Animate number
-        animateValue(percentageDisplay, 0, percentage, 1500, '%');
-    });
-    
-    // ===== ANIMATE HALF DONUT CHART =====
-    const donutContainer = document.getElementById('listings-donut');
-    if (donutContainer) {
-        const leads = parseInt(donutContainer.dataset.leads) || 0;
-        const opps = parseInt(donutContainer.dataset.opportunities) || 0;
-        const sales = parseInt(donutContainer.dataset.sales) || 0;
-        const total = leads + opps + sales;
-        
-        if (total > 0) {
-            const circumference = 251.2;
-            
-            const leadsPercent = leads / total;
-            const oppsPercent = opps / total;
-            const salesPercent = sales / total;
-            
-            const leadsArc = leadsPercent * circumference;
-            const oppsArc = oppsPercent * circumference;
-            const salesArc = salesPercent * circumference;
-            
-            const leadsPath = document.getElementById('leads-arc');
-            const oppsPath = document.getElementById('opps-arc');
-            const salesPath = document.getElementById('sales-arc');
-            
-            setTimeout(() => {
-                // Leads: starts at 0
-                leadsPath.style.strokeDasharray = `${leadsArc} ${circumference}`;
-                leadsPath.style.strokeDashoffset = '0';
-                
-                // Opps: starts after leads
-                oppsPath.style.strokeDasharray = `${oppsArc} ${circumference}`;
-                oppsPath.style.strokeDashoffset = `-${leadsArc}`;
-                
-                // Sales: starts after leads + opps
-                salesPath.style.strokeDasharray = `${salesArc} ${circumference}`;
-                salesPath.style.strokeDashoffset = `-${leadsArc + oppsArc}`;
-            }, 100);
-        }
-    }
-    
-    // ===== HELPER FUNCTION =====
-    function animateValue(element, start, end, duration, suffix) {
-        const startTime = performance.now();
-        const hasDecimal = end % 1 !== 0;
-        
-        function update(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easeOut = 1 - Math.pow(1 - progress, 3);
-            const current = start + (end - start) * easeOut;
-            
-            if (hasDecimal) {
-                element.textContent = current.toFixed(1) + suffix;
-            } else {
-                element.textContent = Math.round(current) + suffix;
-            }
-            
-            if (progress < 1) {
-                requestAnimationFrame(update);
-            }
-        }
-        
-        requestAnimationFrame(update);
-    }
-});
-</script>
+{% block extra_js %}
+<script src="{% static 'js/charts.js' %}"></script>
 {% endblock %}

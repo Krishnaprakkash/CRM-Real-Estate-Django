@@ -1,25 +1,43 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ listing.title }} - Details{% endblock %}
+{% block page_title %}Listing Details{% endblock %}
+{% block page_subtitle %}View complete listing information{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{ listing.title }}</h1>
-        <div>
-            <span class="badge bg-primary fs-5">{{ stage_display }}</span>
-        </div>
-        <div>
+<div class="listing-detail-container">
+    <!-- Header -->
+    <div class="listing-detail-header">
+        <h1 class="listing-title">{{ listing.title }}</h1>
+        
+        <span class="badge stage-badge-large 
+            {% if stage == 'created' %}bg-secondary
+            {% elif stage == 'first_approval' %}bg-warning
+            {% elif stage in 'prospecting,negotiating' %}bg-info
+            {% elif stage == 'final_approval' %}bg-warning
+            {% elif stage == 'processing' %}bg-primary
+            {% elif stage == 'closed_won' %}bg-success
+            {% elif stage == 'closed_lost' %}bg-danger
+            {% endif %}">
+            <i class="bi bi-flag"></i> {{ stage_display }}
+        </span>
+        
+        <div class="listing-actions">
             {% if can_edit %}
-            <a href="{% url 'inventory:listing_edit' listing.pk %}" class="btn btn-warning">
-                <i class="bi bi-pencil"></i> Edit Listing
+            <a href="{% url 'inventory:listing_edit' listing.pk %}" class="btn-edit-listing">
+                <i class="bi bi-pencil-square"></i> Edit Listing
             </a>
             {% endif %}
         </div>
     </div>
 
-    <!-- Stage Progress Bar / Tabs -->
-    <div class="mb-4">
+    <!-- Stage Progress -->
+    <div class="stage-progress-nav">
         <ul class="nav nav-pills nav-fill" id="stageTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link {% if stage == 'created' %}active{% else %}bg-success text-white{% endif %}"
@@ -28,46 +46,44 @@
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button
-                    class="nav-link {% if stage == 'first_approval' %}active{% elif stage in 'prospecting,negotiating,final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
-                    id="first-approval-tab" data-bs-toggle="pill" data-bs-target="#first-approval" type="button"
-                    role="tab" {% if stage == 'created' %}disabled{% endif %}>
-                    First Approval
+                <button class="nav-link {% if stage == 'first_approval' %}active{% elif stage in 'prospecting,negotiating,final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="first-approval-tab" data-bs-toggle="pill" data-bs-target="#first-approval" type="button" role="tab" 
+                    {% if stage == 'created' %}disabled{% endif %}>
+                    1st Approval
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button
-                    class="nav-link {% if stage == 'prospecting' %}active{% elif stage in 'negotiating,final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
-                    id="prospecting-tab" data-bs-toggle="pill" data-bs-target="#prospecting" type="button" role="tab" {% if stage not in 'prospecting,negotiating,final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
-                    Prospecting
+                <button class="nav-link {% if stage == 'prospecting' %}active{% elif stage in 'negotiating,final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="prospecting-tab" data-bs-toggle="pill" data-bs-target="#prospecting" type="button" role="tab" 
+                    {% if stage not in 'prospecting,negotiating,final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
+                    Prospect
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button
-                    class="nav-link {% if stage == 'negotiating' %}active{% elif stage in 'final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
-                    id="negotiating-tab" data-bs-toggle="pill" data-bs-target="#negotiating" type="button" role="tab" {% if stage not in 'negotiating,final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
-                    Negotiating
+                <button class="nav-link {% if stage == 'negotiating' %}active{% elif stage in 'final_approval,processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="negotiating-tab" data-bs-toggle="pill" data-bs-target="#negotiating" type="button" role="tab" 
+                    {% if stage not in 'negotiating,final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
+                    Negotiate
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button
-                    class="nav-link {% if stage == 'final_approval' %}active{% elif stage in 'processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
-                    id="final-approval-tab" data-bs-toggle="pill" data-bs-target="#final-approval" type="button"
-                    role="tab" {% if stage not in 'final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
-                    Final Approval
+                <button class="nav-link {% if stage == 'final_approval' %}active{% elif stage in 'processing,closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="final-approval-tab" data-bs-toggle="pill" data-bs-target="#final-approval" type="button" role="tab" 
+                    {% if stage not in 'final_approval,processing,closed_won,closed_lost' %}disabled{% endif %}>
+                    2nd Approval
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button
-                    class="nav-link {% if stage == 'processing' %}active{% elif stage in 'closed_won,closed_lost' %}bg-success text-white{% endif %}"
-                    id="processing-tab" data-bs-toggle="pill" data-bs-target="#processing" type="button" role="tab" {% if stage not in 'processing,closed_won,closed_lost' %}disabled{% endif %}>
-                    Processing
+                <button class="nav-link {% if stage == 'processing' %}active{% elif stage in 'closed_won,closed_lost' %}bg-success text-white{% endif %}"
+                    id="processing-tab" data-bs-toggle="pill" data-bs-target="#processing" type="button" role="tab" 
+                    {% if stage not in 'processing,closed_won,closed_lost' %}disabled{% endif %}>
+                    Process
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button
-                    class="nav-link {% if stage == 'closed_won' %}active bg-success text-white{% elif stage == 'closed_lost' %}active bg-danger text-white{% endif %}"
-                    id="closed-tab" data-bs-toggle="pill" data-bs-target="#closed" type="button" role="tab" {% if stage not in 'closed_won,closed_lost' %}disabled{% endif %}>
+                <button class="nav-link {% if stage == 'closed_won' %}active bg-success text-white{% elif stage == 'closed_lost' %}active bg-danger text-white{% endif %}"
+                    id="closed-tab" data-bs-toggle="pill" data-bs-target="#closed" type="button" role="tab" 
+                    {% if stage not in 'closed_won,closed_lost' %}disabled{% endif %}>
                     Closed
                 </button>
             </li>
@@ -77,331 +93,315 @@
     <!-- Tab Content -->
     <div class="tab-content" id="stageTabsContent">
 
-        <!-- Created Tab: Basic Info + Property Details -->
+        <!-- Created Tab -->
         <div class="tab-pane fade {% if stage == 'created' %}show active{% endif %}" id="created" role="tabpanel">
             <!-- Basic Information -->
-            <div class="card mb-3">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Basic Information</h5>
+            <div class="detail-card">
+                <div class="detail-card-header primary">
+                    <i class="bi bi-info-circle"></i> Basic Information
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Listing ID</label>
-                            <input type="text" class="form-control" value="{{ listing.id }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-hash"></i> Listing ID
+                            </label>
+                            <input type="text" class="detail-field-value" value="#{{ listing.id }}" disabled>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" class="form-control" value="{{ listing.title }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-card-heading"></i> Title
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.title }}" disabled>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Property Type</label>
-                            <input type="text" class="form-control" value="{{ listing.get_type_display }}" disabled>
+                        <div class="col-md-4 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-building"></i> Property Type
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.get_type_display }}" disabled>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">City</label>
-                            <input type="text" class="form-control" value="{{ listing.city }}" disabled>
+                        <div class="col-md-4 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-geo-alt"></i> City
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.city }}" disabled>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Proposed Price</label>
-                            <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Address</label>
-                            <textarea class="form-control" rows="2" disabled>{{ listing.address }}</textarea>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Branch</label>
-                            <input type="text" class="form-control" value="{{ listing.branch.name }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Assigned Salesman</label>
-                            <input type="text" class="form-control"
-                                value="{{ listing.assigned_salesman.get_full_name }}" disabled>
+                        <div class="col-md-4 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-currency-rupee"></i> Proposed Price
+                            </label>
+                            <input type="text" class="detail-field-value" value="₹{{ listing.proposed_price|floatformat:0 }}" disabled>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Comments</label>
-                            <textarea class="form-control" rows="3"
-                                disabled>{{ listing.comments|default:"No comments" }}</textarea>
+                        <div class="col-md-12 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-pin-map"></i> Address
+                            </label>
+                            <textarea class="detail-field-value" rows="2" disabled>{{ listing.address }}</textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-shop"></i> Branch
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.branch.name }}" disabled>
+                        </div>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-person"></i> Assigned Salesman
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.assigned_salesman.get_full_name }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-chat-left-text"></i> Comments
+                            </label>
+                            <textarea class="detail-field-value" rows="3" disabled>{{ listing.comments|default:"No comments" }}</textarea>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Property Details -->
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Property Details</h5>
+            <div class="detail-card">
+                <div class="detail-card-header success">
+                    <i class="bi bi-house-door"></i> Property Details
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     {% if property_details %}
-                    {% if listing.type == 'Villa' %}
-                    {% include 'inventory/partials/villa_detail.html' %}
-                    {% elif listing.type == 'Apartment' %}
-                    {% include 'inventory/partials/apartment_detail.html' %}
-                    {% elif listing.type == 'Warehouse' %}
-                    {% include 'inventory/partials/warehouse_detail.html' %}
-                    {% elif listing.type == 'Retail' %}
-                    {% include 'inventory/partials/retail_detail.html' %}
-                    {% elif listing.type == 'Office' %}
-                    {% include 'inventory/partials/office_detail.html' %}
-                    {% endif %}
+                        {% if listing.type == 'Villa' %}
+                            {% include 'inventory/partials/villa_detail.html' %}
+                        {% elif listing.type == 'Apartment' %}
+                            {% include 'inventory/partials/apartment_detail.html' %}
+                        {% elif listing.type == 'Warehouse' %}
+                            {% include 'inventory/partials/warehouse_detail.html' %}
+                        {% elif listing.type == 'Retail' %}
+                            {% include 'inventory/partials/retail_detail.html' %}
+                        {% elif listing.type == 'Office' %}
+                            {% include 'inventory/partials/office_detail.html' %}
+                        {% endif %}
                     {% else %}
-                    <div class="alert alert-warning">No property details available.</div>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> No property details available.
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- First Approval Tab: Lead Information -->
-        <div class="tab-pane fade {% if stage == 'first_approval' %}show active{% endif %}" id="first-approval"
-            role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-warning">
-                    <h5 class="mb-0">Lead Information</h5>
+        <!-- First Approval Tab -->
+        <div class="tab-pane fade {% if stage == 'first_approval' %}show active{% endif %}" id="first-approval" role="tabpanel">
+            <div class="detail-card">
+                <div class="detail-card-header warning">
+                    <i class="bi bi-clipboard-check"></i> Lead Information
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Lead Status</label>
-                            <input type="text" class="form-control" value="{{ listing.get_lead_status_display }}"
-                                disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-flag"></i> Lead Status
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.get_lead_status_display }}" disabled>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Approved By</label>
-                            <input type="text" class="form-control"
-                                value="{{ listing.lead_approved_by.get_full_name|default:'' }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-person-check"></i> Approved By
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.lead_approved_by.get_full_name|default:'Pending' }}" disabled>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Approved At</label>
-                            <input type="text" class="form-control"
-                                value="{{ listing.lead_approved_at|date:'Y-m-d H:i'|default:'' }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-calendar-check"></i> Approved At
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.lead_approved_at|date:'M d, Y h:i A'|default:'Pending' }}" disabled>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Proposed Price</label>
-                            <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Prospecting Tab: Basic Info Only -->
-        <div class="tab-pane fade {% if stage == 'prospecting' %}show active{% endif %}" id="prospecting"
-            role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Prospecting - Basic Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Listing ID</label>
-                            <input type="text" class="form-control" value="{{ listing.id }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" class="form-control" value="{{ listing.title }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Property Type</label>
-                            <input type="text" class="form-control" value="{{ listing.get_type_display }}" disabled>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">City</label>
-                            <input type="text" class="form-control" value="{{ listing.city }}" disabled>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Proposed Price</label>
-                            <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Opportunity Status</label>
-                            <input type="text" class="form-control" value="{{ listing.get_opp_status_display }}"
-                                disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-currency-rupee"></i> Proposed Price
+                            </label>
+                            <input type="text" class="detail-field-value" value="₹{{ listing.proposed_price|floatformat:0 }}" disabled>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Negotiating Tab: Basic Info Only -->
-        <div class="tab-pane fade {% if stage == 'negotiating' %}show active{% endif %}" id="negotiating"
-            role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Negotiating - Basic Information</h5>
+        <!-- Prospecting Tab -->
+        <div class="tab-pane fade {% if stage == 'prospecting' %}show active{% endif %}" id="prospecting" role="tabpanel">
+            <div class="detail-card">
+                <div class="detail-card-header info">
+                    <i class="bi bi-search"></i> Prospecting Stage
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Listing ID</label>
-                            <input type="text" class="form-control" value="{{ listing.id }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-hash"></i> Listing ID
+                            </label>
+                            <input type="text" class="detail-field-value" value="#{{ listing.id }}" disabled>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" class="form-control" value="{{ listing.title }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-card-heading"></i> Title
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.title }}" disabled>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Property Type</label>
-                            <input type="text" class="form-control" value="{{ listing.get_type_display }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-flag"></i> Opportunity Status
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.get_opp_status_display }}" disabled>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">City</label>
-                            <input type="text" class="form-control" value="{{ listing.city }}" disabled>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Proposed Price</label>
-                            <input type="text" class="form-control" value="$ {{ listing.proposed_price }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Opportunity Status</label>
-                            <input type="text" class="form-control" value="{{ listing.get_opp_status_display }}"
-                                disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Negotiated Price</label>
-                            <input type="text" class="form-control"
-                                value="$ {{ listing.opp_price|default:listing.proposed_price }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-currency-rupee"></i> Proposed Price
+                            </label>
+                            <input type="text" class="detail-field-value" value="₹{{ listing.proposed_price|floatformat:0 }}" disabled>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Final Approval Tab: Opportunity Information -->
-        <div class="tab-pane fade {% if stage == 'final_approval' %}show active{% endif %}" id="final-approval"
-            role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-warning">
-                    <h5 class="mb-0">Opportunity Information</h5>
+        <!-- Negotiating Tab -->
+        <div class="tab-pane fade {% if stage == 'negotiating' %}show active{% endif %}" id="negotiating" role="tabpanel">
+            <div class="detail-card">
+                <div class="detail-card-header info">
+                    <i class="bi bi-chat-dots"></i> Negotiating Stage
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Opportunity Status</label>
-                            <input type="text" class="form-control" value="{{ listing.get_opp_status_display }}"
-                                disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-flag"></i> Opportunity Status
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.get_opp_status_display }}" disabled>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Approved By</label>
-                            <input type="text" class="form-control"
-                                value="{{ listing.opp_approved_by.get_full_name|default:'' }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Approved At</label>
-                            <input type="text" class="form-control"
-                                value="{{ listing.opp_approved_at|date:'Y-m-d H:i'|default:'' }}" disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Negotiated Price</label>
-                            <input type="text" class="form-control" value="$ {{ listing.opp_price|default:'' }}"
-                                disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-currency-rupee"></i> Negotiated Price
+                            </label>
+                            <input type="text" class="detail-field-value" value="₹{{ listing.opp_price|default:listing.proposed_price|floatformat:0 }}" disabled>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Processing Tab: Basic Info Only -->
+        <!-- Final Approval Tab -->
+        <div class="tab-pane fade {% if stage == 'final_approval' %}show active{% endif %}" id="final-approval" role="tabpanel">
+            <div class="detail-card">
+                <div class="detail-card-header warning">
+                    <i class="bi bi-clipboard2-check"></i> Opportunity Approval
+                </div>
+                <div class="detail-card-body">
+                    <div class="row">
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-flag"></i> Opportunity Status
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.get_opp_status_display }}" disabled>
+                        </div>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-person-check"></i> Approved By
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.opp_approved_by.get_full_name|default:'Pending' }}" disabled>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-calendar-check"></i> Approved At
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.opp_approved_at|date:'M d, Y h:i A'|default:'Pending' }}" disabled>
+                        </div>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-currency-rupee"></i> Negotiated Price
+                            </label>
+                            <input type="text" class="detail-field-value" value="₹{{ listing.opp_price|floatformat:0|default:'N/A' }}" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Tab -->
         <div class="tab-pane fade {% if stage == 'processing' %}show active{% endif %}" id="processing" role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Processing - Basic Information</h5>
+            <div class="detail-card">
+                <div class="detail-card-header primary">
+                    <i class="bi bi-hourglass-split"></i> Processing Stage
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Listing ID</label>
-                            <input type="text" class="form-control" value="{{ listing.id }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-flag"></i> Sale Status
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.get_sale_status_display }}" disabled>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" class="form-control" value="{{ listing.title }}" disabled>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Sale Status</label>
-                            <input type="text" class="form-control" value="{{ listing.get_sale_status_display }}"
-                                disabled>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Final Price</label>
-                            <input type="text" class="form-control"
-                                value="$ {{ listing.sale_price|default:listing.opp_price|default:listing.proposed_price }}"
-                                disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-currency-rupee"></i> Final Price
+                            </label>
+                            <input type="text" class="detail-field-value" value="₹{{ listing.sale_price|default:listing.opp_price|default:listing.proposed_price|floatformat:0 }}" disabled>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Closed Tab: Sale Information -->
-        <div class="tab-pane fade {% if stage == 'closed_won' or stage == 'closed_lost' %}show active{% endif %}"
-            id="closed" role="tabpanel">
-            <div class="card">
-                <div
-                    class="card-header {% if stage == 'closed_won' %}bg-success{% else %}bg-danger{% endif %} text-white">
-                    <h5 class="mb-0">Sale Information - {{ listing.get_sale_status_display }}</h5>
+        <!-- Closed Tab -->
+        <div class="tab-pane fade {% if stage == 'closed_won' or stage == 'closed_lost' %}show active{% endif %}" id="closed" role="tabpanel">
+            <div class="detail-card">
+                <div class="detail-card-header {% if stage == 'closed_won' %}success{% else %}danger{% endif %}">
+                    <i class="bi bi-{% if stage == 'closed_won' %}check-circle{% else %}x-circle{% endif %}"></i>
+                    Sale Information - {{ listing.get_sale_status_display }}
                 </div>
-                <div class="card-body">
+                <div class="detail-card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Sale Status</label>
-                            <input type="text" class="form-control" value="{{ listing.get_sale_status_display }}"
-                                disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-flag"></i> Sale Status
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.get_sale_status_display }}" disabled>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Closed At</label>
-                            <input type="text" class="form-control"
-                                value="{{ listing.sale_closed_at|date:'Y-m-d H:i'|default:'' }}" disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-calendar-x"></i> Closed At
+                            </label>
+                            <input type="text" class="detail-field-value" value="{{ listing.sale_closed_at|date:'M d, Y h:i A'|default:'N/A' }}" disabled>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Final Price</label>
-                            <input type="text" class="form-control" value="$ {{ listing.sale_price|default:'' }}"
-                                disabled>
+                        <div class="col-md-6 detail-field-group">
+                            <label class="detail-field-label">
+                                <i class="bi bi-currency-rupee"></i> Final Price
+                            </label>
+                            <input type="text" class="detail-field-value" value="₹{{ listing.sale_price|floatformat:0|default:'N/A' }}" disabled>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <div class="mt-4">
-        <a href="javascript:history.back()" class="btn btn-secondary">Back to Listings</a>
+    <!-- Actions -->
+    <div class="detail-actions">
+        <a href="javascript:history.back()" class="btn-back">
+            <i class="bi bi-arrow-left"></i> Back to Listings
+        </a>
     </div>
 </div>
-
-{% block styles %}
-<style>
-    .nav-pills .nav-link.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-</style>
-{% endblock %}
 {% endblock %}

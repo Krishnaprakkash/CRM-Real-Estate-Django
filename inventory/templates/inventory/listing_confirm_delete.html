@@ -1,57 +1,132 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Delete Listing{% endblock %}
+{% block page_title %}Delete Listing{% endblock %}
+{% block page_subtitle %}Confirm deletion{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card border-danger">
-        <div class="card-header bg-danger text-white">
-            <h3 class="mb-0">Confirm Deletion</h3>
+<div class="confirm-delete-container">
+    <div class="confirm-card danger">
+        <!-- Header -->
+        <div class="confirm-header">
+            <h3>
+                <i class="bi bi-exclamation-triangle"></i>
+                Confirm Deletion
+            </h3>
         </div>
-        <div class="card-body">
-            <h4>Are you sure you want to delete this listing?</h4>
+        
+        <!-- Body -->
+        <div class="confirm-body">
+            <h4 class="confirm-question">
+                Are you sure you want to delete this listing?
+            </h4>
             
-            <div class="alert alert-warning mt-3">
-                <strong>Warning:</strong> This action cannot be undone. All associated data will be permanently deleted.
+            <!-- Warning Box -->
+            <div class="warning-box">
+                <i class="bi bi-shield-exclamation"></i>
+                <div class="warning-content">
+                    <strong>Warning:</strong>
+                    <p>This action cannot be undone. All associated data will be permanently deleted from the system.</p>
+                </div>
             </div>
             
-            <table class="table table-bordered mt-3">
+            <!-- Listing Details -->
+            <table class="details-table">
                 <tr>
-                    <th width="30%">Listing ID:</th>
-                    <td>{{ listing.id }}</td>
+                    <th>
+                        <i class="bi bi-hash"></i> Listing ID
+                    </th>
+                    <td><strong>#{{ listing.id }}</strong></td>
                 </tr>
                 <tr>
-                    <th>Title:</th>
+                    <th>
+                        <i class="bi bi-card-heading"></i> Title
+                    </th>
                     <td>{{ listing.title }}</td>
                 </tr>
                 <tr>
-                    <th>Property Type:</th>
+                    <th>
+                        <i class="bi bi-building"></i> Property Type
+                    </th>
                     <td>{{ listing.get_type_display }}</td>
                 </tr>
                 <tr>
-                    <th>City:</th>
+                    <th>
+                        <i class="bi bi-geo-alt"></i> City
+                    </th>
                     <td>{{ listing.city }}</td>
                 </tr>
                 <tr>
-                    <th>Price:</th>
-                    <td>${{ listing.proposed_price }}</td>
+                    <th>
+                        <i class="bi bi-currency-rupee"></i> Price
+                    </th>
+                    <td class="text-success fw-bold">₹{{ listing.proposed_price|floatformat:0 }}</td>
                 </tr>
                 <tr>
-                    <th>Status:</th>
-                    <td>{{ listing.stage_display }}</td>
+                    <th>
+                        <i class="bi bi-info-circle"></i> Status
+                    </th>
+                    <td>
+                        {% if listing.lead_status %}
+                        <span class="badge bg-primary">Lead - {{ listing.get_lead_status_display }}</span>
+                        {% elif listing.opp_status %}
+                        <span class="badge bg-warning">Opportunity - {{ listing.get_opp_status_display }}</span>
+                        {% elif listing.sale_status %}
+                        <span class="badge bg-success">Sale - {{ listing.get_sale_status_display }}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Unknown</span>
+                        {% endif %}
+                    </td>
                 </tr>
+                {% if listing.assigned_salesman %}
+                <tr>
+                    <th>
+                        <i class="bi bi-person"></i> Assigned To
+                    </th>
+                    <td>{{ listing.assigned_salesman.get_full_name|default:listing.assigned_salesman.username }}</td>
+                </tr>
+                {% endif %}
             </table>
             
-            <form method="post" class="mt-4">
+            <!-- Actions -->
+            <form method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-lg">
-                    <i class="bi bi-trash"></i> Yes, Delete This Listing
-                </button>
-                <a href="{% url 'inventory:listing_detail' listing.pk %}" class="btn btn-secondary btn-lg">
-                    <i class="bi bi-x-circle"></i> Cancel
-                </a>
+                <div class="confirm-actions">
+                    <a href="{% url 'inventory:listing_detail' listing.pk %}" class="btn-cancel-action">
+                        <i class="bi bi-x-circle"></i>
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn-confirm-delete">
+                        <i class="bi bi-trash"></i>
+                        Yes, Delete This Listing
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Optional: Add keyboard shortcut for quick cancel (ESC key)
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        window.location.href = "{% url 'inventory:listing_detail' listing.pk %}";
+    }
+});
+
+// Optional: Double-check before delete
+document.querySelector('.btn-confirm-delete').addEventListener('click', function(e) {
+    const confirmed = confirm('⚠️ FINAL WARNING\n\nYou are about to permanently delete:\n\n"{{ listing.title }}"\n\nThis cannot be undone!\n\nClick OK to proceed with deletion.');
+    if (!confirmed) {
+        e.preventDefault();
+    }
+});
+</script>
 {% endblock %}

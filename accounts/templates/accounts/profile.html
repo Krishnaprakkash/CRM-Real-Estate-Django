@@ -1,7 +1,250 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Profile{% endblock %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block page_subtitle %}Manage your account settings{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components.css' %}">
+{% endblock %}
 
 {% block content %}
-<h1>Profile page</h1>
+<div class="profile-container">
+    <div class="profile-card">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <h2>{{ user.get_full_name|default:user.username }}</h2>
+            <p>{{ user.email }}</p>
+            <span class="role-badge">
+                <i class="bi bi-shield-check"></i> {{ user.role }}
+            </span>
+        </div>
+        
+        <!-- Profile Body -->
+        <div class="profile-body">
+            <!-- Info Cards -->
+            <div class="info-cards-row">
+                <div class="info-card">
+                    <div class="info-icon branch">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div class="info-content">
+                        <h6>Branch</h6>
+                        <p>{{ user.branch.name|default:"Not Assigned" }}</p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon role">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                    <div class="info-content">
+                        <h6>Role</h6>
+                        <p>{{ user.role }}</p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon joined">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div class="info-content">
+                        <h6>Joined</h6>
+                        <p>{{ user.date_joined|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Form -->
+            <form method="post" class="profile-form">
+                {% csrf_token %}
+                
+                <!-- Personal Information Section -->
+                <div class="profile-section">
+                    <h4 class="profile-section-title">
+                        <i class="bi bi-person"></i> Personal Information
+                    </h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_first_name">First Name</label>
+                            <input 
+                                type="text" 
+                                name="first_name" 
+                                id="id_first_name" 
+                                class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                                value="{{ form.first_name.value|default:'' }}"
+                                placeholder="Enter your first name"
+                                required
+                            >
+                            {% if form.first_name.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.first_name.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_last_name">Last Name</label>
+                            <input 
+                                type="text" 
+                                name="last_name" 
+                                id="id_last_name" 
+                                class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                                value="{{ form.last_name.value|default:'' }}"
+                                placeholder="Enter your last name"
+                                required
+                            >
+                            {% if form.last_name.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.last_name.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Information Section -->
+                <div class="profile-section">
+                    <h4 class="profile-section-title">
+                        <i class="bi bi-envelope"></i> Contact Information
+                    </h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_email">Email Address</label>
+                            <input 
+                                type="email" 
+                                name="email" 
+                                id="id_email" 
+                                class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                value="{{ form.email.value|default:'' }}"
+                                placeholder="Enter your email address"
+                                required
+                            >
+                            {% if form.email.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            <p class="help-text">We'll never share your email with anyone else.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_phone">Phone Number</label>
+                            <input 
+                                type="text" 
+                                name="phone" 
+                                id="id_phone" 
+                                class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+                                value="{{ form.phone.value|default:'' }}"
+                                placeholder="Enter your phone number"
+                            >
+                            {% if form.phone.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.phone.errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Account Information Section (Read-only) -->
+                <div class="profile-section">
+                    <h4 class="profile-section-title">
+                        <i class="bi bi-shield-lock"></i> Account Information
+                    </h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                class="form-control"
+                                value="{{ user.username }}"
+                                disabled
+                            >
+                            <p class="help-text">Username cannot be changed.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="role">Role</label>
+                            <input 
+                                type="text" 
+                                id="role" 
+                                class="form-control"
+                                value="{{ user.role }}"
+                                disabled
+                            >
+                            <p class="help-text">Contact administrator to change role.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="branch">Branch</label>
+                            <input 
+                                type="text" 
+                                id="branch" 
+                                class="form-control"
+                                value="{{ user.branch.name|default:'Not Assigned' }}"
+                                disabled
+                            >
+                            <p class="help-text">Contact administrator to change branch.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date_joined">Member Since</label>
+                            <input 
+                                type="text" 
+                                id="date_joined" 
+                                class="form-control"
+                                value="{{ user.date_joined|date:'F d, Y' }}"
+                                disabled
+                            >
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Password Section -->
+                <div class="profile-section">
+                    <div class="password-section">
+                        <div class="section-title">
+                            <i class="bi bi-key"></i> Password & Security
+                        </div>
+                        <p class="text-muted mb-3">
+                            For security reasons, password changes are handled separately.
+                        </p>
+                        <a href="#" class="btn-outline-warning" onclick="alert('Password change feature coming soon!')">
+                            <i class="bi bi-pencil-square"></i> Change Password
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="profile-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Save Changes
+                    </button>
+                    <a href="{% url 'dashboards:home' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

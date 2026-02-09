@@ -1,161 +1,169 @@
-<div class="card mb-4">
-    <div class="card-header bg-success text-white">
-        <h4><i class="bi bi-house-door"></i> Villa Details</h4>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Room Configuration</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">BHK Configuration:</th>
-                            <td>{{ property_details.get_bhk_config_display }}</td>
-                        </tr>
-                        <tr>
-                            <th>Bedrooms:</th>
-                            <td>{{ property_details.bedrooms }}</td>
-                        </tr>
-                        <tr>
-                            <th>Bathrooms:</th>
-                            <td>{{ property_details.bathrooms }}</td>
-                        </tr>
-                        <tr>
-                            <th>Number of Floors:</th>
-                            <td>{{ property_details.number_of_floors }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+<div class="property-detail-partial">
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h4><i class="bi bi-house-door"></i> Villa Details</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Room Configuration</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">BHK Configuration:</th>
+                                <td>{{ property_details.get_bhk_config_display }}</td>
+                            </tr>
+                            <tr>
+                                <th>Bedrooms:</th>
+                                <td>{{ property_details.bedrooms }}</td>
+                            </tr>
+                            <tr>
+                                <th>Bathrooms:</th>
+                                <td>{{ property_details.bathrooms }}</td>
+                            </tr>
+                            <tr>
+                                <th>Number of Floors:</th>
+                                <td>{{ property_details.number_of_floors }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Area Details</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Plot Area:</th>
+                                <td>{{ property_details.plot_area_sqft }} sq ft</td>
+                            </tr>
+                            <tr>
+                                <th>Built-up Area:</th>
+                                <td>{{ property_details.built_up_area_sqft }} sq ft</td>
+                            </tr>
+                            <tr>
+                                <th>Carpet Area:</th>
+                                <td>
+                                    {% if property_details.carpet_area_sqft %}
+                                        {{ property_details.carpet_area_sqft }} sq ft
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Area Details</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Plot Area:</th>
-                            <td>{{ property_details.plot_area_sqft }} sq ft</td>
-                        </tr>
-                        <tr>
-                            <th>Built-up Area:</th>
-                            <td>{{ property_details.built_up_area_sqft }} sq ft</td>
-                        </tr>
-                        <tr>
-                            <th>Carpet Area:</th>
-                            <td>
-                                {% if property_details.carpet_area_sqft %}
-                                    {{ property_details.carpet_area_sqft }} sq ft
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <hr>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Parking</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Parking Available:</th>
-                            <td>
-                                {% if property_details.parking_available %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Covered Parking:</th>
-                            <td>{{ property_details.covered_parking_spaces }} spaces</td>
-                        </tr>
-                        <tr>
-                            <th>Open Parking:</th>
-                            <td>{{ property_details.open_parking_spaces }} spaces</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <hr>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Parking</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Parking Available:</th>
+                                <td>
+                                    {% if property_details.parking_available %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Covered Parking:</th>
+                                <td>{{ property_details.covered_parking_spaces }} spaces</td>
+                            </tr>
+                            <tr>
+                                <th>Open Parking:</th>
+                                <td>{{ property_details.open_parking_spaces }} spaces</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Property Features</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Furnishing:</th>
+                                <td>
+                                    <span class="badge bg-primary">
+                                        {{ property_details.get_furnishing_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Facing:</th>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ property_details.get_facing_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Property Features</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Furnishing:</th>
-                            <td>
-                                <span class="badge bg-primary">
-                                    {{ property_details.get_furnishing_status_display }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Facing:</th>
-                            <td>
-                                <span class="badge bg-info">
-                                    {{ property_details.get_facing_display }}
-                                </span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <hr>
-        
-        <div class="row">
-            <div class="col-md-12">
-                <h5 class="border-bottom pb-2 mb-3">Amenities & Features</h5>
-                <div class="row">
-                    <div class="col-md-3 mb-2">
-                        {% if property_details.swimming_pool %}
-                            <i class="bi bi-check-circle-fill text-success"></i> Swimming Pool
-                        {% else %}
-                            <i class="bi bi-x-circle text-muted"></i> Swimming Pool
-                        {% endif %}
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        {% if property_details.private_garden %}
-                            <i class="bi bi-check-circle-fill text-success"></i> Private Garden
-                        {% else %}
-                            <i class="bi bi-x-circle text-muted"></i> Private Garden
-                        {% endif %}
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        {% if property_details.servant_quarters %}
-                            <i class="bi bi-check-circle-fill text-success"></i> Servant Quarters
-                        {% else %}
-                            <i class="bi bi-x-circle text-muted"></i> Servant Quarters
-                        {% endif %}
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        {% if property_details.power_backup %}
-                            <i class="bi bi-check-circle-fill text-success"></i> Power Backup
-                        {% else %}
-                            <i class="bi bi-x-circle text-muted"></i> Power Backup
-                        {% endif %}
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        {% if property_details.security_24x7 %}
-                            <i class="bi bi-check-circle-fill text-success"></i> 24x7 Security
-                        {% else %}
-                            <i class="bi bi-x-circle text-muted"></i> 24x7 Security
-                        {% endif %}
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        {% if property_details.gated_community %}
-                            <i class="bi bi-check-circle-fill text-success"></i> Gated Community
-                        {% else %}
-                            <i class="bi bi-x-circle text-muted"></i> Gated Community
-                        {% endif %}
+            <hr>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="property-section-header">Amenities & Features</h5>
+                    <div class="amenities-grid">
+                        <div class="amenity-item {% if property_details.swimming_pool %}available{% else %}unavailable{% endif %}">
+                            {% if property_details.swimming_pool %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle text-muted"></i>
+                            {% endif %}
+                            Swimming Pool
+                        </div>
+                        <div class="amenity-item {% if property_details.private_garden %}available{% else %}unavailable{% endif %}">
+                            {% if property_details.private_garden %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle text-muted"></i>
+                            {% endif %}
+                            Private Garden
+                        </div>
+                        <div class="amenity-item {% if property_details.servant_quarters %}available{% else %}unavailable{% endif %}">
+                            {% if property_details.servant_quarters %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle text-muted"></i>
+                            {% endif %}
+                            Servant Quarters
+                        </div>
+                        <div class="amenity-item {% if property_details.power_backup %}available{% else %}unavailable{% endif %}">
+                            {% if property_details.power_backup %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle text-muted"></i>
+                            {% endif %}
+                            Power Backup
+                        </div>
+                        <div class="amenity-item {% if property_details.security_24x7 %}available{% else %}unavailable{% endif %}">
+                            {% if property_details.security_24x7 %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle text-muted"></i>
+                            {% endif %}
+                            24x7 Security
+                        </div>
+                        <div class="amenity-item {% if property_details.gated_community %}available{% else %}unavailable{% endif %}">
+                            {% if property_details.gated_community %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                                <i class="bi bi-x-circle text-muted"></i>
+                            {% endif %}
+                            Gated Community
+                        </div>
                     </div>
                 </div>
             </div>

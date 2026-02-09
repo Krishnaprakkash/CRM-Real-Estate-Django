@@ -165,6 +165,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 # Login URLs
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/dashboards/home/'  # Changed to correct URL
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'dashboards:home'
+LOGOUT_REDIRECT_URL = 'accounts:login'
+
+# core/settings.py
+
+# Session settings - Add these
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Session expires when browser closes
+SESSION_COOKIE_AGE = 3600  # 1 hour (in seconds) - sessions expire after 1 hour of inactivity
+SESSION_SAVE_EVERY_REQUEST = True  # Reset expiry on each request
+
+# Optional: Use database sessions (default) or in-memory
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Default - uses database
+
+# Security settings for sessions
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection

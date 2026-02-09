@@ -1,0 +1,141 @@
+/* ===== BASE LAYOUT STYLES ===== */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.sidebar .brand {
+    padding: 20px;
+    text-align: center;
+    color: white;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 20px;
+}
+
+.sidebar .brand h3 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.sidebar .brand small {
+    opacity: 0.8;
+}
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,0.8);
+    padding: 12px 20px;
+    margin: 5px 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar .nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    transform: translateX(5px);
+}
+
+.sidebar .nav-link.active {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-weight: bold;
+}
+
+.sidebar .nav-link i {
+    font-size: 1.2rem;
+    width: 24px;
+}
+
+.sidebar .user-info {
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.2);
+    margin: 15px;
+    border-radius: 8px;
+    color: white;
+}
+
+.sidebar .user-info .user-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.sidebar .user-info .user-role {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+/* Top Navbar */
+.navbar-top {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 15px 20px;
+    margin: -20px -20px 20px -20px;
+}
+
+/* Tab Styling */
+.menu {
+    margin: 20px 0;
+}
+
+.tablinks {
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    background: #f1f1f1;
+    cursor: pointer;
+    margin-right: 2px;
+}
+
+.tablinks:hover {
+    background: #ddd;
+}
+
+.tablinks.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.tabcontent {
+    display: none;
+    padding: 20px;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+    .main-content {
+        margin-left: 200px;
+    }
+}

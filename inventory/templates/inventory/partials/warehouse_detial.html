@@ -1,245 +1,247 @@
-<div class="card mb-4">
-    <div class="card-header bg-success text-white">
-        <h4><i class="bi bi-box-seam"></i> Warehouse Details</h4>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Area Specifications</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Total Area:</th>
-                            <td>{{ property_details.total_area_sqft }} sq ft</td>
-                        </tr>
-                        <tr>
-                            <th>Covered Area:</th>
-                            <td>{{ property_details.covered_area_sqft }} sq ft</td>
-                        </tr>
-                        <tr>
-                            <th>Open Area:</th>
-                            <td>
-                                {% if property_details.open_area_sqft %}
-                                    {{ property_details.open_area_sqft }} sq ft
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Office Area:</th>
-                            <td>
-                                {% if property_details.office_area_sqft %}
-                                    {{ property_details.office_area_sqft }} sq ft
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Structure Details</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Ceiling Height:</th>
-                            <td>{{ property_details.ceiling_height_ft }} ft</td>
-                        </tr>
-                        <tr>
-                            <th>Floor Type:</th>
-                            <td>
-                                <span class="badge bg-info">
-                                    {{ property_details.get_floor_type_display }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Structure Type:</th>
-                            <td>
-                                <span class="badge bg-primary">
-                                    {{ property_details.get_structure_type_display }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Floor Load Capacity:</th>
-                            <td>
-                                {% if property_details.floor_load_capacity_kg %}
-                                    {{ property_details.floor_load_capacity_kg }} kg/sq m
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+<div class="property-detail-partial">
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h4><i class="bi bi-box-seam"></i> Warehouse Details</h4>
         </div>
-        
-        <hr>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Loading & Access</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Loading Docks:</th>
-                            <td>{{ property_details.loading_docks }}</td>
-                        </tr>
-                        <tr>
-                            <th>Ground Level Doors:</th>
-                            <td>{{ property_details.ground_level_doors }}</td>
-                        </tr>
-                        <tr>
-                            <th>Truck Accessible:</th>
-                            <td>
-                                {% if property_details.truck_accessible %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Container Accessible:</th>
-                            <td>
-                                {% if property_details.container_accessible %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Area Specifications</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Total Area:</th>
+                                <td>{{ property_details.total_area_sqft }} sq ft</td>
+                            </tr>
+                            <tr>
+                                <th>Covered Area:</th>
+                                <td>{{ property_details.covered_area_sqft }} sq ft</td>
+                            </tr>
+                            <tr>
+                                <th>Open Area:</th>
+                                <td>
+                                    {% if property_details.open_area_sqft %}
+                                        {{ property_details.open_area_sqft }} sq ft
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Office Area:</th>
+                                <td>
+                                    {% if property_details.office_area_sqft %}
+                                        {{ property_details.office_area_sqft }} sq ft
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Structure Details</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Ceiling Height:</th>
+                                <td>{{ property_details.ceiling_height_ft }} ft</td>
+                            </tr>
+                            <tr>
+                                <th>Floor Type:</th>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ property_details.get_floor_type_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Structure Type:</th>
+                                <td>
+                                    <span class="badge bg-primary">
+                                        {{ property_details.get_structure_type_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Floor Load Capacity:</th>
+                                <td>
+                                    {% if property_details.floor_load_capacity_kg %}
+                                        {{ property_details.floor_load_capacity_kg }} kg/sq m
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Power & Utilities</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Power Load:</th>
-                            <td>
-                                {% if property_details.power_load_kva %}
-                                    {{ property_details.power_load_kva }} KVA
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Three Phase Power:</th>
-                            <td>
-                                {% if property_details.three_phase_power %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Power Backup:</th>
-                            <td>
-                                {% if property_details.power_backup %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <hr>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Safety & Compliance</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Fire System Type:</th>
-                            <td>
-                                <span class="badge bg-danger">
-                                    {{ property_details.get_fire_system_type_display }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Fire NOC:</th>
-                            <td>
-                                {% if property_details.fire_noc %}
-                                    <span class="badge bg-success">Available</span>
-                                {% else %}
-                                    <span class="badge bg-warning">Not Available</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Cold Storage:</th>
-                            <td>
-                                {% if property_details.cold_storage %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Hazmat Approved:</th>
-                            <td>
-                                {% if property_details.hazmat_approved %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <hr>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Loading & Access</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Loading Docks:</th>
+                                <td>{{ property_details.loading_docks }}</td>
+                            </tr>
+                            <tr>
+                                <th>Ground Level Doors:</th>
+                                <td>{{ property_details.ground_level_doors }}</td>
+                            </tr>
+                            <tr>
+                                <th>Truck Accessible:</th>
+                                <td>
+                                    {% if property_details.truck_accessible %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Container Accessible:</th>
+                                <td>
+                                    {% if property_details.container_accessible %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Power & Utilities</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Power Load:</th>
+                                <td>
+                                    {% if property_details.power_load_kva %}
+                                        {{ property_details.power_load_kva }} KVA
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Three Phase Power:</th>
+                                <td>
+                                    {% if property_details.three_phase_power %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Power Backup:</th>
+                                <td>
+                                    {% if property_details.power_backup %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
-            <div class="col-md-6">
-                <h5 class="border-bottom pb-2 mb-3">Parking & Security</h5>
-                <table class="table table-sm">
-                    <tbody>
-                        <tr>
-                            <th width="50%">Truck Parking:</th>
-                            <td>{{ property_details.truck_parking_spaces }} spaces</td>
-                        </tr>
-                        <tr>
-                            <th>Car Parking:</th>
-                            <td>{{ property_details.car_parking_spaces }} spaces</td>
-                        </tr>
-                        <tr>
-                            <th>24x7 Security:</th>
-                            <td>
-                                {% if property_details.security_24x7 %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>CCTV Surveillance:</th>
-                            <td>
-                                {% if property_details.cctv %}
-                                    <span class="badge bg-success">Yes</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <hr>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Safety & Compliance</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Fire System Type:</th>
+                                <td>
+                                    <span class="badge bg-danger">
+                                        {{ property_details.get_fire_system_type_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Fire NOC:</th>
+                                <td>
+                                    {% if property_details.fire_noc %}
+                                        <span class="badge bg-success">Available</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Not Available</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Cold Storage:</th>
+                                <td>
+                                    {% if property_details.cold_storage %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Hazmat Approved:</th>
+                                <td>
+                                    {% if property_details.hazmat_approved %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h5 class="property-section-header">Parking & Security</h5>
+                    <table class="table table-sm property-detail-table">
+                        <tbody>
+                            <tr>
+                                <th width="50%">Truck Parking:</th>
+                                <td>{{ property_details.truck_parking_spaces }} spaces</td>
+                            </tr>
+                            <tr>
+                                <th>Car Parking:</th>
+                                <td>{{ property_details.car_parking_spaces }} spaces</td>
+                            </tr>
+                            <tr>
+                                <th>24x7 Security:</th>
+                                <td>
+                                    {% if property_details.security_24x7 %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>CCTV Surveillance:</th>
+                                <td>
+                                    {% if property_details.cctv %}
+                                        <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
