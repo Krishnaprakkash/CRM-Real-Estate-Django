@@ -18,6 +18,11 @@ body {
     overflow-y: auto;
 }
 
+/* Hide sidebar on login page */
+body.login-page .sidebar {
+    display: none;
+}
+
 .sidebar .brand {
     padding: 20px;
     text-align: center;
@@ -86,7 +91,13 @@ body {
     margin-left: 250px;
     padding: 20px;
     min-height: 100vh;
-    background: #f8f9fa;
+    background: white;
+}
+
+/* Remove main content margin on login page */
+body.login-page .main-content {
+    margin-left: 0;
+    padding: 0;
 }
 
 /* Top Navbar */
@@ -98,6 +109,21 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     padding: 15px 20px;
     margin: -20px -20px 20px -20px;
+}
+
+/* Ensure navbar top new-listing button matches inventory page styling */
+.navbar-top .btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.navbar-top .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(40,167,69,0.3);
 }
 
 /* Tab Styling */

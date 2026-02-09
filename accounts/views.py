@@ -26,6 +26,8 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
+    # Clear all session data to prevent browser back button access
+    request.session.flush()
     messages.success(request, 'You have been logged out successfully.')
     return redirect('accounts:login')
 

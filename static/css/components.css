@@ -178,6 +178,13 @@
     background: #5a6268;
 }
 
+/* Make buttons inline-flex and add consistent gap between icon and text */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px; /* space between icon and text */
+}
+
 /* Info Cards */
 .info-card {
     background: #f8f9fa;
@@ -860,7 +867,7 @@ textarea.detail-field-value {
 }
 
 .listing-edit-form .card-header.bg-success {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
 }
 
 .listing-edit-form .card-header h4 {
@@ -1022,7 +1029,7 @@ textarea.detail-field-value {
 }
 
 .listing-create-form .card-header.bg-success {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
 }
 
 .listing-create-form .card-header h4 {
@@ -1095,6 +1102,32 @@ textarea.detail-field-value {
 }
 
 /* Form Action Buttons */
+.action-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Create / primary action used across dashboards and forms */
+.btn-create {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    text-decoration: none;
+    margin-left: auto;
+}
+
+.btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
 .listing-create-form .btn {
     padding: 12px 30px;
     border-radius: 8px;
@@ -1378,6 +1411,19 @@ textarea.detail-field-value {
     border-radius: 6px;
     transition: all 0.2s;
     border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+}
+
+/* Center icons in listing list buttons */
+#listings-table .btn-sm i {
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    font-size: 1.2rem; /* Increased icon size */
 }
 
 #listings-table .btn-info {
@@ -1451,7 +1497,10 @@ textarea.detail-field-value {
     margin: 0;
 }
 
-.page-header-actions .btn-success {
+.page-header-actions .btn-success,
+.navbar-top .btn-success,
+.dashboard-header .btn-success,
+.actions-container .btn-success {
     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     border: none;
     padding: 12px 25px;
@@ -1459,8 +1508,10 @@ textarea.detail-field-value {
     font-weight: 600;
     transition: all 0.3s;
 }
-
-.page-header-actions .btn-success:hover {
+.page-header-actions .btn-success:hover,
+.navbar-top .btn-success:hover,
+.dashboard-header .btn-success:hover,
+.actions-container .btn-success:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);
 }
@@ -1550,7 +1601,7 @@ textarea.detail-field-value {
 }
 
 .property-detail-partial .card-header.bg-success {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
     color: white;
 }
 
@@ -1780,47 +1831,79 @@ textarea.detail-field-value {
     margin-top: 10px;
 }
 
-/* Checkbox/Boolean Fields */
+/* Checkbox/Boolean Fields rendered as toggle boxes */
 .property-form-partial .form-check {
+    margin-bottom: 0;
+    transition: all 0.3s ease;
+}
+
+/* Hide native checkbox control but keep it accessible for forms */
+.property-form-partial .form-check input[type="checkbox"] {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Style the label as the visible toggle box */
+.property-form-partial .form-check-label {
+    display: block;
     padding: 12px 15px;
     background: #f8f9fa;
     border-radius: 8px;
     border: 2px solid #e9ecef;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     cursor: pointer;
-    margin-bottom: 0;
+    font-weight: 500;
+    color: #495057;
+    user-select: none;
+    width: 100%;
+    position: relative;
+    box-shadow: none;
 }
 
-.property-form-partial .form-check:hover {
-    background: #e9ecef;
-    border-color: #2a5298;
-}
-
-.property-form-partial .form-check input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    border: 2px solid #6c757d;
-    border-radius: 4px;
+.property-form-partial .form-check-label i {
     margin-right: 10px;
 }
 
-.property-form-partial .form-check input[type="checkbox"]:checked {
-    background-color: #28a745;
-    border-color: #28a745;
+/* Enhanced hover effects for all amenities */
+.property-form-partial .form-check-label:hover {
+    background: #eef3f7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(42, 82, 152, 0.2);
+    border-color: #1e3c72;
 }
 
-.property-form-partial .form-check-label {
-    font-weight: 500;
-    color: #495057;
-    cursor: pointer;
-    user-select: none;
-    margin-bottom: 0;
-}
-
+/* When checked, label becomes the green gradient used for Create buttons */
 .property-form-partial .form-check input[type="checkbox"]:checked + .form-check-label {
-    color: #28a745;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-color: transparent;
     font-weight: 600;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25);
+}
+
+/* Support JS-driven active state for cases where markup order differs */
+.property-form-partial .form-check.active .form-check-label {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-color: transparent;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25);
+}
+
+/* Enhanced hover effect for already selected amenities */
+.property-form-partial .form-check.active .form-check-label:hover {
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+
+/* Smooth transitions for all state changes */
+.property-form-partial .form-check-label {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.property-form-partial .form-check-label:hover {
+    transition: all 0.2s ease;
 }
 
 /* Amenities Grid */

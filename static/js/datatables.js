@@ -22,9 +22,9 @@ function initManagerLeadsTable() {
         columnDefs: [{ orderable: false, targets: 6 }]
     });
 
-    const typeCol = 2;
-    const statusCol = 5;
-    const salesmanCol = 4;
+    const typeCol = 3;
+    const statusCol = 6;
+    const salesmanCol = 5;
 
     setTimeout(() => populateFilters(table, typeCol, statusCol, salesmanCol, 'Leads'), 100);
 
@@ -47,9 +47,9 @@ function initManagerOppsTable() {
         columnDefs: [{ orderable: false, targets: 6 }]
     });
 
-    const typeCol = 2;
-    const statusCol = 5;
-    const salesmanCol = 4;
+    const typeCol = 3;
+    const statusCol = 6;
+    const salesmanCol = 5;
 
     setTimeout(() => populateFilters(table, typeCol, statusCol, salesmanCol, 'Opps'), 100);
 
@@ -72,9 +72,9 @@ function initManagerSalesTable() {
         columnDefs: [{ orderable: false, targets: 6 }]
     });
 
-    const typeCol = 2;
-    const statusCol = 5;
-    const salesmanCol = 4;
+    const typeCol = 3;
+    const statusCol = 6;
+    const salesmanCol = 5;
 
     setTimeout(() => populateFilters(table, typeCol, statusCol, salesmanCol, 'Sale'), 100);
 

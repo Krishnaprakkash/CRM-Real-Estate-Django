@@ -35,7 +35,7 @@ class Listing(models.Model):
     )
     type = models.TextField(
         choices=typeChoices.choices,
-        default=typeChoices.APARTMENT)
+        default=typeChoices.VILLA)
     proposed_price = models.DecimalField(max_digits=12, decimal_places=2)
     title = models.CharField(max_length=200)
     address = models.TextField()  

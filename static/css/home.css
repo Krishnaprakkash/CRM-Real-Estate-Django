@@ -200,13 +200,14 @@
     font-size: 0.8rem;
 }
 
-/* KPI Cards */
+/* KPI Cards (match listing stats cards: neutral rounded cards, no accent colors) */
 .kpi-card {
     background: white;
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     height: 100%;
+    min-height: 120px;
 }
 
 .kpi-card .kpi-header {
@@ -215,7 +216,7 @@
     gap: 10px;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f0;
+    border-bottom: none;
 }
 
 .kpi-card .kpi-icon {
@@ -229,16 +230,9 @@
     color: white;
 }
 
-.kpi-card .kpi-icon.leads { 
-    background: linear-gradient(135deg, #3498db, #2980b9); 
-}
-
-.kpi-card .kpi-icon.opportunities { 
-    background: linear-gradient(135deg, #f39c12, #e67e22); 
-}
-
-.kpi-card .kpi-icon.sales { 
-    background: linear-gradient(135deg, #27ae60, #229954); 
+.kpi-card .kpi-icon {
+    background: transparent;
+    color: #6c757d;
 }
 
 .kpi-card .kpi-title {

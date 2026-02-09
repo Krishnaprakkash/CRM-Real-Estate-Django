@@ -18,7 +18,7 @@
     {% block extra_css %}{% endblock %}
     {% endcompress %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Brand -->
@@ -82,15 +82,6 @@
                 <span>Inventory</span>
             </a>
             
-            <!-- Settings (Managers & CEO only) -->
-            {% if request.user.role == 'Manager' or request.user.role == 'CEO' %}
-            <a class="nav-link {% if 'settings' in request.resolver_match.url_name %}active{% endif %}" 
-               href="#settings">
-                <i class="bi bi-gear"></i>
-                <span>Settings</span>
-            </a>
-            {% endif %}
-            
             <!-- Divider -->
             <hr style="border-color: rgba(255,255,255,0.2); margin: 20px;">
             
@@ -105,7 +96,8 @@
     
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Top Navigation Bar -->
+        <!-- Top Navigation Bar (only on home) -->
+        {% if request.resolver_match.url_name == 'home' %}
         <div class="navbar-top">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -115,17 +107,18 @@
                 <div>
                     <!-- Quick Actions -->
                     {% if request.user.role == 'Manager' %}
-                    <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> New Listing
+                    <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Create New Listing
                     </a>
                     {% elif request.user.role == 'Salesman' %}
-                    <a href="{% url 'inventory:listing_create_salesman' %}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> New Listing
+                    <a href="{% url 'inventory:listing_create_salesman' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Create New Listing
                     </a>
                     {% endif %}
                 </div>
             </div>
         </div>
+        {% endif %}
         
         <!-- Messages -->
         {% if messages %}
@@ -154,7 +147,35 @@
     <script src="{% static 'js/tabs.js' %}"></script>
     <script src="{% static 'js/batch-actions.js' %}"></script>
     <script src="{% static 'js/datatables.js' %}"></script>
+    <script src="{% static 'js/property-amenities.js' %}"></script>
     {% block extra_js %}{% endblock %}
     {% endcompress %}
+    <script>
+    (function(){
+        var hideTimeout = 2000; // 2 seconds
+        function hideAlerts(){
+            document.querySelectorAll('.alert').forEach(function(el){
+                // schedule removal/close
+                setTimeout(function(){
+                    try{
+                        if (window.bootstrap && bootstrap.Alert){
+                            var instance = bootstrap.Alert.getOrCreateInstance(el);
+                            instance.close();
+                        } else {
+                            el.remove();
+                        }
+                    } catch(e){
+                        if (el && el.parentNode) el.parentNode.removeChild(el);
+                    }
+                }, hideTimeout);
+            });
+        }
+        if (document.readyState === 'loading'){
+            document.addEventListener('DOMContentLoaded', hideAlerts);
+        } else {
+            hideAlerts();
+        }
+    })();
+    </script>
 </body>
 </html>

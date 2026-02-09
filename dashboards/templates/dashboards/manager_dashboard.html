@@ -15,7 +15,7 @@
 <div class="dashboard-header">
     <h1 class="dashboard-welcome">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
     
-    <a href="{% url 'inventory:listing_list' %}" class="btn-inventory">
+    <a href="{% url 'inventory:listing_list' %}" class="btn btn-success">
         <i class="bi bi-box-seam"></i> View Inventory
     </a>
     
@@ -149,8 +149,8 @@
                 <i class="bi bi-trash"></i> Delete
             </button>
             {% if perms.inventory.add_listing %}
-            <a href="{% url 'inventory:listing_create_manager' %}" class="action-btn btn-create">
-                <i class="bi bi-plus-circle"></i> New Listing
+            <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success ms-auto">
+                <i class="bi bi-plus-circle"></i>  Create New Listing
             </a>
             {% endif %}
         </div>
@@ -266,8 +266,8 @@
                 <i class="bi bi-trash"></i> Delete
             </button>
             {% if perms.inventory.add_listing %}
-            <a href="{% url 'inventory:listing_create_manager' %}" class="action-btn btn-create">
-                <i class="bi bi-plus-circle"></i> New Listing
+            <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success ms-auto">
+                <i class="bi bi-plus-circle"></i> Create New Listing
             </a>
             {% endif %}
         </div>
@@ -378,8 +378,8 @@
                 <i class="bi bi-trash"></i> Delete Selected
             </button>
             {% if perms.inventory.add_listing %}
-            <a href="{% url 'inventory:listing_create_manager' %}" class="action-btn btn-create">
-                <i class="bi bi-plus-circle"></i> New Listing
+            <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success ms-auto">
+                <i class="bi bi-plus-circle"></i> Create New Listing
             </a>
             {% endif %}
         </div>

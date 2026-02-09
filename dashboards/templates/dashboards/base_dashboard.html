@@ -15,7 +15,7 @@
 <div class="dashboard-header">
     <h1 class="dashboard-welcome">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
     
-    <a href="{% url 'inventory:listing_list' %}" class="btn-inventory">
+    <a href="{% url 'inventory:listing_list' %}" class="btn btn-success">
         <i class="bi bi-box-seam"></i> View Inventory
     </a>
     
