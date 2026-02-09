@@ -95,7 +95,7 @@ function setSalesmanAction(action, suffix) {
         selected.forEach((checkbox) => {
             const row = checkbox.closest('tr');
             if (row) {
-                const statusCell = row.cells[4]?.textContent?.trim();
+                const statusCell = row.cells[5]?.textContent?.trim();
                 if (statusCell !== 'Prospecting') {
                     const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
                     invalidItems.push({ id: itemId, status: statusCell });
@@ -114,7 +114,7 @@ function setSalesmanAction(action, suffix) {
         selected.forEach((checkbox) => {
             const row = checkbox.closest('tr');
             if (row) {
-                const statusCell = row.cells[4]?.textContent?.trim();
+                const statusCell = row.cells[5]?.textContent?.trim();
                 if (statusCell !== 'Negotiating') {
                     const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
                     invalidItems.push({ id: itemId, status: statusCell });
@@ -131,7 +131,7 @@ function setSalesmanAction(action, suffix) {
         selected.forEach((checkbox) => {
             const row = checkbox.closest('tr');
             if (row) {
-                const statusCell = row.cells[4]?.textContent?.trim();
+                const statusCell = row.cells[5]?.textContent?.trim();
                 if (statusCell === 'Pending Approval' || statusCell === 'Approved') {
                     const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
                     alreadySubmitted.push({ id: itemId, status: statusCell });
@@ -150,7 +150,7 @@ function setSalesmanAction(action, suffix) {
         selected.forEach((checkbox) => {
             const row = checkbox.closest('tr');
             if (row) {
-                const statusCell = row.cells[4]?.textContent?.trim();
+                const statusCell = row.cells[5]?.textContent?.trim();
                 if (statusCell !== 'Processing') {
                     const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
                     invalidItems.push({ id: itemId, status: statusCell });

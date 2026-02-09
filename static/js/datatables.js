@@ -99,8 +99,8 @@ function initSalesmanLeadsTable() {
         columnDefs: [{ orderable: false, targets: 4 }]
     });
 
-    const typeCol = 2;
-    const statusCol = 4;
+    const typeCol = 3;
+    const statusCol = 5;
 
     setTimeout(() => populateSalesmanFilters(table, typeCol, statusCol, 'Leads'), 100);
 
@@ -123,8 +123,8 @@ function initSalesmanOppsTable() {
         columnDefs: [{ orderable: false, targets: 4 }]
     });
 
-    const typeCol = 2;
-    const statusCol = 4;
+    const typeCol = 3;
+    const statusCol = 5;
 
     setTimeout(() => populateSalesmanFilters(table, typeCol, statusCol, 'Opps'), 100);
 
@@ -147,8 +147,8 @@ function initSalesmanSalesTable() {
         columnDefs: [{ orderable: false, targets: 4 }]
     });
 
-    const typeCol = 2;
-    const statusCol = 4;
+    const typeCol = 3;
+    const statusCol = 5;
 
     setTimeout(() => populateSalesmanFilters(table, typeCol, statusCol, 'Sale'), 100);
 
