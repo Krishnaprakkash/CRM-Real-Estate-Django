@@ -1,19 +1,248 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CRM{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
-    {% block styles %}{% endblock %}
-</head>
-
-<body style="font-family: Arial, sans-serif;">
-
-    {% block content %}
+    {% block styles %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+            padding-top: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar .brand {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar .brand h3 {
+            margin: 0;
+            font-weight: bold;
+        }
+        
+        .sidebar .brand small {
+            opacity: 0.8;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            margin: 5px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .sidebar .nav-link i {
+            font-size: 1.2rem;
+            width: 24px;
+        }
+        
+        .sidebar .user-info {
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            margin: 15px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .sidebar .user-info .user-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .sidebar .user-info .user-role {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+        
+        .navbar-top {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            .main-content {
+                margin-left: 200px;
+            }
+        }
+    </style>
     {% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Brand -->
+        <div class="brand">
+            <h3>🏢 Real Estate CRM</h3>
+            <small>Property Management</small>
+        </div>
+        
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="user-name">{{ request.user.get_full_name }}</div>
+            <div class="user-role">
+                <i class="bi bi-person-badge"></i> {{ request.user.role }}
+            </div>
+            <div class="user-role">
+                <i class="bi bi-building"></i> {{ request.user.branch.name }}
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <nav class="nav flex-column">
+            <!-- Home/Dashboard -->
+            <a class="nav-link {% if request.resolver_match.url_name == 'home' or 'dashboard' in request.resolver_match.url_name %}active{% endif %}" 
+               href="{% url 'dashboards:home' %}">
+                <i class="bi bi-house-door"></i>
+                <span>Home</span>
+            </a>
+            
+            <!-- Profile -->
+            <a class="nav-link {% if 'profile' in request.resolver_match.url_name %}active{% endif %}" 
+               href="{% url 'accounts:profile' %}">
+                <i class="bi bi-person-circle"></i>
+                <span>Profile</span>
+            </a>
+            
+            <!-- Sales (Expandable) -->
+            {% if request.user.role == 'Salesman' %}
+            <a class="nav-link {% if 'salesman_dashboard' in request.resolver_match.url_name %}active{% endif %}" 
+            href="{% url 'dashboards:salesman_dashboard' %}">
+                <i class="bi bi-clipboard-check"></i>
+                <span>Pipeline</span>
+            </a>
+            {% elif request.user.role == 'Manager' %}
+            <a class="nav-link {% if 'manager_dashboard' in request.resolver_match.url_name %}active{% endif %}" 
+            href="{% url 'dashboards:manager_dashboard' %}">
+                <i class="bi bi-people"></i>
+                <span>Team Pipeline</span>
+            </a>
+            {% elif request.user.role == 'CEO' %}
+            <a class="nav-link {% if 'ceo_dashboard' in request.resolver_match.url_name %}active{% endif %}" 
+            href="{% url 'dashboards:ceo_dashboard' %}">
+                <i class="bi bi-building"></i>
+                <span>Organization</span>
+            </a>
+            {% endif %}
+
+            
+            <!-- Inventory -->
+            <a class="nav-link {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}" 
+               href="{% url 'inventory:listing_list' %}">
+                <i class="bi bi-box-seam"></i>
+                <span>Inventory</span>
+            </a>
+            
+            <!-- Settings (Managers & CEO only) -->
+            {% if request.user.role == 'Manager' or request.user.role == 'CEO' %}
+            <a class="nav-link {% if 'settings' in request.resolver_match.url_name %}active{% endif %}" 
+               href="#settings">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+            </a>
+            {% endif %}
+            
+            <!-- Divider -->
+            <hr style="border-color: rgba(255,255,255,0.2); margin: 20px;">
+            
+            <!-- Logout -->
+            <a class="nav-link" href="{% url 'accounts:logout' %}" 
+               onclick="return confirm('Are you sure you want to logout?')">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Logout</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation Bar -->
+        <div class="navbar-top">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h4>
+                    <small class="text-muted">{% block page_subtitle %}{% endblock %}</small>
+                </div>
+                <div>
+                    <!-- Quick Actions -->
+                    {% if request.user.role == 'Manager' %}
+                    <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> New Listing
+                    </a>
+                    {% elif request.user.role == 'Salesman' %}
+                    <a href="{% url 'inventory:listing_create_salesman' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> New Listing
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Page Content -->
+        {% block content %}
+        {% endblock %}
+    </div>
 
     <!-- jQuery and DataTables -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
