@@ -451,7 +451,98 @@ function switchTab(evt, tabName) {
     }
     
     // Add active class to clicked button
-    evt.currentTarget.classList.add('active');
+    if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+    }
+    
+    // Update URL hash and localStorage
+    updateTabState(tabName);
 }
+
+// Update URL hash and localStorage to preserve tab state
+function updateTabState(tabName) {
+    // Update URL hash without scrolling
+    if (history.replaceState) {
+        const newUrl = window.location.pathname + '#' + tabName;
+        history.replaceState(null, null, newUrl);
+    } else {
+        window.location.hash = tabName;
+    }
+    
+    // Store in localStorage for persistence across sessions
+    localStorage.setItem('dashboard_active_tab', tabName);
+}
+
+// Initialize tab state on page load
+function initializeTabState() {
+    // Check URL hash first
+    const hash = window.location.hash.replace('#', '');
+    
+    // If hash exists and is a valid tab, use it
+    if (hash && document.getElementById(hash)) {
+        activateTab(hash);
+        return;
+    }
+    
+    // Otherwise check localStorage
+    const savedTab = localStorage.getItem('dashboard_active_tab');
+    if (savedTab && document.getElementById(savedTab)) {
+        activateTab(savedTab);
+        return;
+    }
+    
+    // Default to leads tab if no saved state
+    activateTab('leads');
+}
+
+// Helper function to activate a specific tab without event
+function activateTab(tabName) {
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Hide all stats groups
+    document.querySelectorAll('.stats-group').forEach(group => {
+        group.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    const selectedContent = document.getElementById(tabName);
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+    }
+    
+    // Show corresponding stats group
+    const statsElement = document.getElementById('stats-' + tabName);
+    if (statsElement) {
+        statsElement.classList.add('active');
+    }
+    
+    // Add active class to corresponding button
+    const button = document.querySelector(`.tab-button[onclick*="'${tabName}'"]`);
+    if (button) {
+        button.classList.add('active');
+    }
+    
+    // Update URL hash and localStorage
+    updateTabState(tabName);
+}
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', function() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(hash)) {
+        activateTab(hash);
+    }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initializeTabState);
 </script>
 {% endblock %}

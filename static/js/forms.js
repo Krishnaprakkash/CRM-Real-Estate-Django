@@ -1,11 +1,16 @@
 // Listing Edit Form Functions
 document.addEventListener('DOMContentLoaded', function() {
-    // Disable type field for listing edit forms
+    // Make type field read-only for listing edit forms (don't disable to allow form submission)
     const listingEditForm = document.getElementById('listing-edit-form');
     if (listingEditForm) {
         const typeField = document.querySelector('[name="type"]');
         if (typeField) {
-            typeField.disabled = true;
+            // Ensure the field is read-only but not disabled (to allow form submission)
+            typeField.readOnly = true;
+            typeField.disabled = false; // Make sure it's not disabled
+            typeField.style.backgroundColor = '#f8f9fa';
+            typeField.style.cursor = 'not-allowed';
+            typeField.style.opacity = '0.6';
         }
     }
 });

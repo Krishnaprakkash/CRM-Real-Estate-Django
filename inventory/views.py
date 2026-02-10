@@ -271,14 +271,14 @@ def listing_edit(request, pk):
     
     if request.method == 'POST':
         if request.user.role == 'Manager':
-            form = ManagerListingForm(request, instance=listing, manager=request.user)
+            form = ManagerListingForm(request.POST, instance=listing, manager=request.user)
         else:
-            form = SalesmanListingForm(request, instance=listing)
+            form = SalesmanListingForm(request.POST, instance=listing)
         
         details_form = get_details_form(listing.type, request.POST, instance=property_details)
         
         form_valid = form.is_valid()
-        details_valid = details_from.is_valid() if details_from else True
+        details_valid = details_form.is_valid() if details_form else True
         
         if form_valid and details_valid:
             listing = form.save(commit=False)
@@ -286,7 +286,7 @@ def listing_edit(request, pk):
             listing.save()
             
             if details_form:
-                details = details_from.save(commit=False)
+                details = details_form.save(commit=False)
                 details.listing = listing
                 details.save()
             

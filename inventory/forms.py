@@ -6,6 +6,15 @@ class SalesmanListingForm(forms.ModelForm):
     class Meta:
         model = Listing
         fields = ['title', 'type', 'address', 'city', 'proposed_price']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make type field read-only for editing
+        if self.instance and self.instance.pk:
+            self.fields['type'].widget.attrs['readonly'] = True
+            self.fields['type'].widget.attrs['style'] = 'background-color: #f8f9fa; cursor: not-allowed;'
+            # Ensure the field is not required for editing since it's read-only
+            self.fields['type'].required = False
 
 class ManagerListingForm(forms.ModelForm):
     class Meta:
@@ -20,6 +29,13 @@ class ManagerListingForm(forms.ModelForm):
                 branch=manager.branch,
                 role='Salesman'
             ).order_by('first_name', 'last_name')
+        
+        # Make type field read-only for editing
+        if self.instance and self.instance.pk:
+            self.fields['type'].widget.attrs['readonly'] = True
+            self.fields['type'].widget.attrs['style'] = 'background-color: #f8f9fa; cursor: not-allowed;'
+            # Ensure the field is not required for editing since it's read-only
+            self.fields['type'].required = False
 
 class VillaDetailsForm(forms.ModelForm):
     class Meta:
