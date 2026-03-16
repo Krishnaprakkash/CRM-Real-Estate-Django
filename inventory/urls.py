@@ -1,4 +1,5 @@
 from . import views
+from . import api_views
 from django.urls import path
 
 app_name = 'inventory'
@@ -13,5 +14,8 @@ urlpatterns = [
     path('<str:pk>/edit', views.listing_edit, name='listing_edit'),
     path('<str:pk>/delete', views.listing_delete, name='listing_delete'),
     
-    path('ajax/property-form/', views.get_property_form_ajax, name='get_property_form_ajax')
+    path('ajax/property-form/', views.get_property_form_ajax, name='get_property_form_ajax'),
+    
+    # Inline edit API
+    path('api/listing/<str:pk>/inline-edit/', api_views.listing_inline_edit_api, name='listing_inline_edit_api'),
 ]

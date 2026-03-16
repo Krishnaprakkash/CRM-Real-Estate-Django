@@ -25,11 +25,24 @@ def login_view(request):
     return render(request, 'accounts/login.html', {'form': form, 'next': next_url})
 
 def logout_view(request):
-    logout(request)
+    # Get user info before logout for logging purposes
+    user = request.user
+    
     # Clear all session data to prevent browser back button access
     request.session.flush()
+    
+    # Additional security: clear any cached authentication data
+    if hasattr(request, 'user'):
+        request.user = None
+    
+    # Add cache control headers to logout response
+    response = redirect('accounts:login')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    
     messages.success(request, 'You have been logged out successfully.')
-    return redirect('accounts:login')
+    return response
 
 @login_required
 def profile_view(request):

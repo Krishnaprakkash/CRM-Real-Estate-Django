@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404 
+from django.views.decorators.cache import never_cache
 from .forms import SalesmanListingForm, ManagerListingForm, VillaDetailsForm, ApartmentDetailsForm, WarehouseDetailsForm, OfficeDetailsForm, RetailDetailsForm
 from .models import Listing, VillaDetails, ApartmentDetails, WarehouseDetails, OfficeDetails, RetailDetails
 from accounts.models import User
@@ -165,29 +166,33 @@ def listings_visible_to(user):
     
     return Listing.objects.none()
 
+@never_cache
 @login_required
 def listing_list(request):
     listings = listings_visible_to(request.user)
     
-    property_type = request.GET.get('type', '')
-    city = request.GET.get('city', '')
-    salesman_filter = request.GET.get('salesman', '')
+    # Multi-select filters
+    property_types = request.GET.getlist('type', [])
+    cities = request.GET.getlist('city', [])
+    salesman_ids = request.GET.getlist('salesman', [])
     
-    if property_type:
-        listings = listings.filter(type=property_type)
-    if city:
-        listings = listings.filter(city__icontains=city)
-    if salesman_filter:
-        listings = listings.filter(assigned_salesman_id=salesman_filter)
+    # Apply filters
+    if property_types and 'all' not in property_types:
+        listings = listings.filter(type__in=property_types)
+    if cities and 'all' not in cities:
+        listings = listings.filter(city__in=cities)
+    if salesman_ids and 'all' not in salesman_ids:
+        listings = listings.filter(assigned_salesman_id__in=salesman_ids)
         
+    # Get available filter options
     available_types = listings.values_list('type', flat=True).distinct()
     available_cities = listings.values_list('city', flat=True).distinct()
     
     salesmen = None
     if request.user.role == 'Manager':
         salesmen = User.objects.filter(
-            branch = request.user.branch,
-            role = 'Salesman').order_by('first_name', 'last_name')
+            branch=request.user.branch,
+            role='Salesman').order_by('first_name', 'last_name')
         
     lead_count = listings.filter(
         Q(lead_status=Listing.leadStatusChoices.PENDING) |
@@ -212,9 +217,9 @@ def listing_list(request):
         'available_cities': available_cities,
         'salesmen': salesmen,
         'filters': {
-            'type': property_type,
-            'city': city,
-            'salesman': salesman_filter
+            'types': property_types,
+            'cities': cities,
+            'salesman_ids': salesman_ids
         },
         'total_count': listings.count(),
         'lead_count': lead_count,

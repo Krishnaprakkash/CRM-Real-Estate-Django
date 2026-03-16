@@ -151,7 +151,47 @@
     {% block extra_js %}{% endblock %}
     {% endcompress %}
     <script>
+    // Enhanced logout protection - prevent access to cached authenticated pages
     (function(){
+        // Add cache control meta tags dynamically
+        var metaCacheControl = document.createElement('meta');
+        metaCacheControl.name = 'Cache-Control';
+        metaCacheControl.content = 'no-cache, no-store, must-revalidate';
+        document.getElementsByTagName('head')[0].appendChild(metaCacheControl);
+        
+        var metaPragma = document.createElement('meta');
+        metaPragma.name = 'Pragma';
+        metaPragma.content = 'no-cache';
+        document.getElementsByTagName('head')[0].appendChild(metaPragma);
+        
+        var metaExpires = document.createElement('meta');
+        metaExpires.name = 'Expires';
+        metaExpires.content = '0';
+        document.getElementsByTagName('head')[0].appendChild(metaExpires);
+        
+        // Prevent back button navigation to authenticated pages
+        window.history.pushState(null, document.title, location.href);
+        window.addEventListener('popstate', function(event) {
+            // If user tries to go back, redirect to current page or login
+            if (document.body.classList.contains('authenticated-page')) {
+                window.history.pushState(null, document.title, location.href);
+            }
+        });
+        
+        // Additional check: if this is an authenticated page, verify session
+        function checkSession() {
+            // This function can be extended to make an AJAX call to verify session
+            // For now, we rely on the middleware to handle session validation
+        }
+        
+        // Run session check on page load
+        if (document.readyState === 'loading'){
+            document.addEventListener('DOMContentLoaded', checkSession);
+        } else {
+            checkSession();
+        }
+        
+        // Hide alerts after timeout
         var hideTimeout = 2000; // 2 seconds
         function hideAlerts(){
             document.querySelectorAll('.alert').forEach(function(el){

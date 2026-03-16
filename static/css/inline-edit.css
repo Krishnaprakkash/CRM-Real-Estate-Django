@@ -1,0 +1,234 @@
+/* ===== INLINE EDIT STYLES ===== */
+
+/* Edit Mode Indicators - Clean white background, no yellow */
+.editing {
+    background-color: white !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(42, 82, 152, 0.15);
+}
+
+/* Input Fields in Edit Mode - Match existing form styles */
+.inline-edit-input {
+    border: 2px solid #e9ecef !important;
+    border-radius: 8px !important;
+    background: white !important;
+    box-shadow: none !important;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    padding: 12px 15px;
+}
+
+.inline-edit-input:focus {
+    outline: none !important;
+    border-color: #2a5298 !important;
+    box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1) !important;
+    transform: translateY(-1px);
+}
+
+/* Action Buttons - Match existing dashboard button styles */
+.btn-inline-edit {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+    border: none !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    box-shadow: 0 2px 8px rgba(42, 82, 152, 0.25);
+}
+
+.btn-inline-edit:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(42, 82, 152, 0.35) !important;
+    background: linear-gradient(135deg, #1a3361 0%, #234680 100%) !important;
+}
+
+.btn-inline-save {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    border: none !important;
+    color: white !important;
+    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.25);
+}
+
+.btn-inline-save:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.35) !important;
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%) !important;
+}
+
+.btn-inline-cancel {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+    border: none !important;
+    color: white !important;
+    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.25);
+}
+
+.btn-inline-cancel:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.35) !important;
+    background: linear-gradient(135deg, #5a6268 0%, #545b62 100%) !important;
+}
+
+/* Button Icons - Match existing icon styles */
+.btn-inline-edit i,
+.btn-inline-save i,
+.btn-inline-cancel i {
+    font-size: 1.2rem !important;
+    margin: 0 !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+/* Form Validation States - Match existing form validation */
+.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+}
+
+.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.2) !important;
+}
+
+.invalid-feedback {
+    font-size: 0.85rem !important;
+    color: #dc3545 !important;
+    margin-top: 5px !important;
+    display: block !important;
+}
+
+/* Loading States - Match existing loading styles */
+.loading-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    z-index: 10 !important;
+}
+
+.loading-spinner {
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid #e9ecef !important;
+    border-top: 2px solid #2a5298 !important;
+    border-radius: 50% !important;
+    animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toast Notifications - Match existing alert styles */
+.alert {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 9999 !important;
+    min-width: 300px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    animation: slideInRight 0.3s ease !important;
+}
+
+.alert.alert-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    color: white !important;
+}
+
+.alert.alert-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white !important;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%) !important;
+        opacity: 0 !important;
+    }
+    to {
+        transform: translateX(0) !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Responsive Design - Match existing responsive styles */
+@media (max-width: 768px) {
+    .inline-edit-input {
+        font-size: 1rem !important;
+        padding: 12px 15px !important;
+        min-width: 120px !important;
+    }
+    
+    .btn-inline-edit {
+        padding: 8px 12px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+    }
+    
+    .btn-inline-save,
+    .btn-inline-cancel {
+        padding: 10px 14px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+    }
+}
+
+/* Accessibility - Match existing accessibility standards */
+.inline-edit-input:focus {
+    outline: 3px solid rgba(42, 82, 152, 0.3) !important;
+    outline-offset: 2px !important;
+}
+
+/* High Contrast Support - Match existing high contrast styles */
+@media (prefers-contrast: high) {
+    .inline-edit-input {
+        border: 2px solid #000 !important;
+    }
+    
+    .btn-inline-edit {
+        background: #000 !important;
+        color: #fff !important;
+    }
+    
+    .btn-inline-save {
+        background: #006400 !important;
+        color: #fff !important;
+    }
+    
+    .btn-inline-cancel {
+        background: #696969 !important;
+        color: #fff !important;
+    }
+}

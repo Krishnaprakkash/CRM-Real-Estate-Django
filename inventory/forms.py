@@ -15,6 +15,10 @@ class SalesmanListingForm(forms.ModelForm):
             self.fields['type'].widget.attrs['style'] = 'background-color: #f8f9fa; cursor: not-allowed;'
             # Ensure the field is not required for editing since it's read-only
             self.fields['type'].required = False
+        
+        # Make address and city optional for inline editing
+        self.fields['address'].required = False
+        self.fields['city'].required = False
 
 class ManagerListingForm(forms.ModelForm):
     class Meta:
@@ -36,6 +40,10 @@ class ManagerListingForm(forms.ModelForm):
             self.fields['type'].widget.attrs['style'] = 'background-color: #f8f9fa; cursor: not-allowed;'
             # Ensure the field is not required for editing since it's read-only
             self.fields['type'].required = False
+        
+        # Make address and city optional for inline editing
+        self.fields['address'].required = False
+        self.fields['city'].required = False
 
 class VillaDetailsForm(forms.ModelForm):
     class Meta:

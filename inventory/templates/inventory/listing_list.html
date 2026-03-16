@@ -74,40 +74,85 @@
             <form method="get" id="filter-form">
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <label for="type" class="form-label">Property Type</label>
-                        <select name="type" id="type" class="form-select">
-                            <option value="">All Types</option>
-                            {% for type in available_types %}
-                            <option value="{{ type }}" {% if filters.type == type %}selected{% endif %}>
-                                {{ type }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <label class="form-label">Property Type</label>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="type-filter-btn">
+                                <span id="type-filter-label">All Types</span>
+                            </button>
+                            <ul class="dropdown-menu w-100" id="type-filter-dropdown">
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                        All Types
+                                    </label>
+                                </li>
+                                {% for type in available_types %}
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input class="form-check-input me-2 type-checkbox" type="checkbox" value="{{ type }}" 
+                                               {% if 'all' in filters.types or type in filters.types %}checked{% endif %}>
+                                        {{ type }}
+                                    </label>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <input type="hidden" name="type" id="type-filter-input" value="{% if 'all' in filters.types %}all{% else %}{{ filters.types|join:',' }}{% endif %}">
                     </div>
                     
                     <div class="col-md-3 mb-3">
-                        <label for="city" class="form-label">City</label>
-                        <select name="city" id="city" class="form-select">
-                            <option value="">All Cities</option>
-                            {% for city in available_cities %}
-                            <option value="{{ city }}" {% if filters.city == city %}selected{% endif %}>
-                                {{ city }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <label class="form-label">City</label>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="city-filter-btn">
+                                <span id="city-filter-label">All Cities</span>
+                            </button>
+                            <ul class="dropdown-menu w-100" id="city-filter-dropdown">
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                        All Cities
+                                    </label>
+                                </li>
+                                {% for city in available_cities %}
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input class="form-check-input me-2 city-checkbox" type="checkbox" value="{{ city }}" 
+                                               {% if 'all' in filters.cities or city in filters.cities %}checked{% endif %}>
+                                        {{ city }}
+                                    </label>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <input type="hidden" name="city" id="city-filter-input" value="{% if 'all' in filters.cities %}all{% else %}{{ filters.cities|join:',' }}{% endif %}">
                     </div>
                     
                     {% if user.role == 'Manager' and salesmen %}
                     <div class="col-md-3 mb-3">
-                        <label for="salesman" class="form-label">Salesman</label>
-                        <select name="salesman" id="salesman" class="form-select">
-                            <option value="">All Salesmen</option>
-                            {% for salesman in salesmen %}
-                            <option value="{{ salesman.id }}" {% if filters.salesman == salesman.id|stringformat:"s" %}selected{% endif %}>
-                                {{ salesman.get_full_name }}
-                            </option>
-                            {% endfor %}
-                        </select>
+                        <label class="form-label">Salesman</label>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="salesman-filter-btn">
+                                <span id="salesman-filter-label">All Salesmen</span>
+                            </button>
+                            <ul class="dropdown-menu w-100" id="salesman-filter-dropdown">
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                        All Salesmen
+                                    </label>
+                                </li>
+                                {% for salesman in salesmen %}
+                                <li>
+                                    <label class="dropdown-item">
+                                        <input class="form-check-input me-2 salesman-checkbox" type="checkbox" value="{{ salesman.id }}" 
+                                               {% if 'all' in filters.salesman_ids or salesman.id|stringformat:"s" in filters.salesman_ids %}checked{% endif %}>
+                                        {{ salesman.get_full_name }}
+                                    </label>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <input type="hidden" name="salesman" id="salesman-filter-input" value="{% if 'all' in filters.salesman_ids %}all{% else %}{{ filters.salesman_ids|join:',' }}{% endif %}">
                     </div>
                     {% endif %}
                 </div>
@@ -163,7 +208,7 @@
                                 </span>
                             </td>
                             <td>{{ listing.city }}</td>
-                            <td class="text-end">${{ listing.proposed_price|floatformat:0 }}</td>
+                            <td class="text-end">₹{{ listing.proposed_price|floatformat:0 }}</td>
                             {% if user.role == 'Manager' %}
                             <td>{{ listing.assigned_salesman.get_full_name|default:"—" }}</td>
                             {% endif %}
@@ -220,5 +265,6 @@
 {% block extra_js %}
 {% compress js %}
     <script src="{% static 'js/datatables.js' %}"></script>
+    <script src="{% static 'js/multi-select-filters.js' %}"></script>
 {% endcompress %}
 {% endblock %}

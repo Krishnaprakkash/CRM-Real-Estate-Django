@@ -8,6 +8,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 <link rel="stylesheet" href="{% static 'css/components.css' %}">
+<link rel="stylesheet" href="{% static 'css/inline-edit.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -108,16 +109,56 @@
         <div class="filters-container">
             <div class="filters-row">
                 <div class="filter-group">
-                    <label for="typeFilterLeads">Property Type</label>
-                    <select id="typeFilterLeads">
-                        <option value="">All Types</option>
-                    </select>
+                    <label class="form-label">Property Type</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="typeFilterLeads">
+                            <span id="type-filter-label-leads">All Types</span>
+                        </button>
+                        <ul class="dropdown-menu w-100" id="type-filter-dropdown-leads">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                    All Types
+                                </label>
+                            </li>
+                            {% for type in available_types %}
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2 type-checkbox-leads" type="checkbox" value="{{ type }}" 
+                                           {% if 'all' in filters.types or type in filters.types %}checked{% endif %}>
+                                    {{ type }}
+                                </label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <input type="hidden" name="type" id="type-filter-input-leads" value="{% if 'all' in filters.types %}all{% else %}{{ filters.types|join:',' }}{% endif %}">
                 </div>
                 <div class="filter-group">
-                    <label for="statusFilterLeads">Status</label>
-                    <select id="statusFilterLeads">
-                        <option value="">All Status</option>
-                    </select>
+                    <label class="form-label">City</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="cityFilterLeads">
+                            <span id="city-filter-label-leads">All Cities</span>
+                        </button>
+                        <ul class="dropdown-menu w-100" id="city-filter-dropdown-leads">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                    All Cities
+                                </label>
+                            </li>
+                            {% for city in available_cities %}
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2 city-checkbox-leads" type="checkbox" value="{{ city }}" 
+                                           {% if 'all' in filters.cities or city in filters.cities %}checked{% endif %}>
+                                    {{ city }}
+                                </label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <input type="hidden" name="city" id="city-filter-input-leads" value="{% if 'all' in filters.cities %}all{% else %}{{ filters.cities|join:',' }}{% endif %}">
                 </div>
                 <div class="filter-group">
                     <label>&nbsp;</label>
@@ -152,12 +193,13 @@
                         <th>Type</th>
                         <th>Price</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for listing in listings %}
                     {% if listing.lead_status %}
-                    <tr>
+                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}">
                         <td>
                             <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
@@ -179,6 +221,13 @@
                             {% else %}
                             <span class="status-badge">{{ listing.get_lead_status_display }}</span>
                             {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-primary btn-inline-edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% endif %}
@@ -208,16 +257,56 @@
         <div class="filters-container">
             <div class="filters-row">
                 <div class="filter-group">
-                    <label for="typeFilterOpps">Property Type</label>
-                    <select id="typeFilterOpps">
-                        <option value="">All Types</option>
-                    </select>
+                    <label class="form-label">Property Type</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="typeFilterOpps">
+                            <span id="type-filter-label-opps">All Types</span>
+                        </button>
+                        <ul class="dropdown-menu w-100" id="type-filter-dropdown-opps">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                    All Types
+                                </label>
+                            </li>
+                            {% for type in available_types %}
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2 type-checkbox-opps" type="checkbox" value="{{ type }}" 
+                                           {% if 'all' in filters.types or type in filters.types %}checked{% endif %}>
+                                    {{ type }}
+                                </label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <input type="hidden" name="type" id="type-filter-input-opps" value="{% if 'all' in filters.types %}all{% else %}{{ filters.types|join:',' }}{% endif %}">
                 </div>
                 <div class="filter-group">
-                    <label for="statusFilterOpps">Status</label>
-                    <select id="statusFilterOpps">
-                        <option value="">All Status</option>
-                    </select>
+                    <label class="form-label">City</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="cityFilterOpps">
+                            <span id="city-filter-label-opps">All Cities</span>
+                        </button>
+                        <ul class="dropdown-menu w-100" id="city-filter-dropdown-opps">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                    All Cities
+                                </label>
+                            </li>
+                            {% for city in available_cities %}
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2 city-checkbox-opps" type="checkbox" value="{{ city }}" 
+                                           {% if 'all' in filters.cities or city in filters.cities %}checked{% endif %}>
+                                    {{ city }}
+                                </label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <input type="hidden" name="city" id="city-filter-input-opps" value="{% if 'all' in filters.cities %}all{% else %}{{ filters.cities|join:',' }}{% endif %}">
                 </div>
                 <div class="filter-group">
                     <label>&nbsp;</label>
@@ -261,12 +350,13 @@
                         <th>Type</th>
                         <th>Price</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for listing in listings %}
                     {% if listing.opp_status %}
-                    <tr>
+                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}">
                         <td>
                             <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
@@ -292,6 +382,13 @@
                             {% else %}
                             <span class="status-badge">{{ listing.get_opp_status_display }}</span>
                             {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-primary btn-inline-edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% endif %}
@@ -321,16 +418,56 @@
         <div class="filters-container">
             <div class="filters-row">
                 <div class="filter-group">
-                    <label for="typeFilterSale">Property Type</label>
-                    <select id="typeFilterSale">
-                        <option value="">All Types</option>
-                    </select>
+                    <label class="form-label">Property Type</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="typeFilterSale">
+                            <span id="type-filter-label-sale">All Types</span>
+                        </button>
+                        <ul class="dropdown-menu w-100" id="type-filter-dropdown-sale">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                    All Types
+                                </label>
+                            </li>
+                            {% for type in available_types %}
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2 type-checkbox-sale" type="checkbox" value="{{ type }}" 
+                                           {% if 'all' in filters.types or type in filters.types %}checked{% endif %}>
+                                    {{ type }}
+                                </label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <input type="hidden" name="type" id="type-filter-input-sale" value="{% if 'all' in filters.types %}all{% else %}{{ filters.types|join:',' }}{% endif %}">
                 </div>
                 <div class="filter-group">
-                    <label for="statusFilterSale">Status</label>
-                    <select id="statusFilterSale">
-                        <option value="">All Status</option>
-                    </select>
+                    <label class="form-label">City</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="cityFilterSale">
+                            <span id="city-filter-label-sale">All Cities</span>
+                        </button>
+                        <ul class="dropdown-menu w-100" id="city-filter-dropdown-sale">
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
+                                    All Cities
+                                </label>
+                            </li>
+                            {% for city in available_cities %}
+                            <li>
+                                <label class="dropdown-item">
+                                    <input class="form-check-input me-2 city-checkbox-sale" type="checkbox" value="{{ city }}" 
+                                           {% if 'all' in filters.cities or city in filters.cities %}checked{% endif %}>
+                                    {{ city }}
+                                </label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <input type="hidden" name="city" id="city-filter-input-sale" value="{% if 'all' in filters.cities %}all{% else %}{{ filters.cities|join:',' }}{% endif %}">
                 </div>
                 <div class="filter-group">
                     <label>&nbsp;</label>
@@ -374,12 +511,13 @@
                         <th>Type</th>
                         <th>Price</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for listing in listings %}
                     {% if listing.sale_status %}
-                    <tr>
+                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}">
                         <td>
                             <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
@@ -402,6 +540,13 @@
                             <span class="status-badge">{{ listing.get_sale_status_display }}</span>
                             {% endif %}
                         </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-sm btn-primary btn-inline-edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     {% endif %}
                     {% endfor %}
@@ -420,6 +565,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/inline-edit.js' %}"></script>
 <script>
 // Tab switching with stats group toggle
 function switchTab(evt, tabName) {

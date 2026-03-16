@@ -2,6 +2,7 @@ from urllib import request
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.cache import never_cache
 from inventory.views import listings_visible_to
 from inventory.models import Listing
 from django.utils import timezone
@@ -18,6 +19,7 @@ def is_manager(user):
 def is_ceo(user):
     return user.groups.filter(name='CEO').exists()
 
+@never_cache
 @login_required
 @user_passes_test(is_salesman)
 def salesman_dashboard(request):
@@ -74,6 +76,21 @@ def salesman_dashboard(request):
             messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
             
     listings = listings_visible_to(request.user)
+    
+    # Multi-select filters
+    property_types = request.GET.getlist('type', [])
+    cities = request.GET.getlist('city', [])
+    
+    # Apply filters
+    if property_types and 'all' not in property_types:
+        listings = listings.filter(type__in=property_types)
+    if cities and 'all' not in cities:
+        listings = listings.filter(city__in=cities)
+    
+    # Get available filter options
+    available_types = listings.values_list('type', flat=True).distinct()
+    available_cities = listings.values_list('city', flat=True).distinct()
+    
     lead_count = listings.filter(
         Q(lead_status=Listing.leadStatusChoices.PENDING) |
         Q(lead_status=Listing.leadStatusChoices.APPROVED) |
@@ -104,6 +121,12 @@ def salesman_dashboard(request):
             
     context = {
         'listings': listings,
+        'available_types': available_types,
+        'available_cities': available_cities,
+        'filters': {
+            'types': property_types,
+            'cities': cities
+        },
         'lead_count': lead_count,
         'lead_active_count': lead_active_count,
         'lead_approved_count': lead_approved_count,
@@ -120,6 +143,7 @@ def salesman_dashboard(request):
     }
     return render(request, 'dashboards/salesman_dashboard.html', context)
 
+@never_cache
 @login_required
 @user_passes_test(is_manager)
 def manager_dashboard(request):
@@ -195,6 +219,29 @@ def manager_dashboard(request):
             messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
             
     listings = listings_visible_to(request.user)
+    
+    # Multi-select filters
+    property_types = request.GET.getlist('type', [])
+    cities = request.GET.getlist('city', [])
+    salesman_ids = request.GET.getlist('salesman', [])
+    
+    # Apply filters
+    if property_types and 'all' not in property_types:
+        listings = listings.filter(type__in=property_types)
+    if cities and 'all' not in cities:
+        listings = listings.filter(city__in=cities)
+    if salesman_ids and 'all' not in salesman_ids:
+        listings = listings.filter(assigned_salesman_id__in=salesman_ids)
+    
+    # Get available filter options
+    available_types = listings.values_list('type', flat=True).distinct()
+    available_cities = listings.values_list('city', flat=True).distinct()
+    
+    from accounts.models import User
+    salesmen = User.objects.filter(
+        branch=request.user.branch,
+        role='Salesman').order_by('first_name', 'last_name')
+    
     lead_count = listings.filter(
         Q(lead_status=Listing.leadStatusChoices.PENDING) |
         Q(lead_status=Listing.leadStatusChoices.APPROVED) |
@@ -225,6 +272,14 @@ def manager_dashboard(request):
             
     context = {
         'listings': listings,
+        'available_types': available_types,
+        'available_cities': available_cities,
+        'salesmen': salesmen,
+        'filters': {
+            'types': property_types,
+            'cities': cities,
+            'salesman_ids': salesman_ids
+        },
         'lead_count': lead_count,
         'lead_active_count': lead_active_count,
         'lead_approved_count': lead_approved_count,
@@ -241,12 +296,14 @@ def manager_dashboard(request):
     }
     return render(request, 'dashboards/manager_dashboard.html', context)
 
+@never_cache
 @login_required
 @user_passes_test(is_ceo)
 def ceo_dashboard(request):
     listings = listings_visible_to(request.user)
     return render(request, 'dashboards/ceo_dashboard.html', {'listings': listings})
 
+@never_cache
 @login_required
 @user_passes_test(is_salesman)
 def salesman_home(request):
@@ -312,6 +369,7 @@ def salesman_home(request):
     
     return render(request, 'dashboards/salesman_home.html', context)
 
+@never_cache
 @login_required
 @user_passes_test(is_manager)
 def manager_home(request):
@@ -386,6 +444,7 @@ def manager_home(request):
     return render(request, 'dashboards/manager_home.html', context)
 
     
+@never_cache
 @login_required
 def dashboard_view(request):
     if request.user.groups.filter(name='Salesman').exists():
@@ -394,6 +453,7 @@ def dashboard_view(request):
         return redirect('dashboards:manager_dashboard')
 
 
+@never_cache
 @login_required
 def home(request):
     if request.user.role == 'Salesman':

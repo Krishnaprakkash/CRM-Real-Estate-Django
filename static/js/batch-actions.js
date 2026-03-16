@@ -33,7 +33,7 @@ function setAction(action, suffix = 'leads') {
             const row = checkbox.closest('tr');
             if (row) {
                 const columnValue = row.cells[5]?.textContent?.trim();
-                if (columnValue !== 'Pending Approval') {
+                if (columnValue !== 'Pending') {
                     const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
                     invalidItems.push({ id: itemId, value: columnValue });
                 }
