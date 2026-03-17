@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
-from .forms import ProfileUpdateForm
+from django.http import HttpResponseForbidden
+from .forms import ProfileUpdateForm, SalesmanCreationForm
 
 def login_view(request):
     # Redirect if already logged in
@@ -66,3 +67,38 @@ def profile_view(request):
     }
     
     return render(request, 'accounts/profile.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.role == 'Manager', login_url='accounts:login')
+def create_salesman_view(request):
+    """View for managers to create new salesmen"""
+    if request.method == 'POST':
+        form = SalesmanCreationForm(request.POST, manager=request.user)
+        if form.is_valid():
+            salesman = form.save(commit=False)
+            # Set the branch to match the manager's branch
+            salesman.branch = request.user.branch
+            # The password is already set by the form's save method
+            salesman.save()
+            
+            # Add success message that will persist
+            messages.success(request, f'Salesman "{salesman.get_full_name()}" has been created successfully!')
+            
+            # Return the same page with success message instead of redirecting
+            context = {
+                'form': SalesmanCreationForm(manager=request.user),  # Reset form
+                'manager': request.user,
+                'success_message': f'Salesman "{salesman.get_full_name()}" has been created successfully!'
+            }
+            return render(request, 'accounts/create_salesman.html', context)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = SalesmanCreationForm(manager=request.user)
+    
+    context = {
+        'form': form,
+        'manager': request.user,
+    }
+    
+    return render(request, 'accounts/create_salesman.html', context)

@@ -97,7 +97,7 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Top Navigation Bar (only on home) -->
-        {% if request.resolver_match.url_name == 'home' %}
+        {% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'salesman_home' or request.resolver_match.url_name == 'manager_home' %}
         <div class="navbar-top">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -107,6 +107,9 @@
                 <div>
                     <!-- Quick Actions -->
                     {% if request.user.role == 'Manager' %}
+                    <a href="{% url 'accounts:create_salesman' %}" class="btn btn-success">
+                        <i class="bi bi-person-plus"></i> Create Salesman
+                    </a>
                     <a href="{% url 'inventory:listing_create_manager' %}" class="btn btn-success">
                         <i class="bi bi-plus-circle"></i> Create New Listing
                     </a>

@@ -20,6 +20,14 @@ class User(AbstractUser):
         blank=True,
         related_name='users'
     )
+    manager = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={'role': Role.MANAGER},
+        related_name='salesmen'
+    )
 
     def __str__(self):
         return self.get_username()

@@ -24,13 +24,13 @@ class UserAdmin(BaseUserAdmin):
     
     # Fields shown when editing existing user
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('CRM Info', {'fields': ('role', 'branch')}),
+        ('CRM Info', {'fields': ('role', 'branch', 'manager')}),
     )
     
     # Fields shown when creating new user (important!)
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2', 'role', 'branch'),
+            'fields': ( 'first_name', 'last_name', 'username', 'email', 'password1', 'password2', 'role', 'branch', 'manager'),
         }),
     )

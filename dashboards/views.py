@@ -11,13 +11,13 @@ from django.db.models import Q, Sum
 
 # Create your views here.
 def is_salesman(user):
-    return user.groups.filter(name='Salesman').exists()
+    return user.role == 'Salesman'
 
 def is_manager(user):
-    return user.groups.filter(name='Manager').exists()
+    return user.role == 'Manager'
 
 def is_ceo(user):
-    return user.groups.filter(name='CEO').exists()
+    return user.role == 'CEO'
 
 @never_cache
 @login_required
@@ -447,9 +447,9 @@ def manager_home(request):
 @never_cache
 @login_required
 def dashboard_view(request):
-    if request.user.groups.filter(name='Salesman').exists():
+    if request.user.role == 'Salesman':
         return redirect('dashboards:salesman_dashboard')
-    if request.user.groups.filter(name='Manager').exists():
+    if request.user.role == 'Manager':
         return redirect('dashboards:manager_dashboard')
 
 
@@ -457,9 +457,9 @@ def dashboard_view(request):
 @login_required
 def home(request):
     if request.user.role == 'Salesman':
-        return salesman_home(request)
+        return redirect('dashboards:salesman_home')
     elif request.user.role == 'Manager':
-        return manager_home(request);
+        return redirect('dashboards:manager_home')
     elif request.user.role == 'CEO':
         return redirect('dashboards:ceo_dashboard')
     else:
