@@ -7,6 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CRM{% endblock %}</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'favicon/favicon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon.png' %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'favicon/favicon.png' %}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'favicon/favicon.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/favicon.png' %}">
+    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+    
     <!-- External CSS Libraries -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -42,7 +50,7 @@
         <nav class="nav flex-column">
             <!-- Home/Dashboard -->
             <a class="nav-link {% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'salesman_home' or request.resolver_match.url_name == 'manager_home' %}active{% endif %}" 
-               href="{% url 'dashboards:home' %}">
+               href="{% if request.user.role == 'Salesman' %}{% url 'dashboards:salesman_home' %}{% elif request.user.role == 'Manager' %}{% url 'dashboards:manager_home' %}{% elif request.user.role == 'CEO' %}{% url 'dashboards:ceo_dashboard' %}{% else %}{% url 'accounts:profile' %}{% endif %}">
                 <i class="bi bi-house-door"></i>
                 <span>Home</span>
             </a>
@@ -140,19 +148,188 @@
         {% endblock %}
     </div>
 
+
     <!-- External JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 
-    <!-- Compressed Project JavaScript -->
-    {% compress js %}
+    <!-- Project JavaScript -->
     <script src="{% static 'js/tabs.js' %}"></script>
-    <script src="{% static 'js/batch-actions.js' %}"></script>
     <script src="{% static 'js/datatables.js' %}"></script>
     <script src="{% static 'js/property-amenities.js' %}"></script>
     {% block extra_js %}{% endblock %}
-    {% endcompress %}
+    
+    <!-- CSRF Token Setup -->
+    <script>
+        // Set CSRF token globally for AJAX requests
+        window.csrfToken = '{{ csrf_token }}';
+        
+        // Also set it in a meta tag for compatibility
+        (function() {
+            var meta = document.createElement('meta');
+            meta.name = 'csrf-token';
+            meta.content = '{{ csrf_token }}';
+            document.getElementsByTagName('head')[0].appendChild(meta);
+        })();
+    </script>
+
+    <!-- Inline Batch Actions Script -->
+    <script>
+    // ===== FIXED BATCH ACTIONS - INLINE FALLBACK =====
+    
+    // Toggle select all checkboxes
+    function toggleSelectAll(source) {
+        const table = source.closest('table');
+        if (!table) return;
+        const checkboxes = table.querySelectorAll('input[name="listing_ids"]');
+        checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    // Get selected listing IDs - FIXED VERSION
+    function getSelectedListings(button) {
+        // Find the form that contains this button
+        const form = button.closest('form');
+        if (!form) {
+            console.error('No form found for batch action button');
+            return [];
+        }
+        
+        // Get all checked checkboxes in this form
+        const checkboxes = form.querySelectorAll('input[name="listing_ids"]:checked');
+        const selected = [];
+        
+        checkboxes.forEach(checkbox => {
+            selected.push(checkbox.value);
+        });
+        
+        return selected;
+    }
+
+    // Handle rejection with simple prompt
+    function handleRejection(button) {
+        // Get selected listings first
+        const selected = getSelectedListings(button);
+        
+        if (selected.length === 0) {
+            alert('Please select at least one listing first!');
+            return;
+        }
+        
+        // Show prompt for rejection reason
+        const reason = prompt('Please provide a reason for rejection:', '');
+        
+        if (reason === null) {
+            // User clicked Cancel
+            return;
+        }
+        
+        if (reason === '' || reason.trim() === '') {
+            alert('Rejection reason cannot be empty!');
+            return;
+        }
+        
+        // Find the form and submit it
+        const form = button.closest('form');
+        if (!form) {
+            alert('Could not find form to submit rejection');
+            return;
+        }
+        
+        // Set the rejection reason and action
+        const reasonField = form.querySelector('input[name="rejection-reason"]');
+        const actionField = form.querySelector('input[name="action"]');
+        
+        if (reasonField) reasonField.value = reason.trim();
+        if (actionField) actionField.value = 'reject';
+        
+        // Submit the form
+        form.submit();
+    }
+
+    // Unified batch action handler for both manager and salesman
+    function handleBatchAction(button, action) {
+        console.log('handleBatchAction called with action:', action);
+        
+        // Get selected listings from the form containing this button
+        const selected = getSelectedListings(button);
+        
+        if (selected.length === 0) {
+            alert('Please select at least one listing first!');
+            return;
+        }
+        
+        console.log('Selected listings:', selected);
+        
+        // Handle rejection (requires prompt)
+        if (action === 'reject') {
+            handleRejection(button);
+            return;
+        }
+        
+        // Handle delete with confirmation
+        if (action === 'delete') {
+            if (!confirm(`Are you sure you want to DELETE ${selected.length} listing(s)?`)) {
+                return;
+            }
+        }
+        
+        // Handle other actions with confirmation
+        const confirmations = {
+            'approve': 'Are you sure you want to approve the selected listings?',
+            'submit': `Are you sure you want to submit ${selected.length} listing(s) for approval?`,
+            'won': `Are you sure you want to mark ${selected.length} listing(s) as Closed Won?`,
+            'lost': `Are you sure you want to mark ${selected.length} listing(s) as Closed Lost?`,
+            'prospect': `Are you sure you want to set ${selected.length} listing(s) to Prospecting?`,
+            'negotiate': `Are you sure you want to set ${selected.length} listing(s) to Negotiating?`,
+            'process': `Are you sure you want to set ${selected.length} listing(s) to Processing?`,
+            'pending': 'Are you sure you want to mark the selected listings as Pending?'
+        };
+        
+        if (confirmations[action] && !confirm(confirmations[action])) {
+            return;
+        }
+        
+        // Find the form and submit it
+        const form = button.closest('form');
+        if (!form) {
+            alert('Could not find form to submit action');
+            return;
+        }
+        
+        // Set the action
+        const actionField = form.querySelector('input[name="action"]');
+        if (actionField) {
+            actionField.value = action;
+        } else {
+            // Create hidden input if it doesn't exist
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'action';
+            hiddenInput.value = action;
+            form.appendChild(hiddenInput);
+        }
+        
+        // Submit the form
+        form.submit();
+    }
+
+    // Initialize modal
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Batch actions script loaded successfully');
+        
+        const modal = document.getElementById('rejection-modal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeRejectionModal();
+            });
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeRejectionModal();
+        });
+    });
+    </script>
     <script>
     // Enhanced logout protection - prevent access to cached authenticated pages
     (function(){

@@ -28,29 +28,5 @@ class CacheControlMiddleware(MiddlewareMixin):
         return response
 
 
-class SessionSecurityMiddleware(MiddlewareMixin):
-    """
-    Enhanced session security middleware that checks session validity
-    and prevents access to authenticated pages if session is invalid.
-    """
-    
-    def process_request(self, request):
-        # Skip middleware for login/logout pages and static files
-        if (request.path.startswith('/accounts/login/') or 
-            request.path.startswith('/accounts/logout/') or
-            request.path.startswith('/static/') or
-            request.path.startswith('/admin/')):
-            return None
-        
-        # For authenticated users, check if session is still valid
-        if hasattr(request, 'user') and request.user and request.user.is_authenticated:
-            # Check if session has been flushed (logout occurred)
-            if not request.session.session_key:
-                # Session was cleared, redirect to login
-                return redirect('accounts:login')
-            
-            # Additional check: if user is authenticated but session doesn't contain auth info
-            if '_auth_user_id' not in request.session:
-                return redirect('accounts:login')
-        
-        return None
+# SessionSecurityMiddleware removed to prevent conflicts with Django's authentication system
+# The CacheControlMiddleware is sufficient for preventing back button access to authenticated pages

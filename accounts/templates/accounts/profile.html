@@ -224,7 +224,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-circle"></i> Save Changes
                     </button>
-                    <a href="{% url 'dashboards:home' %}" class="btn btn-secondary">
+                    <a href="{% if request.user.role == 'Salesman' %}{% url 'dashboards:salesman_home' %}{% elif request.user.role == 'Manager' %}{% url 'dashboards:manager_home' %}{% elif request.user.role == 'CEO' %}{% url 'dashboards:ceo_dashboard' %}{% else %}{% url 'accounts:profile' %}{% endif %}" class="btn btn-secondary">
                         <i class="bi bi-x-circle"></i> Cancel
                     </a>
                 </div>

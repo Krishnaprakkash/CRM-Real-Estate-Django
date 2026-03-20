@@ -7,9 +7,23 @@ from django.http import HttpResponseForbidden
 from .forms import ProfileUpdateForm, SalesmanCreationForm
 
 def login_view(request):
-    # Redirect if already logged in
-    if request.user.is_authenticated:
-        return redirect('dashboards:home')  # Redirect to home
+    # Force session clearing to prevent stale session issues
+    # This ensures unauthenticated users always see the login form
+    if hasattr(request, 'session') and request.session.session_key:
+        request.session.flush()
+    
+    # Check if user is authenticated after session clearing
+    if hasattr(request, 'user') and request.user and hasattr(request.user, 'is_authenticated') and request.user.is_authenticated:
+        # If still authenticated after clearing, redirect to dashboard
+        if hasattr(request.user, 'role') and request.user.role:
+            if request.user.role == 'Salesman':
+                return redirect('dashboards:salesman_home')
+            elif request.user.role == 'Manager':
+                return redirect('dashboards:manager_home')
+            elif request.user.role == 'CEO':
+                return redirect('dashboards:ceo_dashboard')
+        # If user doesn't have a role, redirect to login
+        return redirect('accounts:login')
     
     next_url = request.GET.get('next') or request.POST.get('next')
     if request.method == 'POST':
@@ -18,7 +32,20 @@ def login_view(request):
             user = form.get_user()
             login(request, user)
             messages.success(request, f'Welcome back, {user.first_name or user.username}!')
-            return redirect(next_url or 'dashboards:home')  # Changed from dashboard to home
+            
+            # Redirect to role-specific home page or next URL
+            if next_url:
+                return redirect(next_url)
+            else:
+                if hasattr(user, 'role') and user.role:
+                    if user.role == 'Salesman':
+                        return redirect('dashboards:salesman_home')
+                    elif user.role == 'Manager':
+                        return redirect('dashboards:manager_home')
+                    elif user.role == 'CEO':
+                        return redirect('dashboards:ceo_dashboard')
+                # Fallback to login if role is not set
+                return redirect('accounts:login')
         else:
             messages.error(request, 'Invalid username or password.')
     else:
@@ -102,3 +129,14 @@ def create_salesman_view(request):
     }
     
     return render(request, 'accounts/create_salesman.html', context)
+
+def login_redirect(request):
+    """Custom login redirect based on user role"""
+    if request.user.is_authenticated:
+        if request.user.role == 'Salesman':
+            return redirect('dashboards:salesman_home')
+        elif request.user.role == 'Manager':
+            return redirect('dashboards:manager_home')
+        elif request.user.role == 'CEO':
+            return redirect('dashboards:ceo_dashboard')
+    return redirect('accounts:login')

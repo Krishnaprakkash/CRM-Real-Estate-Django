@@ -7,6 +7,7 @@
 {% block extra_css %}
 {% compress css %}
     <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 {% endcompress %}
 {% endblock %}
 
@@ -64,108 +65,46 @@
     </div>
 
     <!-- Filters Card -->
-    <div class="card filters-card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="bi bi-funnel"></i> Filters
-            </h5>
-        </div>
-        <div class="card-body">
-            <form method="get" id="filter-form">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Property Type</label>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="type-filter-btn">
-                                <span id="type-filter-label">All Types</span>
-                            </button>
-                            <ul class="dropdown-menu w-100" id="type-filter-dropdown">
-                                <li>
-                                    <label class="dropdown-item">
-                                        <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                        All Types
-                                    </label>
-                                </li>
-                                {% for type in available_types %}
-                                <li>
-                                    <label class="dropdown-item">
-                                        <input class="form-check-input me-2 type-checkbox" type="checkbox" value="{{ type }}" 
-                                               {% if 'all' in filters.types or type in filters.types %}checked{% endif %}>
-                                        {{ type }}
-                                    </label>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        <input type="hidden" name="type" id="type-filter-input" value="{% if 'all' in filters.types %}all{% else %}{{ filters.types|join:',' }}{% endif %}">
-                    </div>
-                    
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">City</label>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="city-filter-btn">
-                                <span id="city-filter-label">All Cities</span>
-                            </button>
-                            <ul class="dropdown-menu w-100" id="city-filter-dropdown">
-                                <li>
-                                    <label class="dropdown-item">
-                                        <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                        All Cities
-                                    </label>
-                                </li>
-                                {% for city in available_cities %}
-                                <li>
-                                    <label class="dropdown-item">
-                                        <input class="form-check-input me-2 city-checkbox" type="checkbox" value="{{ city }}" 
-                                               {% if 'all' in filters.cities or city in filters.cities %}checked{% endif %}>
-                                        {{ city }}
-                                    </label>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        <input type="hidden" name="city" id="city-filter-input" value="{% if 'all' in filters.cities %}all{% else %}{{ filters.cities|join:',' }}{% endif %}">
-                    </div>
-                    
-                    {% if user.role == 'Manager' and salesmen %}
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Salesman</label>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="salesman-filter-btn">
-                                <span id="salesman-filter-label">All Salesmen</span>
-                            </button>
-                            <ul class="dropdown-menu w-100" id="salesman-filter-dropdown">
-                                <li>
-                                    <label class="dropdown-item">
-                                        <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                        All Salesmen
-                                    </label>
-                                </li>
-                                {% for salesman in salesmen %}
-                                <li>
-                                    <label class="dropdown-item">
-                                        <input class="form-check-input me-2 salesman-checkbox" type="checkbox" value="{{ salesman.id }}" 
-                                               {% if 'all' in filters.salesman_ids or salesman.id|stringformat:"s" in filters.salesman_ids %}checked{% endif %}>
-                                        {{ salesman.get_full_name }}
-                                    </label>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        <input type="hidden" name="salesman" id="salesman-filter-input" value="{% if 'all' in filters.salesman_ids %}all{% else %}{{ filters.salesman_ids|join:',' }}{% endif %}">
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search"></i> Apply Filters
-                    </button>
-                    <a href="{% url 'inventory:listing_list' %}" class="btn btn-secondary">
-                        <i class="bi bi-x-circle"></i> Clear Filters
-                    </a>
-                </div>
-            </form>
+    <div class="filters-container">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label class="form-label">Property Type</label>
+                <select class="form-select" name="type" id="type-filter">
+                    <option value="all" {% if filters.type == 'all' or not filters.type %}selected{% endif %}>All Types</option>
+                    {% for type in available_types %}
+                        <option value="{{ type }}" {% if filters.type == type %}selected{% endif %}>{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="form-label">City</label>
+                <select class="form-select" name="city" id="city-filter">
+                    <option value="all" {% if filters.city == 'all' or not filters.city %}selected{% endif %}>All Cities</option>
+                    {% for city in available_cities %}
+                        <option value="{{ city }}" {% if filters.city == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            {% if user.role == 'Manager' and salesmen %}
+            <div class="filter-group">
+                <label class="form-label">Salesman</label>
+                <select class="form-select" name="salesman" id="salesman-filter">
+                    <option value="all" {% if filters.salesman_id == 'all' or not filters.salesman_id %}selected{% endif %}>All Salesmen</option>
+                    {% for salesman in salesmen %}
+                        <option value="{{ salesman.id }}" data-salesman-name="{{ salesman.get_full_name }}" {% if filters.salesman_id == salesman.id|stringformat:"s" %}selected{% endif %}>{{ salesman.get_full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+            
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <button type="button" id="clearFilters" class="btn-clear" onclick="clearInventoryFilters()">
+                    <i class="bi bi-x-circle"></i> Clear Filters
+                </button>
+            </div>
         </div>
     </div>
 
@@ -195,7 +134,7 @@
                     </thead>
                     <tbody>
                         {% for listing in listings %}
-                        <tr>
+                        <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}" data-city="{{ listing.city }}" data-salesman-id="{{ listing.assigned_salesman.id|default:'' }}">
                             <td>
                                 <a href="{% url 'inventory:listing_detail' listing.pk %}" class="fw-bold">
                                     {{ listing.id }}
@@ -232,8 +171,7 @@
                                     {% endif %}
                                     {% if user.role == 'Manager' or listing.assigned_salesman == user %}
                                     <a href="{% url 'inventory:listing_delete' listing.pk %}" 
-                                       class="btn btn-sm btn-danger" title="Delete"
-                                       onclick="return confirm('Are you sure you want to delete this listing?')">
+                                       class="btn btn-sm btn-danger" title="Delete">
                                         <i class="bi bi-trash"></i>
                                     </a>
                                     {% endif %}
@@ -244,18 +182,6 @@
                     </tbody>
                 </table>
             </div>
-            {% else %}
-            <div class="alert empty-state-alert">
-                <i class="bi bi-info-circle"></i>
-                <div>
-                    No listings found matching your criteria.
-                    {% if user.role == 'Manager' %}
-                        <a href="{% url 'inventory:listing_create_manager' %}" class="alert-link">Create your first listing</a>
-                    {% elif user.role == 'Salesman' %}
-                        <a href="{% url 'inventory:listing_create_salesman' %}" class="alert-link">Create your first listing</a>
-                    {% endif %}
-                </div>
-            </div>
             {% endif %}
         </div>
     </div>
@@ -265,6 +191,6 @@
 {% block extra_js %}
 {% compress js %}
     <script src="{% static 'js/datatables.js' %}"></script>
-    <script src="{% static 'js/multi-select-filters.js' %}"></script>
+    <script src="{% static 'js/single-select-filters.js' %}"></script>
 {% endcompress %}
 {% endblock %}

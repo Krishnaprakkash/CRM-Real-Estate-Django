@@ -654,11 +654,7 @@
     border-color: #dc3545 !important;
 }
 
-.stage-progress-nav .nav-link.disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    pointer-events: none;
-}
+/* Tab State Classes for Listing Detail View - REMOVED for inline styling approach */
 
 /* Detail Cards */
 .detail-card {
@@ -1995,4 +1991,30 @@ textarea.detail-field-value {
         font-size: 0.95rem;
         padding: 10px 12px;
     }
+}
+
+/* ===== TAB HEADER COLOR FIX ===== */
+/* Override Bootstrap active state with our custom colors for tab headers */
+.stage-progress-nav .nav-link.active.tab-completed {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    color: white !important;
+    border-color: #28a745 !important;
+}
+
+.stage-progress-nav .nav-link.active.tab-current {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+    color: #000 !important;
+    border-color: #ffc107 !important;
+}
+
+.stage-progress-nav .nav-link.active.tab-rejected {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+.stage-progress-nav .nav-link.active.tab-unvisited {
+    background: white !important;
+    color: #6c757d !important;
+    border-color: #dee2e6 !important;
 }

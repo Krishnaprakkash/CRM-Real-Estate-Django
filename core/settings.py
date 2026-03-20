@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-0kz_%yla_*t-o)=twr^1!(l20mce7dz8ok)#a_s=6cbwabt!m4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -52,7 +52,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'accounts.middleware.CacheControlMiddleware',  # Add cache control middleware
-    'accounts.middleware.SessionSecurityMiddleware',  # Add session security middleware
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -148,6 +147,12 @@ COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 # Offline compression (only enable in production)
 COMPRESS_OFFLINE = False  # Keep False for development
 
+# Production optimizations
+if not DEBUG:
+    # Enable compression in production
+    COMPRESS_ENABLED = True
+    COMPRESS_OFFLINE = True
+
 # Cache settings for compressor
 CACHES = {
     'default': {
@@ -168,7 +173,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # Login URLs
 LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'dashboards:home'
+LOGIN_REDIRECT_URL = 'accounts:login_redirect'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # core/settings.py

@@ -6,6 +6,9 @@ class SalesmanListingForm(forms.ModelForm):
     class Meta:
         model = Listing
         fields = ['title', 'type', 'address', 'city', 'proposed_price']
+        widgets = {
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Enter property address'}),
+        }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,15 +27,28 @@ class ManagerListingForm(forms.ModelForm):
     class Meta:
         model = Listing
         fields = ['title', 'type', 'address', 'city', 'proposed_price', 'assigned_salesman']
+        widgets = {
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Enter property address'}),
+        }
     
     def __init__(self, *args, **kwargs):
         manager = kwargs.pop('manager', None)
         super().__init__(*args, **kwargs)
-        if manager and hasattr(manager, 'branch'):
-            self.fields['assigned_salesman'].queryset = User.objects.filter(
-                branch=manager.branch,
-                role='Salesman'
-            ).order_by('first_name', 'last_name')
+        if manager:
+            if manager.role == 'Manager':
+                # Show only salesmen assigned to this specific manager
+                self.fields['assigned_salesman'].queryset = User.objects.filter(
+                    manager=manager,
+                    role='Salesman'
+                ).order_by('first_name', 'last_name')
+            elif manager.role == 'CEO':
+                # Show all salesmen for CEO (maintain existing behavior)
+                self.fields['assigned_salesman'].queryset = User.objects.filter(
+                    role='Salesman'
+                ).order_by('first_name', 'last_name')
+        
+        # Customize the assigned_salesman field to display full names
+        self.fields['assigned_salesman'].label_from_instance = lambda obj: f"{obj.first_name} {obj.last_name}"
         
         # Make type field read-only for editing
         if self.instance and self.instance.pk:

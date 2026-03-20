@@ -120,13 +120,5 @@ document.addEventListener('keydown', function(e) {
         window.location.href = "{% url 'inventory:listing_detail' listing.pk %}";
     }
 });
-
-// Optional: Double-check before delete
-document.querySelector('.btn-confirm-delete').addEventListener('click', function(e) {
-    const confirmed = confirm('⚠️ FINAL WARNING\n\nYou are about to permanently delete:\n\n"{{ listing.title }}"\n\nThis cannot be undone!\n\nClick OK to proceed with deletion.');
-    if (!confirmed) {
-        e.preventDefault();
-    }
-});
 </script>
 {% endblock %}

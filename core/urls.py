@@ -19,10 +19,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
 
-def home_view(request):
-    """Redirect to dashboard if logged in, otherwise to login"""
-    if request.user.is_authenticated:
-        return redirect('dashboards:home')
+def root_redirect_view(request):
+    """Redirect root URL to login page"""
     return redirect('accounts:login')
 
 urlpatterns = [
@@ -30,5 +28,5 @@ urlpatterns = [
     path('dashboard/', include('dashboards.urls')),
     path('accounts/', include('accounts.urls')),
     path('inventory/', include('inventory.urls')),
-    path('', home_view, name='home'),  # Root URL handler
+    path('', root_redirect_view, name='home'),  # Root URL goes to login
 ]

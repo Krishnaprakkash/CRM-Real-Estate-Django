@@ -16,8 +16,8 @@
 <div class="dashboard-header">
     <h1 class="dashboard-welcome">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
     
-    <a href="{% url 'inventory:listing_list' %}" class="btn btn-success">
-        <i class="bi bi-box-seam"></i> View Inventory
+    <a href="{% url 'inventory:listing_create_salesman' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Create New Listing
     </a>
     
     <div class="stats-overview-card">
@@ -99,7 +99,7 @@
 
 <!-- ==================== LEADS TAB ==================== -->
 <div id="leads" class="tab-content active">
-    <form method="post" id="batch-form-leads">
+    <form method="post" id="filter-form-leads">
         {% csrf_token %}
         <input type="hidden" name="action" id="batch-action-leads" value="">
         <input type="hidden" name="rejection-reason" id="rejection-reason-leads" value="">
@@ -110,59 +110,25 @@
             <div class="filters-row">
                 <div class="filter-group">
                     <label class="form-label">Property Type</label>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="typeFilterLeads">
-                            <span id="type-filter-label-leads">All Types</span>
-                        </button>
-                        <ul class="dropdown-menu w-100" id="type-filter-dropdown-leads">
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                    All Types
-                                </label>
-                            </li>
-                            {% for type in available_types %}
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2 type-checkbox-leads" type="checkbox" value="{{ type }}" 
-                                           {% if 'all' in filters.types or type in filters.types %}checked{% endif %}>
-                                    {{ type }}
-                                </label>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <input type="hidden" name="type" id="type-filter-input-leads" value="{% if 'all' in filters.types %}all{% else %}{{ filters.types|join:',' }}{% endif %}">
+                    <select class="form-select" name="type" id="type-filter-leads">
+                        <option value="all" {% if filters.type == 'all' or not filters.type %}selected{% endif %}>All Types</option>
+                        {% for type in available_types %}
+                            <option value="{{ type }}" {% if filters.type == type %}selected{% endif %}>{{ type }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="filter-group">
-                    <label class="form-label">City</label>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="cityFilterLeads">
-                            <span id="city-filter-label-leads">All Cities</span>
-                        </button>
-                        <ul class="dropdown-menu w-100" id="city-filter-dropdown-leads">
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                    All Cities
-                                </label>
-                            </li>
-                            {% for city in available_cities %}
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2 city-checkbox-leads" type="checkbox" value="{{ city }}" 
-                                           {% if 'all' in filters.cities or city in filters.cities %}checked{% endif %}>
-                                    {{ city }}
-                                </label>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <input type="hidden" name="city" id="city-filter-input-leads" value="{% if 'all' in filters.cities %}all{% else %}{{ filters.cities|join:',' }}{% endif %}">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status" id="status-filter-leads">
+                        <option value="all" {% if filters.status == 'all' or not filters.status %}selected{% endif %}>All Statuses</option>
+                        {% for status in available_statuses %}
+                            <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status|title }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="filter-group">
                     <label>&nbsp;</label>
-                    <button type="button" id="clearFiltersLeads" class="btn-clear">
+                    <button type="button" id="clearFiltersLeads" class="btn-clear" onclick="clearFilters('leads')">
                         <i class="bi bi-x-circle"></i> Clear Filters
                     </button>
                 </div>
@@ -171,7 +137,7 @@
         
         <!-- Actions -->
         <div class="actions-container">
-            <button type="button" class="action-btn btn-delete" onclick="setSalesmanAction('delete','leads')">
+            <button type="button" class="action-btn btn-delete" onclick="handleBatchAction(this, 'delete')">
                 <i class="bi bi-trash"></i> Delete Selected
             </button>
             {% if perms.inventory.add_listing %}
@@ -199,7 +165,7 @@
                 <tbody>
                     {% for listing in listings %}
                     {% if listing.lead_status %}
-                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}">
+                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}" data-status="{{ listing.lead_status|default:'' }}">
                         <td>
                             <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
@@ -247,7 +213,7 @@
 
 <!-- ==================== OPPORTUNITIES TAB ==================== -->
 <div id="opps" class="tab-content">
-    <form method="post" id="batch-form-opps">
+    <form method="post" id="filter-form-opps">
         {% csrf_token %}
         <input type="hidden" name="action" id="batch-action-opps" value="">
         <input type="hidden" name="rejection-reason" id="rejection-reason-opps" value="">
@@ -258,59 +224,25 @@
             <div class="filters-row">
                 <div class="filter-group">
                     <label class="form-label">Property Type</label>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="typeFilterOpps">
-                            <span id="type-filter-label-opps">All Types</span>
-                        </button>
-                        <ul class="dropdown-menu w-100" id="type-filter-dropdown-opps">
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                    All Types
-                                </label>
-                            </li>
-                            {% for type in available_types %}
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2 type-checkbox-opps" type="checkbox" value="{{ type }}" 
-                                           {% if 'all' in filters.types or type in filters.types %}checked{% endif %}>
-                                    {{ type }}
-                                </label>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <input type="hidden" name="type" id="type-filter-input-opps" value="{% if 'all' in filters.types %}all{% else %}{{ filters.types|join:',' }}{% endif %}">
+                    <select class="form-select" name="type" id="type-filter-opps">
+                        <option value="all" {% if filters.type == 'all' or not filters.type %}selected{% endif %}>All Types</option>
+                        {% for type in available_types %}
+                            <option value="{{ type }}" {% if filters.type == type %}selected{% endif %}>{{ type }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="filter-group">
-                    <label class="form-label">City</label>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="cityFilterOpps">
-                            <span id="city-filter-label-opps">All Cities</span>
-                        </button>
-                        <ul class="dropdown-menu w-100" id="city-filter-dropdown-opps">
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                    All Cities
-                                </label>
-                            </li>
-                            {% for city in available_cities %}
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2 city-checkbox-opps" type="checkbox" value="{{ city }}" 
-                                           {% if 'all' in filters.cities or city in filters.cities %}checked{% endif %}>
-                                    {{ city }}
-                                </label>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <input type="hidden" name="city" id="city-filter-input-opps" value="{% if 'all' in filters.cities %}all{% else %}{{ filters.cities|join:',' }}{% endif %}">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status" id="status-filter-opps">
+                        <option value="all" {% if filters.status == 'all' or not filters.status %}selected{% endif %}>All Statuses</option>
+                        {% for status in available_statuses %}
+                            <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status|title }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="filter-group">
                     <label>&nbsp;</label>
-                    <button type="button" id="clearFiltersOpps" class="btn-clear">
+                    <button type="button" id="clearFiltersOpps" class="btn-clear" onclick="clearFilters('opps')">
                         <i class="bi bi-x-circle"></i> Clear Filters
                     </button>
                 </div>
@@ -319,16 +251,16 @@
         
         <!-- Actions -->
         <div class="actions-container">
-            <button type="button" class="action-btn btn-prospecting" onclick="setSalesmanAction('prospect','opps')">
+            <button type="button" class="action-btn btn-prospecting" onclick="handleBatchAction(this, 'prospect')">
                 <i class="bi bi-search"></i> Prospecting
             </button>
-            <button type="button" class="action-btn btn-negotiating" onclick="setSalesmanAction('negotiate','opps')">
+            <button type="button" class="action-btn btn-negotiating" onclick="handleBatchAction(this, 'negotiate')">
                 <i class="bi bi-chat-dots"></i> Negotiating
             </button>
-            <button type="button" class="action-btn btn-submit" onclick="setSalesmanAction('submit','opps')">
+            <button type="button" class="action-btn btn-submit" onclick="handleBatchAction(this, 'submit')">
                 <i class="bi bi-send"></i> Submit for Approval
             </button>
-            <button type="button" class="action-btn btn-delete" onclick="setSalesmanAction('delete','opps')">
+            <button type="button" class="action-btn btn-delete" onclick="handleBatchAction(this, 'delete')">
                 <i class="bi bi-trash"></i> Delete
             </button>
             {% if perms.inventory.add_listing %}
@@ -356,7 +288,7 @@
                 <tbody>
                     {% for listing in listings %}
                     {% if listing.opp_status %}
-                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}">
+                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}" data-status="{{ listing.opp_status|default:'' }}">
                         <td>
                             <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
@@ -408,7 +340,7 @@
 
 <!-- ==================== SALES TAB ==================== -->
 <div id="sale" class="tab-content">
-    <form method="post" id="batch-form-sale">
+    <form method="post" id="filter-form-sale">
         {% csrf_token %}
         <input type="hidden" name="action" id="batch-action-sale" value="">
         <input type="hidden" name="rejection-reason" id="rejection-reason-sale" value="">
@@ -419,59 +351,25 @@
             <div class="filters-row">
                 <div class="filter-group">
                     <label class="form-label">Property Type</label>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="typeFilterSale">
-                            <span id="type-filter-label-sale">All Types</span>
-                        </button>
-                        <ul class="dropdown-menu w-100" id="type-filter-dropdown-sale">
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                    All Types
-                                </label>
-                            </li>
-                            {% for type in available_types %}
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2 type-checkbox-sale" type="checkbox" value="{{ type }}" 
-                                           {% if 'all' in filters.types or type in filters.types %}checked{% endif %}>
-                                    {{ type }}
-                                </label>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <input type="hidden" name="type" id="type-filter-input-sale" value="{% if 'all' in filters.types %}all{% else %}{{ filters.types|join:',' }}{% endif %}">
+                    <select class="form-select" name="type" id="type-filter-sale">
+                        <option value="all" {% if filters.type == 'all' or not filters.type %}selected{% endif %}>All Types</option>
+                        {% for type in available_types %}
+                            <option value="{{ type }}" {% if filters.type == type %}selected{% endif %}>{{ type }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="filter-group">
-                    <label class="form-label">City</label>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="cityFilterSale">
-                            <span id="city-filter-label-sale">All Cities</span>
-                        </button>
-                        <ul class="dropdown-menu w-100" id="city-filter-dropdown-sale">
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2" type="checkbox" value="all" checked>
-                                    All Cities
-                                </label>
-                            </li>
-                            {% for city in available_cities %}
-                            <li>
-                                <label class="dropdown-item">
-                                    <input class="form-check-input me-2 city-checkbox-sale" type="checkbox" value="{{ city }}" 
-                                           {% if 'all' in filters.cities or city in filters.cities %}checked{% endif %}>
-                                    {{ city }}
-                                </label>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <input type="hidden" name="city" id="city-filter-input-sale" value="{% if 'all' in filters.cities %}all{% else %}{{ filters.cities|join:',' }}{% endif %}">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status" id="status-filter-sale">
+                        <option value="all" {% if filters.status == 'all' or not filters.status %}selected{% endif %}>All Statuses</option>
+                        {% for status in available_statuses %}
+                            <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>{{ status|title }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="filter-group">
                     <label>&nbsp;</label>
-                    <button type="button" id="clearFiltersSale" class="btn-clear">
+                    <button type="button" id="clearFiltersSale" class="btn-clear" onclick="clearFilters('sale')">
                         <i class="bi bi-x-circle"></i> Clear Filters
                     </button>
                 </div>
@@ -480,20 +378,20 @@
         
         <!-- Actions -->
         <div class="actions-container">
-            <button type="button" class="action-btn btn-processing" onclick="setSalesmanAction('process','sale')">
+            <button type="button" class="action-btn btn-processing" onclick="handleBatchAction(this, 'process')">
                 <i class="bi bi-hourglass-split"></i> Processing
             </button>
-            <button type="button" class="action-btn btn-won" onclick="setSalesmanAction('won','sale')">
+            <button type="button" class="action-btn btn-won" onclick="handleBatchAction(this, 'won')">
                 <i class="bi bi-trophy"></i> Closed Won
             </button>
-            <button type="button" class="action-btn btn-lost" onclick="setSalesmanAction('lost','sale')">
+            <button type="button" class="action-btn btn-lost" onclick="handleBatchAction(this, 'lost')">
                 <i class="bi bi-x-octagon"></i> Closed Lost
             </button>
-            <button type="button" class="action-btn btn-delete" onclick="setSalesmanAction('delete','sale')">
+            <button type="button" class="action-btn btn-delete" onclick="handleBatchAction(this, 'delete')">
                 <i class="bi bi-trash"></i> Delete
             </button>
             {% if perms.inventory.add_listing %}
-            <a href="{% url 'inventory:listing_create_salesman' %}" class="action-btn btn-create">
+            <a href="{% url 'inventory:listing_create_salesman' %}" class="btn btn-success ms-auto">
                 <i class="bi bi-plus-circle"></i> New Listing
             </a>
             {% endif %}
@@ -517,7 +415,7 @@
                 <tbody>
                     {% for listing in listings %}
                     {% if listing.sale_status %}
-                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}">
+                    <tr data-listing-id="{{ listing.id }}" data-property-type="{{ listing.type }}" data-status="{{ listing.sale_status|default:'' }}">
                         <td>
                             <input type="checkbox" name="listing_ids" value="{{ listing.id }}" class="listing-checkbox">
                         </td>
@@ -565,7 +463,8 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/inline-edit.js' %}"></script>
+<script src="{% static 'js/single-select-filters.js' %}"></script>
+<script src="{% static 'js/inline-edit-new.js' %}"></script>
 <script>
 // Tab switching with stats group toggle
 function switchTab(evt, tabName) {

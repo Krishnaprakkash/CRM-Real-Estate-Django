@@ -12,10 +12,12 @@ urlpatterns = [
     path('listing/create/manager/', views.listing_create_manager, name='listing_create_manager'),
     
     path('<str:pk>/edit', views.listing_edit, name='listing_edit'),
+    path('<str:pk>/inline-edit', views.listing_inline_edit, name='listing_inline_edit'),
     path('<str:pk>/delete', views.listing_delete, name='listing_delete'),
     
     path('ajax/property-form/', views.get_property_form_ajax, name='get_property_form_ajax'),
     
     # Inline edit API
-    path('api/listing/<str:pk>/inline-edit/', api_views.listing_inline_edit_api, name='listing_inline_edit_api'),
+    path('api/listing/<str:pk>/inline-save/', api_views.listing_inline_save_api, name='listing_inline_save_api'),
+    path('api/listing/<str:pk>/inline-data/', views.listing_inline_data, name='listing_inline_data'),
 ]

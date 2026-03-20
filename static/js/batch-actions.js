@@ -1,186 +1,180 @@
-// ===== BATCH ACTION FUNCTIONALITY =====
+// ===== FIXED BATCH ACTIONS - SIMPLE AND RELIABLE =====
 
+// Toggle select all checkboxes
 function toggleSelectAll(source) {
     const table = source.closest('table');
     if (!table) return;
-    const checkboxes = table.querySelectorAll('input.listing-checkbox');
+    const checkboxes = table.querySelectorAll('input[name="listing_ids"]');
     checkboxes.forEach(cb => cb.checked = source.checked);
-    console.log(`Toggled ${checkboxes.length} checkboxes`);
 }
 
-// Manager batch actions
-function setAction(action, suffix = 'leads') {
-    console.log('Action clicked:', action, 'for', suffix);
+// Get selected listing IDs - FIXED VERSION
+function getSelectedListings(button) {
+    // Find the form that contains this button
+    const form = button.closest('form');
+    if (!form) {
+        console.error('No form found for batch action button');
+        return [];
+    }
+    
+    // Get all checked checkboxes in this form
+    const checkboxes = form.querySelectorAll('input[name="listing_ids"]:checked');
+    const selected = [];
+    
+    checkboxes.forEach(checkbox => {
+        selected.push(checkbox.value);
+    });
+    
+    return selected;
+}
 
-    const formSelector = `#batch-form-${suffix}`;
-    const selected = document.querySelectorAll(`${formSelector} input.listing-checkbox:checked`);
+// Show rejection modal
+function showRejectionModal(button) {
+    const modal = document.getElementById('rejection-modal');
+    if (!modal) return;
+    
+    // Store reference to the button that triggered this
+    modal.dataset.triggerButton = button.id || 'unknown';
+    modal.style.display = 'flex';
+    
+    const textarea = document.getElementById('rejection-reason-input');
+    if (textarea) {
+        textarea.value = ''; // Clear previous content
+        textarea.focus();
+    }
+}
 
-    if (selected.length === 0) {
-        alert(`Please select at least one listing first!`);
+// Close rejection modal
+function closeRejectionModal() {
+    const modal = document.getElementById('rejection-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.dataset.triggerButton = '';
+    }
+    const textarea = document.getElementById('rejection-reason-input');
+    if (textarea) textarea.value = '';
+}
+
+// Submit rejection
+function submitRejection() {
+    const modal = document.getElementById('rejection-modal');
+    const reasonInput = document.getElementById('rejection-reason-input');
+    const reason = reasonInput.value.trim();
+    
+    if (!reason) {
+        alert('Please provide a reason for rejection!');
         return;
     }
-
-    if (action === 'delete') {
-        const confirmMsg = `Are you sure you want to DELETE ${selected.length} listing(s)?\n\nThis action CANNOT BE UNDONE.`;
-        if (!confirm(confirmMsg)) {
-            return;
+    
+    // Find the form and submit it
+    const triggerButtonId = modal.dataset.triggerButton;
+    let form = null;
+    
+    if (triggerButtonId) {
+        const triggerButton = document.getElementById(triggerButtonId);
+        if (triggerButton) {
+            form = triggerButton.closest('form');
         }
     }
-
-    if (suffix === 'opps' && action !== 'delete') {
-        const invalidItems = [];
-        selected.forEach((checkbox) => {
-            const row = checkbox.closest('tr');
-            if (row) {
-                const columnValue = row.cells[5]?.textContent?.trim();
-                if (columnValue !== 'Pending') {
-                    const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
-                    invalidItems.push({ id: itemId, value: columnValue });
-                }
-            }
-        });
-        if (invalidItems.length > 0) {
-            alert(`Cannot perform batch action. ${invalidItems.length} selected item(s) have not been submitted for approval.`);
-            return;
-        }
+    
+    // Fallback: find any visible form
+    if (!form) {
+        form = document.querySelector('form:has(input[name="action"])');
     }
+    
+    if (!form) {
+        alert('Could not find form to submit rejection');
+        return;
+    }
+    
+    // Set the rejection reason and action
+    const reasonField = form.querySelector('input[name="rejection-reason"]');
+    const actionField = form.querySelector('input[name="action"]');
+    
+    if (reasonField) reasonField.value = reason;
+    if (actionField) actionField.value = 'reject';
+    
+    // Submit the form
+    form.submit();
+    
+    closeRejectionModal();
+}
 
+// Unified batch action handler for both manager and salesman
+function handleBatchAction(button, action) {
+    // Get selected listings from the form containing this button
+    const selected = getSelectedListings(button);
+    
+    if (selected.length === 0) {
+        alert('Please select at least one listing first!');
+        return;
+    }
+    
+    // Handle rejection (requires modal)
     if (action === 'reject') {
-        const reason = prompt('Enter rejection reason (required):');
-        if (!reason || !reason.trim()) {
-            alert('Rejection reason is required!');
-            return;
-        }
-        const rr = document.getElementById(`rejection-reason-${suffix}`);
-        if (rr) rr.value = reason;
-    }
-
-    if (action === 'approve') {
-        if (!confirm(`Are you sure you want to approve the selected listings?`)) {
-            return;
-        }
-    }
-
-    const ba = document.getElementById(`batch-action-${suffix}`);
-    const st = document.getElementById(`stage-${suffix}`);
-    const bf = document.getElementById(`batch-form-${suffix}`);
-    if (ba) ba.value = action;
-    if (st) st.value = (st.value || '');
-    console.log(`Submitting ${selected.length} listings for ${action} (form ${formSelector})`);
-    if (bf) bf.submit();
-}
-
-// Salesman batch actions
-function setSalesmanAction(action, suffix) {
-    console.log('Salesman action clicked:', action, 'for', suffix);
-
-    const formSelector = `#batch-form-${suffix}`;
-    const selected = document.querySelectorAll(`${formSelector} input.listing-checkbox:checked`);
-
-    if (selected.length === 0) {
-        alert(`Please select at least one listing first!`);
+        showRejectionModal(button);
         return;
     }
-
+    
+    // Handle delete with confirmation
     if (action === 'delete') {
-        const confirmMsg = `Are you sure you want to DELETE ${selected.length} listing(s)?\n\nThis action CANNOT BE UNDONE.`;
-        if (!confirm(confirmMsg)) {
+        if (!confirm(`Are you sure you want to DELETE ${selected.length} listing(s)?`)) {
             return;
         }
     }
-
-    // Validation for moving to negotiating
-    if (suffix === 'opps' && action === 'negotiating') {
-        const invalidItems = [];
-        selected.forEach((checkbox) => {
-            const row = checkbox.closest('tr');
-            if (row) {
-                const statusCell = row.cells[5]?.textContent?.trim();
-                if (statusCell !== 'Prospecting') {
-                    const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
-                    invalidItems.push({ id: itemId, status: statusCell });
-                }
-            }
-        });
-        if (invalidItems.length > 0) {
-            alert(`Cannot submit for approval. ${invalidItems.length} selected item(s) are not in Prospecting status.`);
-            return;
-        }
-    }
-
-    // Validation for submitting opportunities
-    if (suffix === 'opps' && action === 'submit') {
-        const invalidItems = [];
-        selected.forEach((checkbox) => {
-            const row = checkbox.closest('tr');
-            if (row) {
-                const statusCell = row.cells[5]?.textContent?.trim();
-                if (statusCell !== 'Negotiating') {
-                    const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
-                    invalidItems.push({ id: itemId, status: statusCell });
-                }
-            }
-        });
-        if (invalidItems.length > 0) {
-            alert(`Cannot submit for approval. ${invalidItems.length} selected item(s) are not in Negotiating status.`);
-            return;
-        }
-
-        // Check if already submitted
-        const alreadySubmitted = [];
-        selected.forEach((checkbox) => {
-            const row = checkbox.closest('tr');
-            if (row) {
-                const statusCell = row.cells[5]?.textContent?.trim();
-                if (statusCell === 'Pending Approval' || statusCell === 'Approved') {
-                    const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
-                    alreadySubmitted.push({ id: itemId, status: statusCell });
-                }
-            }
-        });
-        if (alreadySubmitted.length > 0) {
-            alert(`Cannot submit for approval. ${alreadySubmitted.length} selected item(s) are already submitted for approval.`);
-            return;
-        }
-    }
-
-    // Validation for processing sales
-    if (suffix === 'sale' && (action === 'won' || action === 'lost')) {
-        const invalidItems = [];
-        selected.forEach((checkbox) => {
-            const row = checkbox.closest('tr');
-            if (row) {
-                const statusCell = row.cells[5]?.textContent?.trim();
-                if (statusCell !== 'Processing') {
-                    const itemId = checkbox.value || row.cells[0]?.textContent?.trim();
-                    invalidItems.push({ id: itemId, status: statusCell });
-                }
-            }
-        });
-        if (invalidItems.length > 0) {
-            alert(`Cannot mark as ${action}. ${invalidItems.length} selected item(s) are already closed.`);
-            return;
-        }
-    }
-
-    // Confirmations for critical actions
+    
+    // Handle other actions with confirmation
     const confirmations = {
+        'approve': 'Are you sure you want to approve the selected listings?',
         'submit': `Are you sure you want to submit ${selected.length} listing(s) for approval?`,
         'won': `Are you sure you want to mark ${selected.length} listing(s) as Closed Won?`,
-        'lost': `Are you sure you want to mark ${selected.length} listing(s) as Closed Lost?`
+        'lost': `Are you sure you want to mark ${selected.length} listing(s) as Closed Lost?`,
+        'prospect': `Are you sure you want to set ${selected.length} listing(s) to Prospecting?`,
+        'negotiate': `Are you sure you want to set ${selected.length} listing(s) to Negotiating?`,
+        'process': `Are you sure you want to set ${selected.length} listing(s) to Processing?`,
+        'pending': 'Are you sure you want to mark the selected listings as Pending?'
     };
-
-    if (confirmations[action]) {
-        if (!confirm(confirmations[action])) {
-            return;
-        }
+    
+    if (confirmations[action] && !confirm(confirmations[action])) {
+        return;
     }
-
-    const ba = document.getElementById(`batch-action-${suffix}`);
-    const st = document.getElementById(`stage-${suffix}`);
-    const bf = document.getElementById(`batch-form-${suffix}`);
-    if (ba) ba.value = action;
-    if (st) st.value = (st.value || '');
-    console.log(`Submitting ${selected.length} listings for ${action} (form ${formSelector})`);
-    if (bf) bf.submit();
+    
+    // Find the form and submit it
+    const form = button.closest('form');
+    if (!form) {
+        alert('Could not find form to submit action');
+        return;
+    }
+    
+    // Set the action
+    const actionField = form.querySelector('input[name="action"]');
+    if (actionField) {
+        actionField.value = action;
+    } else {
+        // Create hidden input if it doesn't exist
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'action';
+        hiddenInput.value = action;
+        form.appendChild(hiddenInput);
+    }
+    
+    // Submit the form
+    form.submit();
 }
+
+// Initialize modal
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Batch actions script loaded successfully');
+    
+    const modal = document.getElementById('rejection-modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeRejectionModal();
+        });
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeRejectionModal();
+    });
+});

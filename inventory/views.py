@@ -13,13 +13,13 @@ from django.db.models import Q
 # Create your views here.
 
 def is_salesman(user):
-    return user.groups.filter(name='Salesman').exists()
+    return user.role == 'Salesman'
 
 def is_manager(user):
-    return user.groups.filter(name='Manager').exists()
+    return user.role == 'Manager'
 
 def is_manager_or_salesman(user):
-    return user.groups.filter(name__in=['Salesman', 'Manager']).exists()
+    return user.role in ['Salesman', 'Manager']
 
 def get_details_form(property_type, data=None, instance=None):
     form_map = {
@@ -37,12 +37,10 @@ def get_details_form(property_type, data=None, instance=None):
     return None
 
 def get_existing_details(listing):
+    """Get existing property-specific details for a listing"""
     try:
-        details = listing.get_property_details()
-        print(f"Details for {listing.id}: {details}")  # Debug
-        return details
-    except Exception as e:
-        print(f"Error getting details for {listing.id}: {e}")  # Debug
+        return listing.get_property_details()
+    except Exception:
         return None
 
 def generate_listing_id():
@@ -171,18 +169,18 @@ def listings_visible_to(user):
 def listing_list(request):
     listings = listings_visible_to(request.user)
     
-    # Multi-select filters
-    property_types = request.GET.getlist('type', [])
-    cities = request.GET.getlist('city', [])
-    salesman_ids = request.GET.getlist('salesman', [])
+    # Single-select filters
+    property_type = request.GET.get('type', '')
+    city = request.GET.get('city', '')
+    salesman_id = request.GET.get('salesman', '')
     
     # Apply filters
-    if property_types and 'all' not in property_types:
-        listings = listings.filter(type__in=property_types)
-    if cities and 'all' not in cities:
-        listings = listings.filter(city__in=cities)
-    if salesman_ids and 'all' not in salesman_ids:
-        listings = listings.filter(assigned_salesman_id__in=salesman_ids)
+    if property_type and property_type != 'all':
+        listings = listings.filter(type=property_type)
+    if city and city != 'all':
+        listings = listings.filter(city=city)
+    if salesman_id and salesman_id != 'all':
+        listings = listings.filter(assigned_salesman_id=salesman_id)
         
     # Get available filter options
     available_types = listings.values_list('type', flat=True).distinct()
@@ -191,7 +189,7 @@ def listing_list(request):
     salesmen = None
     if request.user.role == 'Manager':
         salesmen = User.objects.filter(
-            branch=request.user.branch,
+            manager=request.user,
             role='Salesman').order_by('first_name', 'last_name')
         
     lead_count = listings.filter(
@@ -217,15 +215,15 @@ def listing_list(request):
         'available_cities': available_cities,
         'salesmen': salesmen,
         'filters': {
-            'types': property_types,
-            'cities': cities,
-            'salesman_ids': salesman_ids
+            'type': property_type,
+            'city': city,
+            'salesman_id': salesman_id
         },
         'total_count': listings.count(),
         'lead_count': lead_count,
         'opp_count': opp_count,
         'sale_count': sale_count
-    } 
+    }
     return render(request, 'inventory/listing_list.html', context)
 
 @login_required
@@ -256,6 +254,142 @@ def listing_detail(request, pk):
     )}
 
     return render(request, 'inventory/listing_detail.html', context)
+
+@login_required
+@user_passes_test(is_manager_or_salesman)
+def listing_inline_edit(request, pk):
+    """Dedicated API endpoint for inline editing - returns JSON only"""
+    listings = listings_visible_to(request.user)
+    listing = get_object_or_404(listings, pk=pk)
+    
+    can_edit = (
+        request.user.role =='Manager' or
+        listing.assigned_salesman == request.user
+    )
+    
+    if not can_edit:
+        return JsonResponse({'success': False, 'error': 'You are not allowed to edit this listing.'}, status=403)
+    
+    if request.method == 'POST':
+        # This endpoint only handles AJAX requests
+        if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'This endpoint only accepts AJAX requests.'}, status=400)
+        
+        try:
+            property_details = get_existing_details(listing)
+            
+            if request.user.role == 'Manager':
+                form = ManagerListingForm(request.POST, instance=listing, manager=request.user)
+            else:
+                form = SalesmanListingForm(request.POST, instance=listing)
+            
+            details_form = get_details_form(listing.type, request.POST, instance=property_details)
+            
+            form_valid = form.is_valid()
+            details_valid = details_form.is_valid() if details_form else True
+            
+            if form_valid and details_valid:
+                listing = form.save(commit=False)
+                listing.updated_at = timezone.now()
+                listing.save()
+                
+                if details_form:
+                    details = details_form.save(commit=False)
+                    details.listing = listing
+                    details.save()
+                
+                # Return updated data for the datatable
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Listing updated successfully.',
+                    'data': {
+                        'title': listing.title,
+                        'price_display': f"₹{listing.proposed_price:,}" if listing.proposed_price else '—',
+                        'assigned_salesman': listing.assigned_salesman.get_full_name() if listing.assigned_salesman else '—',
+                        'status': listing.get_lead_status_display() if listing.lead_status else 
+                                 listing.get_opp_status_display() if listing.opp_status else
+                                 listing.get_sale_status_display() if listing.sale_status else '—'
+                    }
+                })
+            else:
+                # Return form errors as JSON with better formatting
+                errors = {}
+                if form.errors:
+                    for field, error_list in form.errors.items():
+                        errors[field] = [str(error) for error in error_list]
+                if details_form and details_form.errors:
+                    for field, error_list in details_form.errors.items():
+                        errors[field] = [str(error) for error in error_list]
+                
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Please correct the errors below.',
+                    'errors': errors
+                }, status=400)
+        except Exception as e:
+            
+            return JsonResponse({
+                'success': False,
+                'error': 'An unexpected error occurred. Please try again.'
+            }, status=500)
+    else:
+        return JsonResponse({'success': False, 'error': 'This endpoint only accepts POST requests.'}, status=405)
+
+@login_required
+@user_passes_test(is_manager_or_salesman)
+def listing_inline_data(request, pk):
+    """API endpoint to fetch listing data for inline editing - GET request"""
+    listings = listings_visible_to(request.user)
+    listing = get_object_or_404(listings, pk=pk)
+    
+    can_edit = (
+        request.user.role =='Manager' or
+        listing.assigned_salesman == request.user
+    )
+    
+    if not can_edit:
+        return JsonResponse({'success': False, 'error': 'You are not allowed to edit this listing.'}, status=403)
+    
+    try:
+        # Get property details
+        property_details = get_existing_details(listing)
+        
+        # Get salesmen options for manager
+        salesmen_options = []
+        if request.user.role == 'Manager':
+            salesmen = User.objects.filter(
+                manager=request.user,
+                role='Salesman'
+            ).order_by('first_name', 'last_name')
+            salesmen_options = [
+                {'value': str(salesman.id), 'label': salesman.get_full_name()}
+                for salesman in salesmen
+            ]
+        
+        # Prepare response data
+        response_data = {
+            'success': True,
+            'data': {
+                'title': listing.title,
+                'proposed_price': float(listing.proposed_price) if listing.proposed_price else None,
+                'assigned_salesman': listing.assigned_salesman.id if listing.assigned_salesman else None,
+                'lead_status': listing.lead_status,
+                'opp_status': listing.opp_status,
+                'sale_status': listing.sale_status,
+                'property_details': property_details.__dict__ if property_details else {}
+            },
+            'options': {
+                'salesmen': salesmen_options
+            }
+        }
+        
+        return JsonResponse(response_data)
+        
+    except Exception:
+        return JsonResponse({
+            'success': False,
+            'error': 'Failed to fetch listing data.'
+        }, status=500)
 
 @login_required
 @user_passes_test(is_manager_or_salesman)
@@ -296,7 +430,13 @@ def listing_edit(request, pk):
                 details.save()
             
             messages.success(request, 'Listing Updated Successfully.')
-            return redirect('inventory:listing_detail', pk=pk)
+            
+            # Handle redirect to inventory listing page
+            next_url = request.GET.get('next')
+            if next_url and next_url.startswith('/'):
+                return redirect(next_url)
+            else:
+                return redirect('inventory:listing_list')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -315,6 +455,7 @@ def listing_edit(request, pk):
         'submit_text': 'Update Listing',
         'is_edit': True,
         'property_type': listing.type,
+        'next_url': request.GET.get('next', ''),
         **get_all_details_forms()
     }
     

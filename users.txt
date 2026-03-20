@@ -1,0 +1,12 @@
+North Bangalore:
+  mscott - mscrm1234
+    abernard - abcrm1234
+    rhoward - rhcrm1234
+
+West Bangalore:
+  jhalpert - jhcrm1234
+    pbeesly - pbcrm1234
+    ehannon - ehcrm1234
+  dschrute - dscrm1234
+    amartin - amcrm1234
+    kmalone - kmcrm1234

@@ -8,6 +8,7 @@ from inventory.models import Listing
 from django.utils import timezone
 from django.contrib import messages
 from django.db.models import Q, Sum
+from accounts.models import User
 
 # Create your views here.
 def is_salesman(user):
@@ -77,19 +78,38 @@ def salesman_dashboard(request):
             
     listings = listings_visible_to(request.user)
     
-    # Multi-select filters
-    property_types = request.GET.getlist('type', [])
-    cities = request.GET.getlist('city', [])
+    # Single-select filters
+    property_type = request.GET.get('type', '')
+    city = request.GET.get('city', '')
+    status = request.GET.get('status', '')
     
     # Apply filters
-    if property_types and 'all' not in property_types:
-        listings = listings.filter(type__in=property_types)
-    if cities and 'all' not in cities:
-        listings = listings.filter(city__in=cities)
+    if property_type and property_type != 'all':
+        listings = listings.filter(type=property_type)
+    if city and city != 'all':
+        listings = listings.filter(city=city)
+    if status and status != 'all':
+        # Apply status filter based on current stage
+        stage = request.GET.get('stage', 'lead')
+        if stage == 'opportunity':
+            listings = listings.filter(opp_status=status)
+        elif stage == 'sale':
+            listings = listings.filter(sale_status=status)
+        else:
+            listings = listings.filter(lead_status=status)
     
     # Get available filter options
     available_types = listings.values_list('type', flat=True).distinct()
     available_cities = listings.values_list('city', flat=True).distinct()
+    
+    # Get status options based on current stage
+    stage = request.GET.get('stage', 'lead')
+    if stage == 'opportunity':
+        available_statuses = listings.values_list('opp_status', flat=True).distinct()
+    elif stage == 'sale':
+        available_statuses = listings.values_list('sale_status', flat=True).distinct()
+    else:
+        available_statuses = listings.values_list('lead_status', flat=True).distinct()
     
     lead_count = listings.filter(
         Q(lead_status=Listing.leadStatusChoices.PENDING) |
@@ -117,16 +137,21 @@ def salesman_dashboard(request):
     sale_active_count = listings.filter(sale_status=Listing.saleStatusChoices.PROCESSING).count()
     sale_won_count = listings.filter(sale_status=Listing.saleStatusChoices.CLOSED_WON).count()
     sale_lost_count = listings.filter(sale_status=Listing.saleStatusChoices.CLOSED_LOST).count()
-    stage = request.POST.get('stage', 'lead') 
+    stage = request.POST.get('stage', 'lead')
+    
+    # Get active tab from GET parameters (for filter submissions)
+    active_tab = request.GET.get('active_tab', 'leads')
             
     context = {
         'listings': listings,
         'available_types': available_types,
         'available_cities': available_cities,
         'filters': {
-            'types': property_types,
-            'cities': cities
+            'type': property_type,
+            'city': city,
+            'status': status
         },
+        'available_statuses': available_statuses,
         'lead_count': lead_count,
         'lead_active_count': lead_active_count,
         'lead_approved_count': lead_approved_count,
@@ -139,7 +164,8 @@ def salesman_dashboard(request):
         'sale_active_count': sale_active_count,
         'sale_won_count': sale_won_count,
         'sale_lost_count': sale_lost_count,
-        'stage': stage
+        'stage': stage,
+        'active_tab': active_tab
     }
     return render(request, 'dashboards/salesman_dashboard.html', context)
 
@@ -218,29 +244,52 @@ def manager_dashboard(request):
 
             messages.success(request, f"{action.capitalize()} {len(selected_ids)} listings in {stage} stage.")
             
-    listings = listings_visible_to(request.user)
+    # Get all salesmen under this manager
+    salesmen_under_manager = User.objects.filter(manager=request.user)
     
-    # Multi-select filters
-    property_types = request.GET.getlist('type', [])
-    cities = request.GET.getlist('city', [])
-    salesman_ids = request.GET.getlist('salesman', [])
+    # Get all listings for the manager's team (including their own listings)
+    listings = Listing.objects.filter(
+        Q(assigned_salesman__in=salesmen_under_manager) |
+        Q(assigned_salesman=request.user)
+    ).select_related('assigned_salesman', 'apartment_details', 'villa_details', 'office_details', 'retail_details', 'warehouse_details')
+    
+    # Single-select filters
+    property_type = request.GET.get('type', '')
+    city = request.GET.get('city', '')
+    salesman_id = request.GET.get('salesman', '')
+    status = request.GET.get('status', '')
     
     # Apply filters
-    if property_types and 'all' not in property_types:
-        listings = listings.filter(type__in=property_types)
-    if cities and 'all' not in cities:
-        listings = listings.filter(city__in=cities)
-    if salesman_ids and 'all' not in salesman_ids:
-        listings = listings.filter(assigned_salesman_id__in=salesman_ids)
+    if property_type and property_type != 'all':
+        listings = listings.filter(type=property_type)
+    if city and city != 'all':
+        listings = listings.filter(city=city)
+    if salesman_id and salesman_id != 'all':
+        listings = listings.filter(assigned_salesman_id=salesman_id)
+    if status and status != 'all':
+        # Apply status filter based on current stage
+        stage = request.GET.get('stage', 'lead')
+        if stage == 'opportunity':
+            listings = listings.filter(opp_status=status)
+        elif stage == 'sale':
+            listings = listings.filter(sale_status=status)
+        else:
+            listings = listings.filter(lead_status=status)
     
     # Get available filter options
     available_types = listings.values_list('type', flat=True).distinct()
     available_cities = listings.values_list('city', flat=True).distinct()
     
-    from accounts.models import User
-    salesmen = User.objects.filter(
-        branch=request.user.branch,
-        role='Salesman').order_by('first_name', 'last_name')
+    # Get status options based on current stage
+    stage = request.GET.get('stage', 'lead')
+    if stage == 'opportunity':
+        available_statuses = listings.values_list('opp_status', flat=True).distinct()
+    elif stage == 'sale':
+        available_statuses = listings.values_list('sale_status', flat=True).distinct()
+    else:
+        available_statuses = listings.values_list('lead_status', flat=True).distinct()
+    
+    salesmen = salesmen_under_manager.order_by('first_name', 'last_name')
     
     lead_count = listings.filter(
         Q(lead_status=Listing.leadStatusChoices.PENDING) |
@@ -268,7 +317,10 @@ def manager_dashboard(request):
     sale_active_count = listings.filter(sale_status=Listing.saleStatusChoices.PROCESSING).count()
     sale_won_count = listings.filter(sale_status=Listing.saleStatusChoices.CLOSED_WON).count()
     sale_lost_count = listings.filter(sale_status=Listing.saleStatusChoices.CLOSED_LOST).count()
-    stage = request.POST.get('stage', 'lead') 
+    stage = request.POST.get('stage', 'lead')
+    
+    # Get active tab from GET parameters (for filter submissions)
+    active_tab = request.GET.get('active_tab', 'leads')
             
     context = {
         'listings': listings,
@@ -276,10 +328,12 @@ def manager_dashboard(request):
         'available_cities': available_cities,
         'salesmen': salesmen,
         'filters': {
-            'types': property_types,
-            'cities': cities,
-            'salesman_ids': salesman_ids
+            'type': property_type,
+            'city': city,
+            'salesman_id': salesman_id,
+            'status': status
         },
+        'available_statuses': available_statuses,
         'lead_count': lead_count,
         'lead_active_count': lead_active_count,
         'lead_approved_count': lead_approved_count,
@@ -292,7 +346,8 @@ def manager_dashboard(request):
         'sale_active_count': sale_active_count,
         'sale_won_count': sale_won_count,
         'sale_lost_count': sale_lost_count,
-        'stage': stage
+        'stage': stage,
+        'active_tab': active_tab
     }
     return render(request, 'dashboards/manager_dashboard.html', context)
 
@@ -373,7 +428,14 @@ def salesman_home(request):
 @login_required
 @user_passes_test(is_manager)
 def manager_home(request):
-    listings = listings_visible_to(request.user)
+    # Get all salesmen under this manager
+    salesmen_under_manager = User.objects.filter(manager=request.user)
+    
+    # Get all listings for the manager's team (including their own listings)
+    listings = Listing.objects.filter(
+        Q(assigned_salesman__in=salesmen_under_manager) |
+        Q(assigned_salesman=request.user)
+    ).select_related('assigned_salesman', 'apartment_details', 'villa_details', 'office_details', 'retail_details', 'warehouse_details')
     
     lead_pending = listings.filter(lead_status=Listing.leadStatusChoices.PENDING).count()
     lead_approved = listings.filter(lead_status=Listing.leadStatusChoices.APPROVED).count()
@@ -411,11 +473,8 @@ def manager_home(request):
     
     total_listings = listings.count()
 
-    from accounts.models import User
-    team_size = User.objects.filter(
-        branch=request.user.branch,
-        role='Salesman'
-    ).count()
+    # Get only salesmen under this manager for team size
+    team_size = salesmen_under_manager.count()
     
     context = {
         'total_listings': total_listings,
@@ -444,24 +503,4 @@ def manager_home(request):
     return render(request, 'dashboards/manager_home.html', context)
 
     
-@never_cache
-@login_required
-def dashboard_view(request):
-    if request.user.role == 'Salesman':
-        return redirect('dashboards:salesman_dashboard')
-    if request.user.role == 'Manager':
-        return redirect('dashboards:manager_dashboard')
-
-
-@never_cache
-@login_required
-def home(request):
-    if request.user.role == 'Salesman':
-        return redirect('dashboards:salesman_home')
-    elif request.user.role == 'Manager':
-        return redirect('dashboards:manager_home')
-    elif request.user.role == 'CEO':
-        return redirect('dashboards:ceo_dashboard')
-    else:
-        return redirect('accounts:profile')
     
